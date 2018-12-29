@@ -117,7 +117,6 @@ CREATE TABLE `consume_group` (
 
 LOCK TABLES `consume_group` WRITE;
 /*!40000 ALTER TABLE `consume_group` DISABLE KEYS */;
-INSERT INTO `consume_group` VALUES (1,'cg_test','Engineering','Software','administration;',1,'',1,10000,300000,1,1,'','{}','{\"asyncThreads\":8,\"redisConfig\":null}','',0,'2018-12-29 06:07:01','2018-12-29 06:07:01'),(2,'cg_R_test_chronos_inner_0_1','Engineering','Software','administration;',1,'',1,10000,300000,1,1,'','{}','{\"asyncThreads\":8,\"redisConfig\":null}','',0,'2018-12-29 06:07:37','2018-12-29 06:07:36');
 /*!40000 ALTER TABLE `consume_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -186,7 +185,6 @@ CREATE TABLE `consume_subscription` (
 
 LOCK TABLES `consume_subscription` WRITE;
 /*!40000 ALTER TABLE `consume_subscription` DISABLE KEYS */;
-INSERT INTO `consume_subscription` VALUES (1,1,'cg_test',1,'test',1,'ddmq',0,'',0,128.00,0,1,2,10000,300000,1,1000,3,'[50,100,150]',1,1,1,NULL,'{}',1,'',1,0,'','[]',0,'','{}',0,'',0,'[\"Async\",\"PullServer\"]','{\"appendContext\":null,\"binlog\":false,\"concurrency\":1024,\"fetchThreads\":1,\"httpMaxTps\":-1.0,\"maxConsumeLag\":-1,\"maxPullBatchSize\":8,\"needResetOffset\":false,\"oldDbData\":false,\"proxies\":{\"C_ddmq\":[\"127.0.0.1:9713\"]}}',0,'{}','',0,'2018-12-29 06:07:11','2018-12-29 06:07:14'),(2,2,'cg_R_test_chronos_inner_0_1',3,'R_test_chronos_inner_0',1,'ddmq',0,'',0,128.00,0,1,2,10000,300000,1,1000,3,'[50,100,150]',1,1,1,NULL,'{}',1,'',1,0,'','[]',0,'','{}',0,'',0,'[\"Async\",\"PullServer\"]','{\"appendContext\":null,\"binlog\":false,\"concurrency\":1024,\"fetchThreads\":1,\"httpMaxTps\":-1.0,\"maxConsumeLag\":-1,\"maxPullBatchSize\":8,\"needResetOffset\":false,\"oldDbData\":false,\"proxies\":{\"C_ddmq\":[\"127.0.0.1:9713\"]}}',0,'{}','',0,'2018-12-29 06:07:51','2018-12-29 06:07:55');
 /*!40000 ALTER TABLE `consume_subscription` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -322,7 +320,6 @@ CREATE TABLE `topic` (
 
 LOCK TABLES `topic` WRITE;
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
-INSERT INTO `topic` VALUES (1,'test',NULL,'Engineering','Software','administration;','',0,1,1,1,0,'',0,'{\"autoBatch\":false,\"compressionType\":0,\"useCache\":true}','test realtime topic.','{}',0,'2018-12-29 06:01:34','2018-12-29 06:01:34'),(2,'delayTest',NULL,'Engineering','Software','administration;','',0,0,1,1,0,'',0,'{\"autoBatch\":false,\"compressionType\":0,\"useCache\":true}','a delayTime test topic.','{}',0,'2018-12-29 06:05:54','2018-12-29 06:05:54'),(3,'R_test_chronos_inner_0',NULL,'Engineering','Software','administration;','',0,1,1,1,0,'',0,'{\"autoBatch\":false,\"compressionType\":0,\"useCache\":true}','inner topic for chronos.','{}',0,'2018-12-29 06:06:49','2018-12-29 06:06:48');
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -364,7 +361,6 @@ CREATE TABLE `topic_conf` (
 
 LOCK TABLES `topic_conf` WRITE;
 /*!40000 ALTER TABLE `topic_conf` DISABLE KEYS */;
-INSERT INTO `topic_conf` VALUES (1,1,'test',1,'ddmq',1,'R_default',1,'default','',1024,1024,1024,0,'{\"proxies\":{\"P_ddmq\":[\"127.0.0.1:9613\"]}}',0,'2018-12-29 06:01:34','2018-12-29 06:01:34'),(2,2,'delayTest',1,'ddmq',1,'R_default',1,'default','',1024,1024,1024,0,'{\"proxies\":{\"P_ddmq\":[\"127.0.0.1:9613\"]}}',0,'2018-12-29 06:05:54','2018-12-29 06:05:54'),(3,3,'R_test_chronos_inner_0',1,'ddmq',1,'R_default',1,'default','',1024,1024,1024,0,'{\"proxies\":{\"P_ddmq\":[\"127.0.0.1:9613\"]}}',0,'2018-12-29 06:06:49','2018-12-29 06:06:48');
 /*!40000 ALTER TABLE `topic_conf` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -377,4 +373,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-29 14:08:59
+-- Dump completed on 2018-12-29 16:54:26
