@@ -34,8 +34,9 @@
 ### Architecture Overview
 
 <center>
-![](image/arch.png)
+<img src="image/arch.png" width = "80%" />
 </center>
+
 
 
 ----------
