@@ -16,8 +16,8 @@ DDMQ Console is a Web service developed with Spring and Vue. Console is used to 
 * add pproxy & cproxy
   > http://console_address:8080/carrera/api/odin/internal/v4/addPProxy?cluster=ddmq&host=pproxy_addr
   
- > http://console_address:8080/carrera/api/odin/internal/v4/addCProxy?cluster=ddmq&host=cproxy_addr
+  > http://console_address:8080/carrera/api/odin/internal/v4/addCProxy?cluster=ddmq&host=cproxy_addr
 
 
 * add broker & namesvr
- > need to manually update mq_server and cluster_mqserver_relation table.
+  > need to manually update mq_server and cluster_mqserver_relation table.
