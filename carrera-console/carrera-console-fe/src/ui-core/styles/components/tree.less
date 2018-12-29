@@ -1,0 +1,36 @@
+.bcui-tree {
+  &node {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    font-size: 1.3rem;
+
+    li {
+      list-style-type: none;
+    }
+
+    .bold {
+      font-weight: 600;
+    }
+  }
+
+  &node-arrow {
+    display: inline-block;
+    transition: all .2s ease-in-out;
+
+    &--open {
+      transform: rotate(90deg);
+    }
+  }
+
+  &node-name {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &node > &node {
+    margin: 0;
+    padding-left: 16px;
+  }
+}

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" name="carrera" monitorInterval="60">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ABSOLUTE} %5p %c{1}:%L - %m%n"/>
+        </Console>
+        <RollingFile name="INFO_LOG" fileName="logs/mq/carrera.log"
+                     filePattern="logs/mq/old/carrera-%d{yyyy-MM-dd-HH}.%i.log">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="10d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="WARN_LOG" fileName="logs/mq/error.log"
+                     filePattern="logs/mq/old/error-%d{yyyy-MM-dd}.%i.log">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="10d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="DROP" fileName="logs/mq/drop.log"
+                     filePattern="logs/mq/old/drop-%d{yyyy-MM-dd-HH}.%i.log">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="7d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <Async name="Async_INFO_LOG">
+            <AppenderRef ref="INFO_LOG"/>
+            <!--<AppenderRef ref="stdout"/>-->
+        </Async>
+        <Async name="Async_WARN_LOG">
+            <AppenderRef ref="WARN_LOG"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Async_INFO_LOG"/>
+            <AppenderRef ref="Async_WARN_LOG" level="WARN"/>
+        </Root>
+        <AsyncLogger name="DROP_LOG" level="INFO" additivity="false">
+            <AppenderRef ref="DROP"/>
+        </AsyncLogger>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,39 @@
+@import (reference) '../common/variables.less';
+
+.bcui-breadcrumb {
+  font-size: 13px;
+  line-height: 1;
+
+  &__separator {
+    margin: 0 6px;
+    color: #d7dde4;
+  }
+
+  & .bcui-breadcrumb__item:last-child {
+    font-weight: 600;
+
+    & .bcui-breadcrumb__separator {
+      display: none;
+    }
+  }
+}
+
+.bcui-breadcrumb__item {
+  display: inline-block;
+  color: rgba(0,0,0,.65);
+
+  &-link {
+    color: rgba(0,0,0,.65);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+
+    &:link {
+      color: rgba(0,0,0,.65);
+    }
+
+    &:hover {
+      color: @primary-color;
+    }
+
+  }
+}

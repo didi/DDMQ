@@ -1,0 +1,73 @@
+@import (reference) '../common/variables.less';
+
+.bcui-loading-box {
+  display: initial;
+  opacity: 1;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  transition: opacity 0.3s;
+}
+
+.bcui-loading-spinner {
+  top: 50%;
+  margin-top: -21px;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+
+  .bcui-loading-text {
+    color: fade(@primary-color, 80%);
+    margin: 3px 0;
+    font-size: 14px;
+  }
+  .circular {
+    width: 42px;
+    height: 42px;
+    animation: loading-rotate 2s linear infinite;
+  }
+
+  .circular {
+    size: 40px;
+    animation: loading-rotate 2s linear infinite;
+  }
+
+  .path {
+    animation: loading-dash 1.5s ease-in-out infinite;
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: 0;
+    stroke-width: 2;
+    stroke: fade(@primary-color, 80%);
+    stroke-linecap: round;
+  }
+}
+
+.bcui-loading-fade-enter,
+.bcui-loading-fade-leave-active {
+  opacity: 0;
+}
+
+@keyframes loading-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -40px;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -120px;
+  }
+}
+
+

@@ -1,0 +1,91 @@
+@import (reference) '../../styles/common/variables';
+.bcui-checkbox {
+  font-size: 12px;
+  display: inline-block;
+  white-space: nowrap;
+  cursor: pointer;
+
+  & {
+    margin-right: 16px;
+  }
+
+  &__input {
+    white-space: nowrap;
+    cursor: pointer;
+    outline: none;
+    display: inline-block;
+    line-height: 1;
+    position: relative;
+    vertical-align: middle;
+    &&--checked .bcui-checkbox__inner {
+      background: @primary-color;
+      border-color: @primary-color;
+      &::after {
+        content: '';
+        display: table;
+        width: 4px;
+        height: 8px;
+        position: absolute;
+        top: 1px;
+        left: 4px;
+        border: 2px solid #fff;
+        border-top: 0;
+        border-left: 0;
+        transform: rotate(45deg) scale(1);
+        transition: all 0.2s ease-in-out;
+      }
+    }
+    &&--checked&&--disabled {
+      .bcui-checkbox__inner::after {
+        animation-name: none;
+        border-color: #ccc;
+      }
+    }
+    &&--disabled {
+      cursor: not-allowed;
+      .bcui-checkbox__inner {
+        border-color: #dddee1;
+        background-color: #f3f3f3;
+        &:after {
+          animation-name: none;
+          border-color: #f3f3f3;
+        }
+      }
+      .bcui-checkbox__label {
+        color: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+  &__inner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #c3c3c3;
+    border-radius: 2px;
+    background-color: #fff;
+    position: relative;
+    cursor: pointer;
+    white-space: nowrap;
+    outline: none;
+  }
+  &__original-input {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    opacity: 0;
+    cursor: pointer;
+    &[disabled] {
+      cursor: not-allowed;
+    }
+  }
+  &__label {
+    font-size: 12px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}

@@ -1,0 +1,228 @@
+@import (reference) './variables.less';
+
+.clearfix() {
+  *zoom: 1;
+
+  &:before,
+  &:after {
+    display: table;
+    line-height: 0;
+    content: "";
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+// for bc-v-table
+.bcui-table.bcui-table--light {
+  border: none;
+
+  table {
+    width: 100%;
+    border-top: 1px solid #d1d9e5;
+  }
+
+  thead {
+    border-bottom: 1px solid #e8edf0;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid #e8edf0;
+  }
+
+  th {
+    height: 42px;
+    font-size: 12px;
+    color: #888;
+    background: #fff;
+    font-weight: 400;
+    text-align: left;
+    .cell {
+      color: #888;
+      background: #fff;
+    }
+  }
+
+  .cell {
+    line-height: 18px;
+    word-wrap: normal;
+    text-overflow: ellipsis;
+    display: inline-block;
+    line-height: 30px;
+    vertical-align: middle;
+    width: 100%;
+    padding: 6px 14px;
+  }
+
+  .empty-text {
+    padding: 20px;
+    text-align: center;
+    color: #5e7682;
+    border-bottom: 1px solid #e8edf0;
+    i {
+    }
+  }
+}
+
+.bcui-table:after, .bcui-table:before {
+  display: none;
+}
+
+// 兼容代码，表格组件代码结构优化之后可以删除
+
+.bcui-table--light {
+border: none;
+
+  table {
+    width: 100%;
+    border-top: 1px solid #d1d9e5;
+  }
+
+  thead {
+    border-bottom: 1px solid #e8edf0;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid #e8edf0;
+  }
+
+  th {
+    height: 42px;
+    font-size: 12px;
+    color: #888;
+    background: #fff;
+    font-weight: 400;
+    text-align: left;
+    .cell {
+      color: #888;
+      background: #fff;
+    }
+  }
+
+  .cell {
+    line-height: 18px;
+    padding-left: 14px;
+    padding-right: 14px;
+    word-wrap: normal;
+    // text-overflow: ellipsis;
+    display: inline-block;
+    line-height: 30px;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  .empty-text {
+    padding: 20px;
+    text-align: center;
+    color: #5e7682;
+    i {
+      vertical-align: -4px;
+    }
+  }
+}
+
+
+
+
+// 兼容简单的table
+table.bcui-table {
+
+  font-size: 13px;
+  border-collapse: collapse;
+  width: 100%;
+  border-top: 1px solid #d7dde4;
+  border-left: 1px solid #d7dde4;
+
+  a {
+    color: @primary-color;
+    text-decoration: none;
+
+    &:link {
+      color: @primary-color;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  thead th {
+    height: 40px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    background-color: #f5f7f9;
+    box-sizing: border-box;
+    text-align: left;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    border-bottom: 1px solid #e3e8ee;
+  }
+  tbody td {
+    height: 40px;
+    min-width: 0;
+    background-color: #fff;
+    transition: background-color .2s ease-in-out;
+    box-sizing: border-box;
+    text-align: left;
+    // text-overflow: ellipsis;
+    vertical-align: middle;
+    border-bottom: 1px solid #e3e8ee;
+  }
+  th,
+  td {
+    height: 40px;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: left;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    border-bottom: 1px solid #e3e8ee;
+    border-right: 1px solid #e3e8ee;
+  }
+
+  .bcui-table-cell {
+    padding: 0 14px;
+    word-break: break-all;
+    &.is-editing {
+      height: 60px;
+    }
+  }
+}
+
+// 表格上面的工具栏
+
+.bcui-table-toolbar {
+  padding: 16px 0 10px;
+  .clearfix();
+
+  &__item {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 10px;
+  }
+
+  &__item:last-child {
+    margin-right: 0px;
+  }
+
+  &__form-label {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  &__form-field {
+    display: inline-block;
+    .bcui-select {
+      width: 120px;
+    }
+  }
+}
+
+.bcui-table-selection-column {
+  width: 1px;
+}

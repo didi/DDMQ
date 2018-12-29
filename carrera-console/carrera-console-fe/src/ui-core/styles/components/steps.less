@@ -1,0 +1,148 @@
+@import (reference) '../common/variables.less';
+
+.bcui-steps {
+  font-size: 0;
+
+  &-item:last-child &-tail {
+    display: none;
+  }
+
+  &-item {
+    display: inline-block;
+    position: relative;
+  }
+
+  &-title {
+    font-size: 14px;
+    line-height: 26px;
+    color: rgba(0,0,0,.65);
+    font-weight: 700;
+    background-color: #fff;
+    display: inline-block;
+    padding-right: 10px;
+  }
+
+  &-description {
+    font-size: 12px;
+    color: rgba(0,0,0,.43);
+  }
+
+  &-head, &-body {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 14px;
+  }
+
+  &-head {
+    background: #fff;
+
+    &__inner {
+      display: block;
+      border: 1px solid rgba(0,0,0,.25);
+      width: 26px;
+      height: 26px;
+      color: rgba(0,0,0,.25);
+      line-height: 23px;
+      text-align: center;
+      border-radius: 26px;
+      font-size: 14px;
+      margin-right: 8px;
+      transition: background-color .3s ease,border-color .3s ease;
+    }
+  }
+
+  &-body{
+
+
+  }
+
+  &-tail {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 13px;
+    padding: 0 10px;
+
+    &__line {
+      display: inline-block;
+      vertical-align: top;
+      background: #e9e9e9;
+      height: 1px;
+      border-radius: 4px;
+      width: 100%;
+      position: relative;
+
+      &:after {
+        position: absolute;
+        content: "";
+        top: 0;
+        width: 0;
+        background: #e9e9e9;
+        height: 100%;
+        opacity: 0;
+      }
+    }
+  }
+
+  // 状态配色
+  & {
+
+    // 处理中 process
+    &-status--process &-head__inner {
+      border-color: @primary-color;
+      background-color: @primary-color;
+    }
+    &-status--process .bcui-steps-icon {
+      color: #fff;
+    }
+
+    // 已完成 finish
+    &-status--finish &-head__inner {
+      border-color: @primary-color;
+      background-color: #fff;
+    }
+
+    &-status--finish &-tail__line:after {
+      width: 100%;
+      background: @primary-color;
+      -webkit-transition: all .6s;
+      transition: all 0.6s;
+      opacity: 1;
+      box-shadow: 0 0 0 0 @primary-color;
+      animation: tailEffect 0.4s;
+    }
+
+    &-status--finish .bcui-steps-icon {
+      color: @primary-color;
+    }
+    &-status--finish .bcui-steps-title{
+      color: rgba(0,0,0,.43);
+    }
+
+    &-status--next-error &-tail__line {
+      background-color: #f04134;
+      &:after {
+        background-color: #f04134;
+      }
+    }
+
+
+    &-status--error .bcui-steps{
+      &-head__inner {
+        border-color: #f04134;
+        background-color: #fff;
+        color: #f04134;
+      }
+    }
+    &-status--error .bcui-steps-title{
+      color: #f04134;
+    }
+    &-status--error .bcui-steps-description{
+      color: #f04134;
+    }
+
+
+  }
+
+}

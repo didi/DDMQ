@@ -1,0 +1,104 @@
+@import (reference) './variables.less';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+  height: 100%;
+}
+
+body {
+  // font-family: Neue Haas Grotesk Text Pro, Arial Nova, Segoe UI, Helvetica Neue, PingFang SC, Microsoft YaHei, Microsoft JhengHei, Source Han Sans SC, Noto Sans CJK SC, Source Han Sans CN, Noto Sans SC, Source Han Sans TC, Noto Sans CJK TC, Hiragino Sans GB, sans-serif;
+  font-family:  -apple-system,BlinkMacSystemFont,"Neue Haas Grotesk Text Pro","Arial Nova","Segoe UI","Helvetica Neue",".PingFang SC","PingFang SC","Microsoft YaHei","Microsoft JhengHei","Source Han Sans SC","Noto Sans CJK SC","Source Han Sans CN","Noto Sans SC","Source Han Sans TC","Noto Sans CJK TC","Hiragino Sans GB",sans-serif;
+  background-color: #fff;
+  color: #333;
+  line-height: 1.5;
+  font-size: 12px;
+  height: 100%;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.clearfix {
+  &:after {
+    content: '';
+    display: block;
+    visibility: visible;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    clear: both;
+  }
+}
+
+
+// 常用类
+
+.text-primary {
+  color: @primary-color;
+
+  &--hoverable {
+    color: fade(@primary-color, 80%);
+    cursor: pointer;
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+}
+
+.text-info {
+  color: @info-color;
+}
+
+.text-success {
+  color: @success-color;
+}
+
+.text-warning {
+  color: @warning-color;
+}
+
+.text-error {
+  color: @error-color;
+}
+
+.text-link {
+  cursor: pointer;
+  margin-right: 20px;
+  color: @primary-color;
+}
+
+.text-link:last-child {
+  margin-right: 0px;
+}
+
+a {
+  color: fade(@primary-color, 80%);
+
+  &:link {
+    color: fade(@primary-color, 80%);
+  }
+
+  &:hover {
+    color: @primary-color;
+  }
+}

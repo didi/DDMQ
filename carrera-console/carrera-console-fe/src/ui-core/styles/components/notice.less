@@ -1,0 +1,131 @@
+@import (reference) '../common/variables.less';
+
+.bcui-notice-container {
+  width: 335px;
+  margin-right: 24px;
+  position: fixed;
+  z-index: 1010
+}
+
+.bcui-notice {
+  margin-bottom: 10px;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+  background: #fff;
+  line-height: 1;
+  position: relative;
+  overflow: hidden
+}
+
+.bcui-notice-close {
+  position: absolute;
+  right: 16px;
+  top: 15px;
+  color: #999;
+  outline: 0;
+  cursor: pointer;
+}
+
+.bcui-notice-close i {
+  font-size: 14px;
+  color: #999;
+  transition: color .2s ease;
+  position: relative;
+  top: -3px
+}
+
+.bcui-notice-close i:hover {
+  color: #444;
+}
+
+.bcui-notice--with-desc .bcui-notice-close {
+  top: 11px
+}
+
+.bcui-notice-title {
+  font-size: 14px;
+  color: #464c5b;
+  padding-right: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.bcui-notice--with-desc .bcui-notice__title {
+  margin-bottom: 8px
+}
+
+.bcui-notice--with-desc.bcui-notice--with-icon .bcui-notice__title {
+  margin-left: 51px
+}
+
+.bcui-notice__desc {
+  font-size: 12px;
+  color: #999;
+  // text-align: justify;
+  word-break: break-all;
+  line-height: 1.5
+}
+
+.bcui-notice--with-desc.bcui-notice--with-icon .bcui-notice__desc {
+  margin-left: 51px
+}
+
+.bcui-notice--with-icon .bcui-notice__title {
+  margin-left: 26px
+}
+
+.bcui-notice__icon {
+  position: absolute;
+  left: 20px;
+  margin-top: -1px;
+  font-size: 16px
+}
+
+.bcui-notice__icon-success {
+  color: #0c6
+}
+
+.bcui-notice__icon-info {
+  color: #39f
+}
+
+.bcui-notice__icon-warning {
+  color: #f90
+}
+
+.bcui-notice__icon-error {
+  color: #f30
+}
+
+.bcui-notice--with-desc .bcui-notice__icon {
+  font-size: 36px
+}
+
+.bcui-notice__custom-content:after {
+  content: "";
+  display: block;
+  width: 4px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0
+}
+
+.bcui-notice--with-info:after,
+.bcui-notice--with-normal:after {
+  background: #39f
+}
+
+.bcui-notice--with-success:after {
+  background: #0c6
+}
+
+.bcui-notice--with-warning:after {
+  background: #f90
+}
+
+.bcui-notice--with-error:after {
+  background: #f30
+}

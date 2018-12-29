@@ -1,0 +1,3 @@
+zookeeper: ${console.carrera.zookeeper}
+env: ${console.env}
+carreraAdminUser: ${console.carrera.admin.user}

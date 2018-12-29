@@ -1,0 +1,165 @@
+@import (reference) '../common/variables.less';
+
+@input-hover-border-color: @primary-color;
+
+.extend-input {
+  width: 100%;
+  line-height: 1.5;
+  padding: @input-padding-vertical-base @input-padding-horizontal;
+  font-size: @input-font-size-base;
+  border: 1px solid #d7dde4;
+  border-radius: 4px;
+  color: @input-color;
+  background-color: #fff;
+  background-image: none;
+  position: relative;
+  cursor: text;
+  transition: border @transition-time @ease-in-out, background .2s ease-in-out, box-shadow @transition-time @ease-in-out;
+
+  &:hover {
+    border-color: tint(@input-hover-border-color, 20%);
+  }
+
+  &:focus {
+    border-color: @input-hover-border-color;
+    outline: 0;
+    // box-shadow: 0 0 0 2px fade(@input-hover-border-color, 20%);
+  }
+
+  &--disabled {
+    background-color: @input-disabled-bg;
+    opacity: 1;
+    cursor: not-allowed;
+    color: #ccc;
+    &:hover {
+      border-color: #dfe4e9;
+    }
+  }
+}
+
+.bcui-inputfield {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  width: 100%;
+  line-height: 1;
+
+  &--extra {
+    display: inline-table;
+  }
+
+  &__prepend,
+  &__append {
+    display: table-cell;
+    padding: 4px 6px;
+    color: #657180;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #d7dde4;
+    border-radius: 4px;
+
+    .bcui-select {
+      margin: -4px -6px;
+    }
+
+    .bcui-select__inner {
+      height: 30px;
+      border-color: #eee;
+      background: #eee;
+
+      &:hover {
+        border-color: #eee;
+      }
+    }
+  }
+
+  &__select {
+    display: table-cell;
+    height: 34px;
+    vertical-align: middle;
+    width: 1px;
+
+    .bcui-select__inner {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+      margin-right: -1px;
+    }
+  }
+
+  &__prepend {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-right: 0;
+  }
+
+  &__append {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-left: 0;
+  }
+
+  &__icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 14px;
+    z-index: 1;
+    width: 32px;
+    height: @input-height-base;
+    text-align: center;
+    line-height: @input-height-base + 1 !important;
+  }
+
+  // 包含 prepend 和 append 时的圆角处理
+  &--extra &__input {
+
+    &:first-child {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+  }
+}
+
+.bcui-inputfield__input {
+  .extend-input();
+  height: @input-height-base;
+
+  &--small {
+    padding: 7px @input-padding-vertical-small;
+    height: @input-height-small;
+    border-radius: 3px;
+  }
+
+  &--large {
+    font-size: 14px;
+    padding: 7px @input-padding-vertical-large;
+    height: @input-height-large;
+  }
+
+  &--larger {
+    font-size: 14px;
+    padding: 7px @input-padding-vertical-larger;
+    height: @input-height-larger;
+  }
+
+  &--iconed {
+    padding-right: 32px;
+  }
+}
+
+.bcui-inputfield__textarea {
+  display: block;
+  .extend-input();
+}
+
+.bcui-inputfield__input,
+.bcui-inputfield__textarea {
+  &::placeholder {
+    color: @text-disabled-color;
+  }
+}

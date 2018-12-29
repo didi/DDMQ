@@ -1,0 +1,59 @@
+@import (reference) "../common/variables.less";
+
+.bcui-tag {
+  display: inline-block;
+  height: 22px;
+  line-height: 22px;
+  margin: 2px 4px 2px 0;
+  padding: 0 8px;
+  border: 1px solid #e3e8ee;
+  border-radius: 3px;
+  font-size: 12px;
+  vertical-align: middle;
+  opacity: 1;
+  overflow: hidden;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &--primary {
+    background: @primary-color;
+    border-color: @primary-color;
+    color: #fff;
+  }
+  i {
+    font-size: 10px;
+  }
+}
+
+.bcui-tag-dot {
+  height: 32px;
+  line-height: 32px;
+  border: 1px solid #e3e8ee;
+  color: #657180;
+  background: #fff;
+  padding: 0 12px;
+
+  &__inner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: #e3e8ee;
+    position: relative;
+    top: 1px;
+  }
+}
+
+.bcui-tag-border {
+  height: 24px;
+  line-height: 24px;
+  border: 1px solid #e3e8ee;
+  color: #657180;
+  background: #fff;
+  position: relative;
+}
+

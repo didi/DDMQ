@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="logImpl" value="SLF4J" />
+	</settings>
+	
+	<plugins>
+		<plugin interceptor="com.didi.carrera.console.dao.MybatisInterceptor">
+			<property name="showDetailSql" value="true"/>
+			<property name="showCostTime" value="true"/>
+			<property name="slowSqlMs" value="500"/>
+		</plugin>
+    </plugins>
+    
+</configuration>
