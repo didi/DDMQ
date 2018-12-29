@@ -1,0 +1,17 @@
+Consumer.o: Consumer.cpp Consumer.h ConsumerConfig.h \
+ consumerProxy_types.h ConsumerService.h ConsumerLogger.h
+ConsumerConfig.o: ConsumerConfig.cpp ConsumerConfig.h ConsumerLogger.h
+ConsumerLogger.o: ConsumerLogger.cpp ConsumerLogger.h
+ConsumerPool.o: ConsumerPool.cpp ConsumerPool.h Consumer.h \
+ ConsumerConfig.h consumerProxy_types.h ConsumerService.h \
+ ConsumerLogger.h
+ConsumerService.o: ConsumerService.cpp ConsumerService.h \
+ consumerProxy_types.h
+ConsumerWrapper.o: ConsumerWrapper.cpp Consumer.h ConsumerConfig.h \
+ consumerProxy_types.h ConsumerService.h ConsumerPool.h
+consumerProxy_constants.o: consumerProxy_constants.cpp \
+ consumerProxy_constants.h consumerProxy_types.h
+consumerProxy_types.o: consumerProxy_types.cpp consumerProxy_types.h
+test_consumer_pool.o: test_consumer_pool.cpp Consumer.h ConsumerConfig.h \
+ consumerProxy_types.h ConsumerService.h ConsumerPool.h ConsumerLogger.h
+test_consumer.o: test_consumer.c consumerwrapper.h

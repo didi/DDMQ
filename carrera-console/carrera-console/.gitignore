@@ -1,0 +1,10 @@
+/target/
+src/main/webapp/iconfont/**
+src/main/webapp/1.index.css
+src/main/webapp/ddmq-logo.svg
+src/main/webapp/favicon.ico
+src/main/webapp/index.css
+src/main/webapp/index.js
+src/main/webapp/index.html
+src/main/webapp/logo-with-text.png
+src/main/webapp/vendors.js

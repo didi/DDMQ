@@ -1,0 +1,130 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.rocketmq.tools.command.broker;
+
+import java.util.Properties;
+import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.rocketmq.remoting.RPCHook;
+import org.apache.rocketmq.srvutil.ServerUtil;
+import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
+import org.apache.rocketmq.tools.command.CommandUtil;
+import org.apache.rocketmq.tools.command.SubCommand;
+import org.apache.rocketmq.tools.command.SubCommandException;
+
+public class UpdateBrokerConfigSubCommand implements SubCommand {
+
+    @Override
+    public String commandName() {
+        return "updateBrokerConfig";
+    }
+
+    @Override
+    public String commandDesc() {
+        return "Update broker's config";
+    }
+
+    @Override
+    public Options buildCommandlineOptions(Options options) {
+        Option opt = new Option("b", "brokerAddr", true, "update which broker");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("c", "clusterName", true, "update which cluster");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("k", "key", true, "config key");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        opt = new Option("v", "value", true, "config value");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        for (int i = 1; i < 9; i++) {
+            opt = new Option("k" + i, "key" + i, true, "config key" + i);
+            opt.setRequired(false);
+            options.addOption(opt);
+
+            opt = new Option("v" + i, "value" + i, true, "config value" + i);
+            opt.setRequired(false);
+            options.addOption(opt);
+        }
+
+        return options;
+    }
+
+    @Override
+    public void execute(CommandLine commandLine, Options options, RPCHook rpcHook) throws SubCommandException {
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(rpcHook, 20 * 1000);
+
+        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+
+        try {
+            int index = 0;
+            Properties properties = new Properties();
+            while (true) {
+                String optionKey = index == 0 ? "k" : ("k" + index);
+                String optionValue = index == 0 ? "v" : ("v" + index);
+                if (!commandLine.hasOption(optionKey)) {
+                    break;
+                }
+                String key = commandLine.getOptionValue(optionKey).trim();
+                String value = commandLine.getOptionValue(optionValue).trim();
+                properties.put(key, value);
+                index++;
+            }
+            System.out.printf("properties:%s\n", properties.toString());
+
+            if (commandLine.hasOption('b')) {
+                String brokerAddr = commandLine.getOptionValue('b').trim();
+
+                defaultMQAdminExt.start();
+
+                defaultMQAdminExt.updateBrokerConfig(brokerAddr, properties);
+                System.out.printf("update broker config success, broker:%s, config:%s\n", brokerAddr, properties.toString());
+                return;
+
+            } else if (commandLine.hasOption('c')) {
+                String clusterName = commandLine.getOptionValue('c').trim();
+
+                defaultMQAdminExt.start();
+
+                Set<String> masterSet =
+                    CommandUtil.fetchMasterAddrByClusterName(defaultMQAdminExt, clusterName);
+                for (String brokerAddr : masterSet) {
+                    try {
+                        defaultMQAdminExt.updateBrokerConfig(brokerAddr, properties);
+                        System.out.printf("update broker config success, broker:%s, config:%s\n", brokerAddr, properties.toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;
+            }
+
+            ServerUtil.printCommandLineHelp("mqadmin " + this.commandName(), options);
+        } catch (Exception e) {
+            throw new SubCommandException(this.getClass().getSimpleName() + " command failed", e);
+        } finally {
+            defaultMQAdminExt.shutdown();
+        }
+    }
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="carrera" monitorInterval="60" shutdownHook="disable" >
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ABSOLUTE} %5p %c{1}:%L - %m%n"/>
+        </Console>
+        <RollingFile name="MAIN_LOG" fileName="logs/carrera.log"
+                     filePattern="logs/old/carrera.log-%d{yyyy-MM-dd-HH}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="ERROR_LOG" fileName="logs/error.log"
+                     filePattern="logs/old/error.log-%d{yyyy-MM-dd}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="PushAppender" fileName="logs/push.log"
+                     filePattern="logs/old/push.log-%d{yyyy-MM-dd-HH}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="PullAppender" fileName="logs/pull.log"
+                     filePattern="logs/old/pull.log-%d{yyyy-MM-dd-HH}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="SwitchAppender" fileName="logs/switch.log"
+                     filePattern="logs/old/switch.log-%d{yyyy-MM-dd-HH}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="MetricAppender" fileName="logs/metric.log"
+                     filePattern="logs/old/metric.log-%d{yyyy-MM-dd-HH}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="warn">
+            <AppenderRef ref="MAIN_LOG"/>
+            <AppenderRef ref="ERROR_LOG"/>
+        </Root>
+        <Logger name="com.xiaoju.chronos" additivity="false" level="info">
+            <AppenderRef ref="MAIN_LOG"/>
+            <AppenderRef ref="ERROR_LOG" level="error"/>
+        </Logger>
+        <Logger name="PushLogger" additivity="false" level="info">
+            <AppenderRef ref="PushAppender"/>
+        </Logger>
+        <Logger name="PullLogger" additivity="false" level="info">
+            <AppenderRef ref="PullAppender"/>
+        </Logger>
+        <Logger name="SwitchLogger" additivity="false" level="info">
+            <AppenderRef ref="SwitchAppender"/>
+        </Logger>
+        <Logger name="MetricLogger" additivity="false" level="info">
+            <AppenderRef ref="MetricAppender"/>
+        </Logger>
+    </Loggers>
+</Configuration>

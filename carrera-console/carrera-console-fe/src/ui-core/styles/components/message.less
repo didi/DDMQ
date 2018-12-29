@@ -1,0 +1,69 @@
+.bcui-message-container {
+  font-size: 12px;
+  position: fixed;
+  z-index: 1010;
+  width: 100%;
+  top: 16px;
+  left: 0;
+}
+
+.bcui-message {
+  padding: 8px;
+  text-align: center;
+  transition: height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+.bcui-message__content {
+  display: inline-block;
+  pointer-events: all;
+  padding: 8px 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  position: relative;
+}
+.bcui-message-close {
+  position: absolute;
+  right: 4px;
+  top: 10px;
+  color: #999;
+  outline: 0;
+
+  i.bcui-icon {
+    font-size: 10px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.bcui-message__success .bcui-icon {
+  color: #0c6;
+}
+
+.bcui-message__error .bcui-icon {
+  color: #f30;
+}
+
+.bcui-message__warning .bcui-icon {
+  color: #f90;
+}
+
+.bcui-message__info .bcui-icon,
+.bcui-message__loading .bcui-icon {
+  color: #39f;
+}
+
+.bcui-message .bcui-icon {
+  margin-right: 8px;
+  font-size: 14px;
+  top: 1px;
+  position: relative;
+}
+
+.bcui-message--closable {
+  .bcui-message__content {
+    padding-right: 40px;
+  }
+}

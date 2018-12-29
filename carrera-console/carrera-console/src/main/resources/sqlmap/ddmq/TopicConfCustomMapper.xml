@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.didi.carrera.console.dao.mapper.custom.TopicConfCustomMapper">
+
+    <resultMap id="BaseResultMap" type="com.didi.carrera.console.dao.model.custom.CustomTopicConf">
+        <id column="id" jdbcType="BIGINT" property="confId"/>
+        <result column="topic_id" jdbcType="BIGINT" property="topicId"/>
+        <result column="cluster_id" jdbcType="BIGINT" property="clusterId"/>
+        <result column="cluster_name" jdbcType="VARCHAR" property="clusterName"/>
+        <result column="mq_server_id" jdbcType="BIGINT" property="mqServerId"/>
+        <result column="mq_server_name" jdbcType="VARCHAR" property="mqServerName"/>
+        <result column="server_idc_id" jdbcType="BIGINT" property="serverIdcId" />
+        <result column="server_idc_name" jdbcType="VARCHAR" property="serverIdcName" />
+        <result column="client_idc" jdbcType="VARCHAR" property="clientIdc" />
+        <result column="produce_tps" jdbcType="INTEGER" property="produceTps"/>
+        <result column="msg_avg_size" jdbcType="INTEGER" property="msgAvgSize"/>
+        <result column="msg_max_size" jdbcType="INTEGER" property="msgMaxSize"/>
+        <result column="config" jdbcType="VARCHAR" property="config" />
+        <result column="consumer_num" jdbcType="INTEGER" property="consumerNum"/>
+    </resultMap>
+
+    <select id="selectByTopicId" resultMap="BaseResultMap">
+        select
+        a.id , a.topic_id, a.cluster_id, a.cluster_name, a.mq_server_id, a.mq_server_name,a.server_idc_id, a.server_idc_name, a.client_idc, a.produce_tps,
+        a.msg_avg_size,a.msg_max_size, a.config,
+        case when b.consumer_num is null then 0 else b.consumer_num end as consumer_num
+        from topic_conf a
+        LEFT JOIN (select topic_id,cluster_id,count(group_id) as consumer_num from consume_subscription where is_delete=0
+        group by topic_id,cluster_id) b ON (a.topic_id=b.topic_id and a.cluster_id = b.cluster_id)
+        where
+        a.is_delete = 0
+        AND a.topic_id IN
+        <foreach item="item" collection="list" index="index" open="(" separator="," close=")">#{item}</foreach>
+
+    </select>
+
+</mapper>

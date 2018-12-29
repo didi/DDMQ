@@ -1,0 +1,39 @@
+.bcui-form-item {
+  margin-bottom: 20px;
+}
+
+.bcui-form-item__label {
+  display: inline-block;
+  padding: 0 0 4px 0;
+  font-size: 14px;
+  color: #333333;
+  position: relative;
+}
+
+.bcui-form-item--required .bcui-form-item__label::before {
+  content: '';
+  display: none;
+}
+
+.bcui-form-item--required .bcui-form-item__label::after {
+  content: "*";
+  display: inline-block;
+  margin-right: 4px;
+  line-height: 1;
+  font-size: 14px;
+  font-weight: 300;
+  color: #2D77EE;
+  position: absolute;
+  top: 0;
+  right: -12px;
+}
+
+.bcui-form-item-tooltip {
+  position: absolute;
+  top: 0;
+  right: -26px;
+  color: #999;
+  &:hover {
+    color: #333;
+  }
+}

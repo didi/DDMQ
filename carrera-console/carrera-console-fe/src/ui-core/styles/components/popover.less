@@ -1,0 +1,125 @@
+.bcui-popover {
+  display: inline-block;
+
+  &__inner {
+    min-width: 150px;
+    max-height: initial;
+    padding: 0;
+    margin: 0;
+    overflow: initial;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 900;
+  }
+
+  &__inner-content {
+    background-color: #fff;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.2);
+  }
+
+  &__title {
+    padding: 8px 12px 6px;
+    border-bottom: 1px solid #eaeaea;
+    font-size: 14px;
+  }
+
+  &__content {
+    padding: 8px 12px 10px;
+  }
+
+  &__body {
+  }
+
+  &__arrow {
+    width: 8px;
+    height: 8px;
+    border-color: transparent;
+    border-style: solid;
+    background: #fff;
+    transform: rotate(45deg);
+    position: absolute;
+  }
+
+  &__inner[x-placement^="top"] {
+    padding-bottom: 10px;
+  }
+  &__inner[x-placement^="top"] &__arrow {
+    bottom: 6px;
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.09);
+  }
+  &__inner[x-placement="top"] &__arrow {
+    left: 50%;
+    margin-left: -5px
+  }
+  &__inner[x-placement="top-start"] &__arrow {
+    left: 16px;
+  }
+  &__inner[x-placement="top-end"] &__arrow {
+    right: 16px;
+  }
+
+
+  &__inner[x-placement^="right"] {
+    padding-left: 10px;
+  }
+  &__inner[x-placement^="right"] &__arrow {
+    left: 6px;
+    box-shadow: -3px 3px 7px rgba(0, 0, 0, 0.09);
+  }
+  &__inner[x-placement="right"] &__arrow {
+    top: 50%;
+    margin-top: -5px
+  }
+  &__inner[x-placement="right-start"] &__arrow {
+    top: 10px;
+  }
+  &__inner[x-placement="right-end"] &__arrow {
+    bottom: 10px;
+  }
+
+
+
+  &__inner[x-placement^="bottom"] {
+    padding-top: 10px;
+  }
+  &__inner[x-placement^="bottom"] &__arrow {
+    top: 6px;
+    box-shadow: -1px -1px 4px rgba(0, 0, 0, 0.09);
+  }
+  &__inner[x-placement="bottom"] &__arrow {
+    left: 50%;
+    margin-left: -5px
+  }
+  &__inner[x-placement="bottom-start"] &__arrow {
+    left: 10px;
+  }
+  &__inner[x-placement="bottom-end"] &__arrow {
+    right: 10px;
+  }
+
+
+
+  &__inner[x-placement^="left"] {
+    padding-right: 10px;
+  }
+  &__inner[x-placement^="left"] &__arrow {
+    right: 6px;
+    box-shadow: 3px -3px 7px rgba(0, 0, 0, 0.07);
+  }
+  &__inner[x-placement="left"] &__arrow {
+    top: 50%;
+    margin-top: -5px
+  }
+  &__inner[x-placement="left-start"] &__arrow {
+    top: 10px;
+  }
+  &__inner[x-placement="left-end"] &__arrow {
+    bottom: 10px;
+  }
+
+}

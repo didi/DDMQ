@@ -1,0 +1,93 @@
+@import (reference) "../common/variables.less";
+
+.bcui-alert {
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #fff;
+  border-radius: 4px;
+
+  &--info {
+    border-color: @info-color;
+    background-color: tint(@info-color, 70%);
+  }
+  &--info &__icon {
+    color: @info-color;
+  }
+
+  &--success {
+    border-color: @success-color;
+    background-color: tint(@success-color, 70%);
+  }
+
+  &--success &__icon {
+    color: @success-color;
+  }
+
+  &--warning {
+    border-color: @warning-color;
+    background-color: tint(@warning-color, 70%);
+  }
+
+  &--warning &__icon {
+    color: @warning-color;
+  }
+
+  &--error {
+    border-color: @error-color;
+    background-color: tint(@error-color, 70%);
+  }
+
+  &--error &__icon {
+    color: @error-color;
+  }
+
+  &--with-icon {
+    padding: 8px 48px 8px 38px;
+    position: relative;
+  }
+
+  &--with-description {
+    position: relative;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    color: #495060;
+    line-height: 1.5;
+  }
+
+  &--with-description&--with-icon {
+    padding: 16px 16px 16px 69px;
+  }
+
+  &--with-description &__message {
+    font-size: 14px;
+    color: #1c2438;
+    display: block;
+  }
+
+  &--with-description &__description {
+    display: block;
+  }
+
+  &--with-description &__icon {
+    top: 50%;
+    left: 24px;
+    margin-top: -21px;
+    font-size: 28px;
+  }
+
+  &__icon {
+    font-size: 14px;
+    top: 8px;
+    left: 16px;
+    position: absolute;
+  }
+
+
+  &__description {
+    font-size: 12px;
+    color: #495060;
+    line-height: 21px;
+    display: none;
+    text-align: justify;
+  }
+}

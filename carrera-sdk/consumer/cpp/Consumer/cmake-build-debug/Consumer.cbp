@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Consumer"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Consumer">
+				<Option output="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Consumer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/."/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/processor"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/protocol"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/server"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/processor"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/qt"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 Consumer"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Consumer/fast">
+				<Option output="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Consumer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/."/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/processor"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/protocol"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/server"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/processor"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/qt"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server"/>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 Consumer/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/CarreraClientExample.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/CarreraConfig.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/CarreraConsumer.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/CarreraConsumer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/CarreraDefine.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/ConsumerService.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/ConsumerService.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/SimpleCarreraClient.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/SimpleCarreraClient.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/consumerProxy_constants.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/consumerProxy_constants.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/consumerProxy_types.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/consumerProxy_types.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/mq_logger.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/mq_logger.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera/CarreraClient.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera/ConsumerService.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera/SimpleCarreraClient.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera/consumerProxy_constants.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera/consumerProxy_types.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/carrera/mq_logger.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/TApplicationException.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/TDispatchProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/TLogging.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/TProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/TReflectionLocal.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/TToString.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/Thrift.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TAsyncBufferProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TAsyncChannel.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TAsyncDispatchProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TAsyncProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TAsyncProtocolProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TEvhttpClientChannel.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/async/TEvhttpServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/config.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/processor/thrift_dispatch_processor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/processor/thrift_processor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/protocol/thrift_binary_protocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/protocol/thrift_binary_protocol_factory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/protocol/thrift_protocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/protocol/thrift_protocol_factory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/server/thrift_server.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/server/thrift_simple_server.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/thrift.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/thrift_application_exception.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/thrift_struct.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_buffered_transport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_buffered_transport_factory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_framed_transport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_framed_transport_factory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_memory_buffer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_server_socket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_server_transport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_socket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_transport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/c_glib/transport/thrift_transport_factory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/BoostThreadFactory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/Exception.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/FunctionRunner.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/Monitor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/Mutex.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/PlatformThreadFactory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/PosixThreadFactory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/StdMonitor.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/StdMutex.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/StdThreadFactory.cpp">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/StdThreadFactory.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/Thread.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/ThreadManager.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/TimerManager.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/concurrency/Util.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/config.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/cxxfunctional.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/processor/PeekProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/processor/StatsProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/processor/TMultiplexedProcessor.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TBase64Utils.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TBinaryProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TBinaryProtocol.tcc">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TCompactProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TCompactProtocol.tcc">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TDebugProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TDenseProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TJSONProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TMultiplexedProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TProtocolDecorator.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TProtocolException.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TProtocolTap.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/protocol/TVirtualProtocol.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/qt/TQIODeviceTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/qt/TQTcpServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server/TNonblockingServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server/TServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server/TSimpleServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server/TThreadPoolServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/server/TThreadedServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/thrift-config.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/PlatformSocket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TBufferTransports.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TFDTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TFileTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/THttpClient.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/THttpServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/THttpTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TPipe.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TPipeServer.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TSSLServerSocket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TSSLSocket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TServerSocket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TServerTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TShortReadTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TSimpleFileTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TSocket.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TSocketPool.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TTransportException.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TTransportUtils.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TVirtualTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/thirdparty/thrift/transport/TZlibTransport.h">
+			<Option target="Consumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/Consumer/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

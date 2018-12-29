@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="LowlevelConsumer"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="LowlevelConsumer">
+				<Option output="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/LowlevelConsumer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 LowlevelConsumer"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="LowlevelConsumer/fast">
+				<Option output="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/LowlevelConsumer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 LowlevelConsumer/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/Consumer.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/Consumer.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerConfig.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerConfig.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerLogger.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerLogger.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerPool.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerPool.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerService.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerService.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerWrapper.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/ConsumerWrapper.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/consumerProxy_constants.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/consumerProxy_constants.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/consumerProxy_types.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/consumerProxy_types.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/consumerwrapper.h">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/test_consumer.c">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/src/test_consumer_pool.cpp">
+			<Option target="LowlevelConsumer"/>
+		</Unit>
+		<Unit filename="/Users/zanglei/Developer/carrera-sdk/consumer/cpp/LowlevelConsumer/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.didi.carrera.console.dao.mapper.ClusterMqserverRelationMapper">
+  <resultMap id="BaseResultMap" type="com.didi.carrera.console.dao.model.ClusterMqserverRelation">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="cluster_id" jdbcType="BIGINT" property="clusterId" />
+    <result column="cluster_name" jdbcType="VARCHAR" property="clusterName" />
+    <result column="mq_server_id" jdbcType="BIGINT" property="mqServerId" />
+    <result column="mq_server_name" jdbcType="VARCHAR" property="mqServerName" />
+    <result column="proxy_conf" jdbcType="VARCHAR" property="proxyConf" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, cluster_id, cluster_name, mq_server_id, mq_server_name, proxy_conf, type, is_delete, 
+    create_time, modify_time
+  </sql>
+  <select id="selectByExample" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelationCriteria" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cluster_mqserver_relation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <if test="start != null and start >= 0 ">
+      limit #{start}
+    </if>
+    <if test="start != null and start >= 0 and end != null and end >= 0">
+      , #{end}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cluster_mqserver_relation
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from cluster_mqserver_relation
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelationCriteria">
+    delete from cluster_mqserver_relation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelation" useGeneratedKeys="true">
+    insert into cluster_mqserver_relation (cluster_id, cluster_name, mq_server_id, 
+      mq_server_name, proxy_conf, type, 
+      is_delete, create_time, modify_time
+      )
+    values (#{clusterId,jdbcType=BIGINT}, #{clusterName,jdbcType=VARCHAR}, #{mqServerId,jdbcType=BIGINT}, 
+      #{mqServerName,jdbcType=VARCHAR}, #{proxyConf,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT}, 
+      #{isDelete,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelation" useGeneratedKeys="true">
+    insert into cluster_mqserver_relation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="clusterId != null">
+        cluster_id,
+      </if>
+      <if test="clusterName != null">
+        cluster_name,
+      </if>
+      <if test="mqServerId != null">
+        mq_server_id,
+      </if>
+      <if test="mqServerName != null">
+        mq_server_name,
+      </if>
+      <if test="proxyConf != null">
+        proxy_conf,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="clusterId != null">
+        #{clusterId,jdbcType=BIGINT},
+      </if>
+      <if test="clusterName != null">
+        #{clusterName,jdbcType=VARCHAR},
+      </if>
+      <if test="mqServerId != null">
+        #{mqServerId,jdbcType=BIGINT},
+      </if>
+      <if test="mqServerName != null">
+        #{mqServerName,jdbcType=VARCHAR},
+      </if>
+      <if test="proxyConf != null">
+        #{proxyConf,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelationCriteria" resultType="java.lang.Long">
+    select count(*) from cluster_mqserver_relation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update cluster_mqserver_relation
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.clusterId != null">
+        cluster_id = #{record.clusterId,jdbcType=BIGINT},
+      </if>
+      <if test="record.clusterName != null">
+        cluster_name = #{record.clusterName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mqServerId != null">
+        mq_server_id = #{record.mqServerId,jdbcType=BIGINT},
+      </if>
+      <if test="record.mqServerName != null">
+        mq_server_name = #{record.mqServerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proxyConf != null">
+        proxy_conf = #{record.proxyConf,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=TINYINT},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.modifyTime != null">
+        modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update cluster_mqserver_relation
+    set id = #{record.id,jdbcType=BIGINT},
+      cluster_id = #{record.clusterId,jdbcType=BIGINT},
+      cluster_name = #{record.clusterName,jdbcType=VARCHAR},
+      mq_server_id = #{record.mqServerId,jdbcType=BIGINT},
+      mq_server_name = #{record.mqServerName,jdbcType=VARCHAR},
+      proxy_conf = #{record.proxyConf,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=TINYINT},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelation">
+    update cluster_mqserver_relation
+    <set>
+      <if test="clusterId != null">
+        cluster_id = #{clusterId,jdbcType=BIGINT},
+      </if>
+      <if test="clusterName != null">
+        cluster_name = #{clusterName,jdbcType=VARCHAR},
+      </if>
+      <if test="mqServerId != null">
+        mq_server_id = #{mqServerId,jdbcType=BIGINT},
+      </if>
+      <if test="mqServerName != null">
+        mq_server_name = #{mqServerName,jdbcType=VARCHAR},
+      </if>
+      <if test="proxyConf != null">
+        proxy_conf = #{proxyConf,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.didi.carrera.console.dao.model.ClusterMqserverRelation">
+    update cluster_mqserver_relation
+    set cluster_id = #{clusterId,jdbcType=BIGINT},
+      cluster_name = #{clusterName,jdbcType=VARCHAR},
+      mq_server_id = #{mqServerId,jdbcType=BIGINT},
+      mq_server_name = #{mqServerName,jdbcType=VARCHAR},
+      proxy_conf = #{proxyConf,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

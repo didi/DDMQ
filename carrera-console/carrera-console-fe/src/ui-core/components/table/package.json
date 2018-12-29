@@ -1,0 +1,66 @@
+{
+  "name": "@dt/bc-v-table",
+  "version": "0.1.22",
+  "description": "table component for bcui",
+  "keywords": [
+    "vue",
+    "bcui",
+    "bc-v-table"
+  ],
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "server": "webpack-dev-server --inline  --compress --quiet  --hot --content-base ./ --env development",
+    "build": "webpack -p --env production",
+    "start": "npm run build & npm run server"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "devDependencies": {
+    "@dt/bc-v-pagination":"^0.0.1",
+    "babel": "^6.23.0",
+    "babel-core": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-loader": "^6.4.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-2": "^6.0.0",
+    "babel-preset-stage-3": "^6.11.0",
+    "babel-runtime": "^6.0.0",
+    "css-loader": "^0.28.0",
+    "eslint": "^3.10.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-loader": "^1.7.1",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-html": "^2.0.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-node": "^4.2.2",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.11.1",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.3",
+    "style-loader": "^0.16.1",
+    "url-loader": "^0.5.7",
+    "vue": "^2.2.6",
+    "vue-router": "^2.5.3",
+    "vue-loader": "^11.3.4",
+    "vue-template-compiler": "^2.2.6",
+    "webpack": "^2.4.1",
+    "webpack-dev-server": "^2.4.2",
+    "yargs": "^7.1.0"
+  },
+  "dependencies": {
+
+  }
+}

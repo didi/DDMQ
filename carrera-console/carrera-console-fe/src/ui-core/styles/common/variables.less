@@ -1,0 +1,168 @@
+
+// Prefix
+@css-prefix             : bcui;
+@css-prefix-iconfont    : bcui-icon;
+
+
+// Color
+// @primary-color          : #28b0b0;
+@primary-color          : #2d77ee;
+@info-color             : #2db7f5;
+@success-color          : #09d274;
+@warning-color          : #ffb437;
+// @error-color            : #ff3300;
+@error-color            : #fe4f27;
+@link-color             : #3399ff;
+@link-hover-color       : tint(@link-color, 20%);
+@link-active-color      : shade(@link-color, 5%);
+@selected-color         : fade(@primary-color, 90%);
+@tooltip-color          : #fff;
+@subsidiary-color       : #9ea7b4;
+@rate-star-color        : #f5a623;
+
+// Base
+@body-background        : #fff;
+@font-family            : "Neue Haas Grotesk Text Pro", "Arial Nova", "Segoe UI", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", "Microsoft JhengHei", "Source Han Sans SC", "Noto Sans CJK SC", "Source Han Sans CN", "Noto Sans SC", "Source Han Sans TC", "Noto Sans CJK TC", "Hiragino Sans GB", sans-serif;;
+@code-family                   : Consolas,Menlo,Courier,monospace;
+@font-color-black-base         : #333;
+@font-color-black-light        : #666;
+@font-color-black-middle-light : #999;
+@text-disabled-color    : #bbbec4;
+@font-size-base         : 14px;
+@font-size-small        : 12px;
+@line-height-base       : 1.5;
+@line-height-computed   : floor((@font-size-base * @line-height-base));
+@border-radius-base     : 6px;
+@border-radius-small    : 4px;
+@cursor-disabled        : not-allowed;
+
+// Border color
+@border-color-base      : #d7dde4;  // outside
+@border-color-split     : #e3e8ee;  // inside
+
+// Background color
+@background-color-base        : #f7f7f7;  // base
+@background-color-select-hover: @input-disabled-bg;
+// @background-color-disabled:
+
+// Shadow
+@shadow-color           : rgba(0, 0, 0, .2);
+@shadow-base            : @shadow-down;
+@shadow-card            : 0 1px 1px 0 rgba(0,0,0,.1);
+@shadow-up              : 0 -1px 6px @shadow-color;
+@shadow-down            : 0 1px 6px @shadow-color;
+@shadow-left            : -1px 0 6px @shadow-color;
+@shadow-right           : 1px 0 6px @shadow-color;
+
+// Button
+@btn-font-weight        : normal;
+@btn-padding-base       : 0px 16px;
+@btn-padding-larger     : 6px 16px;
+@btn-padding-large      : 0px 16px;
+@btn-padding-small      : 0px 9px;
+@btn-padding-extra      : 0px;
+
+@btn-height-larger         : 48px;
+@btn-height-large          : 40px;
+@btn-height-base           : 36px;
+@btn-height-small          : 24px;
+@btn-height-extra          : 20px;
+
+@btn-font-size          : 14px;
+@btn-font-size-larger   : 14px;
+@btn-font-size-large    : 14px;
+@btn-font-size-small    : 12px;
+@btn-font-size-extra    : 9px;
+@btn-border-radius      : 4px;
+@btn-border-radius-small: 3px;
+@btn-group-border       : shade(@primary-color, 5%);
+
+@btn-disable-color      : #c3cbd6;
+@btn-disable-bg         : @background-color-base;
+@btn-disable-border     : @border-color-base;
+
+@btn-default-color            : #495060;
+@btn-default-bg               : #fff;
+@btn-default-border           : #dddee1;
+@btn-default-hover-bg         : #fcfcfc;
+@btn-default-hover-border     : @primary-color;
+
+@btn-primary-color      : #fff;
+@btn-primary-bg         : @primary-color;
+
+@btn-gray-color         : #666;
+@btn-gray-bg            : #F2F3F5;
+@btn-gray-border        : #DBDEE3;
+
+@btn-ghost-color        : #b3b3b3;
+@btn-ghost-bg           : transparent;
+@btn-ghost-border       : #f5f5f5;
+
+@btn-circle-size-larger  : 48px;
+@btn-circle-size-large   : 40px;
+@btn-circle-size         : 36px;
+@btn-circle-size-small   : 24px;
+@btn-circle-size-extra   : 20px;
+
+@btn-icon-only-padding   : 0 10px;
+
+// Layout and Grid
+@grid-columns           : 24;
+@grid-gutter-width      : 0;
+
+// Legend
+@legend-color           : #999;
+
+// Input
+@input-height-small          : 24px;
+@input-height-base           : 36px;
+@input-height-large          : 40px;
+@input-height-larger         : 48px;
+
+@input-font-size-base           : 14px;
+@input-padding-horizontal       : 12px;
+@input-padding-vertical-base    : 4px;
+@input-padding-vertical-small   : 1px;
+@input-padding-vertical-large   : 16px;
+@input-padding-vertical-larger  : 18px;
+
+@input-placeholder-color     : @btn-disable-color;
+@input-color                 : @font-color-black-base;
+@input-border-color          : @border-color-base;
+@input-bg                    : #fff;
+
+@input-hover-border-color    : @primary-color;
+@input-focus-border-color    : @primary-color;
+@input-disabled-bg           : #f3f3f3;
+
+// Tag
+@tag-font-size          : 12px;
+
+// Animation
+@animation-time         : .3s;
+@transition-time        : .2s;
+@ease-in-out            : ease-in-out;
+
+// Slider
+@slider-color              : tint(@primary-color, 20%);
+@slider-height             : 4px;
+@slider-margin             : 16px 0;
+@slider-button-wrap-size   : 18px;
+@slider-button-wrap-offset : -4px;
+@slider-disabled-color     : #ccc;
+
+// Tooltip
+@tooltip-bg                : rgba(24,33,48,0.85);
+@tooltip-box-shadow        : 0 2px 4px 0 rgba(31,50,82,0.40);
+@tooltip-border-radius     : 8px;
+
+
+// Form
+@form-label-font-size      : 14px;
+
+
+// ZIndex
+@zindex-tooltip         : 1060;
+
+
+@radio-font-size        : 14px;

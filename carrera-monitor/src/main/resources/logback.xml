@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
+
+    <property name="LOG_LEVEL" value="INFO" />
+    <property name="LOG_PATH" value="./logs" />
+    <property name="LOG_FILE_NAME" value="carrera" />
+    <property name="LOG_MAX_HISTORY" value="3   " />
+
+    <property name="FILE_LOG_FORMAT" value="[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}] [%thread] [%level] | [%logger{0}:%line] | %msg%n" />
+
+    <!-- 日志文件 appender定义 -->
+    <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${FILE_LOG_FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- error日志 -->
+    <appender name="ErrorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-error-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- broker monitor日志 -->
+    <appender name="BrokerMonitorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-broker.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-broker-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- inspection monitor日志 -->
+    <appender name="InspectionAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-inspection.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-inspection-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- lag monitor日志 -->
+    <appender name="LagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-lag.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-lag-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.xiaojukeji.carrera.monitor.broker" level="INFO" additivity="false">
+        <appender-ref ref="BrokerMonitorAppender" />
+    </logger>
+
+    <logger name="com.xiaojukeji.carrera.monitor.inspection" level="INFO" additivity="false">
+        <appender-ref ref="InspectionAppender" />
+    </logger>
+
+    <logger name="com.xiaojukeji.carrera.monitor.lag" level="INFO" additivity="false">
+        <appender-ref ref="LagAppender" />
+    </logger>
+
+    <!-- Default日志 -->
+    <root level="INFO">
+        <!-- Error日志 -->
+        <appender-ref ref="ErrorAppender" />
+        <!-- All日志 -->
+        <appender-ref ref="FileAppender" />
+    </root>
+</configuration>

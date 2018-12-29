@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="carrera" shutdownHook="disable">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ABSOLUTE} %5p %c{1}:%L - %m%n"/>
+        </Console>
+        <RollingFile name="MAIN_LOG" fileName="logs/carrera.log"
+                     filePattern="logs/old/carrera-%d{yyyy-MM-dd-HH}.%i.log">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="2">
+                    <IfLastModified age="15d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <Async name="Async_MAIN_LOG">
+            <AppenderRef ref="MAIN_LOG"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Async_MAIN_LOG"/>
+            <AppenderRef ref="stdout"/>
+        </Root>
+        <Logger name="com.xiaojukeji.carrera.consumer" additivity="false" level="info">
+            <AppenderRef ref="Async_MAIN_LOG"/>
+            <AppenderRef ref="stdout"/>
+        </Logger>
+    </Loggers>
+</Configuration>

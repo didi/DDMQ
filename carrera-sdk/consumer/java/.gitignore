@@ -1,0 +1,7 @@
+*.iml
+carrera-consumer-sdk/logs/
+carrera-consumer-sdk/target/     
+carrera-consumer-sdk-examples/target/       
+carrera-thrift-consumer-sdk/target/         
+carrera-thrift-consumer-sdk-example/target/
+carrera-apache-storm/target/

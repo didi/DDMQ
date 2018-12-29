@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
+
+    <property name="LOG_LEVEL" value="${logs.level}"/>
+    <property name="LOG_PATH" value="${logs.file.path}"/>
+    <property name="LOG_FILE_NAME" value="carrera"/>
+    <property name="LOG_MAX_HISTORY" value="30"/>
+
+    <property name="STD_LOG_FORMAT"
+              value="[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}] [%thread] [%level] | [%logger:%line] [%X{logId}] | %msg%n"/>
+    <property name="FILE_LOG_FORMAT"
+              value="[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}] [%thread] [%level] | [%logger{36}:%line] [%X{logId}] | %msg%n"/>
+    <property name="SQL_LOG_FORMAT"
+              value="[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}] [%thread] [%level] | [%logger{36}:%line] [%X{logId}] | %msg%n"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${STD_LOG_FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${FILE_LOG_FORMAT}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ErrorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-error-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SqlAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-sql.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-sql-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AccessAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-access.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-access-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ZkDiffAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-diff.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-diff-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ZkV4Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv4.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv4-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ZkV3V4Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv3v4.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv3v4-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ProxyListAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-proxy.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-proxy-%d{yyyyMMdd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>${FILE_LOG_FORMAT}</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.mybatis" level="ERROR"/>
+    <logger name="druid.sql" level="ERROR"/>
+    <logger name="com.alibaba.druid" level="ERROR"/>
+    <logger name="com.alibaba.rocketmq" level="ERROR"/>
+
+    <logger name="carrera.console.framework.request" level="INFO" additivity="false">
+        <appender-ref ref="AccessAppender"/>
+    </logger>
+
+    <logger name="com.didi.carrera.console.dao.MybatisInterceptor" level="INFO" additivity="false">
+        <appender-ref ref="SqlAppender"/>
+    </logger>
+
+    <logger name="com.didi.carrera.console.service.impl.ZKV4ConfigServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="ZkV4Appender"/>
+    </logger>
+
+    <logger name="com.didi.carrera.console.service.CompareProxyListService" level="INFO" additivity="false">
+        <appender-ref ref="ProxyListAppender"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="ErrorAppender"/>
+        <appender-ref ref="FileAppender"/>
+    </root>
+</configuration>

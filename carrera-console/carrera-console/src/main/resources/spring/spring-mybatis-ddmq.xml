@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="ddmqDataSource" class="com.alibaba.druid.pool.xa.DruidXADataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.ddmq.driver}"/>
+        <property name="url" value="${jdbc.ddmq.url}"/>
+        <property name="username" value="${jdbc.ddmq.user}"/>
+        <property name="password" value="${jdbc.ddmq.password}"/>
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="200"/>
+        <property name="maxWait" value="60000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="poolPreparedStatements" value="false"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+    </bean>
+
+    <bean id="atoDdmqDataSource" class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close">
+        <property name="uniqueResourceName" value="ddmqDataSource" />
+        <property name="xaDataSource" ref="ddmqDataSource"/>
+        <property name="testQuery" value="select 1"/>
+        <property name="minPoolSize" value="10" />
+        <property name="maxPoolSize" value="200"/>
+    </bean>
+
+    <bean id="ddmqSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<property name="dataSource" ref="atoDdmqDataSource"/>
+        <property name="configLocation" value="classpath:spring/mybatis-config.xml" />
+        <property name="mapperLocations" value="classpath:sqlmap/ddmq/**Mapper.xml"></property>
+    </bean>
+
+    <bean id="ddmqMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.didi.carrera.console.dao.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="ddmqSqlSessionFactory"></property>
+    </bean>
+
+</beans>
