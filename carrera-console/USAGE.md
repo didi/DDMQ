@@ -13,7 +13,7 @@ DDMQ 用户控制台((以下简称 Console)提供了使用 DDMQ 的一站式服�
 * Rate Limit： 生产消息的限流值，**超过限流值时将拒绝写入**；  
 
 <center>
-![](../image/createTopic.png)
+<img src="../image/createTopic.png" width = "50%" />
 </center>
 
 ----------

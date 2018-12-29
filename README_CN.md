@@ -33,8 +33,9 @@
 ### DDMQ 架构图
 
 <center>
-![](image/arch.png)
+<img src="image/arch.png" width = "80%" />
 </center>
+
 
 
 ----------
