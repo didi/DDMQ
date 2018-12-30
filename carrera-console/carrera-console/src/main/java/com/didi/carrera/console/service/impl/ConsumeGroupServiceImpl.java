@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.common.admin.TopicStatsTable;
 import org.slf4j.Logger;
@@ -81,8 +80,6 @@ public class ConsumeGroupServiceImpl implements ConsumeGroupService {
 
     @Resource(name = "didiRmqAdminServiceImpl")
     private RmqAdminService rmqAdminService;
-
-    private static final String INDEPENDENT_HTTP_CLUSTER = "independentHttpCluster";
 
     @Override
     public ConsumeGroup findByGroupName(String groupName) {
@@ -240,18 +237,6 @@ public class ConsumeGroupServiceImpl implements ConsumeGroupService {
         }
 
         return ConsoleBaseResponse.success();
-    }
-
-    @Override
-    public boolean isHttpCluster(ConsumeGroup groupInfo) {
-        if (groupInfo == null || MapUtils.isEmpty(groupInfo.getGroupExtraParams())) {
-            return false;
-        }
-
-        if (groupInfo.getGroupExtraParams().containsKey(INDEPENDENT_HTTP_CLUSTER) && "true".equalsIgnoreCase(groupInfo.getGroupExtraParams().get(INDEPENDENT_HTTP_CLUSTER))) {
-            return true;
-        }
-        return false;
     }
 
     @Override

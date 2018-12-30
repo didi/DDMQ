@@ -220,27 +220,6 @@ public class TopicServiceImpl implements TopicService {
         return mqServerMap;
     }
 
-    @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void initTopicConfIdc() throws Exception {
-        List<Topic> list = findAllWithoutPage();
-        Map<Long, Cluster> clusterMap = clusterService.findMap();
-        for (Topic topic : list) {
-            if (topic.getProduceMode() != TopicProduceMode.SAME_IDC.getIndex()) {
-                continue;
-            }
-            List<TopicConf> topicConfList = topicConfService.findByTopicId(topic.getId());
-            for (TopicConf topicConf : topicConfList) {
-                if (!clusterMap.containsKey(topicConf.getClusterId())) {
-                    continue;
-                }
-                topicConf.setServerIdcId(clusterMap.get(topicConf.getClusterId()).getIdcId());
-                topicConf.setServerIdcName(clusterMap.get(topicConf.getClusterId()).getIdc());
-                topicConfService.updateByPrimaryKey(topicConf);
-            }
-        }
-    }
-
     private void setProxies(TopicConf topicConf) {
         TopicConfConfig config = new TopicConfConfig();
         config.setProxies(Maps.newHashMap());

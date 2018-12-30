@@ -40,9 +40,6 @@ public class InternalController extends AbstractBaseController {
     @Autowired
     private ZKV4ConfigService zkv4ConfigService;
 
-    @Resource(name = "didiClusterServiceImpl")
-    private ClusterService clusterService;
-
     @ResponseBody
     @RequestMapping(value = {"/createTopic"}, method = {RequestMethod.POST})
     public ConsoleBaseResponse<?> createTopic(@Valid @RequestBody TopicOrderBo<AcceptTopicConfBo> topicinfo, BindingResult bindingResult) throws Exception {
@@ -92,13 +89,6 @@ public class InternalController extends AbstractBaseController {
     }
 
     @ResponseBody
-    @RequestMapping(value = {"/v4/initIdc"}, method = {RequestMethod.GET})
-    public ConsoleBaseResponse<?> initIdc() throws Exception {
-        // 初始化 idc 表 & 更新 cluster 中 idc 字段
-        return clusterService.initIdc();
-    }
-
-    @ResponseBody
     @RequestMapping(value = {"/v4/addPProxy"}, method = {RequestMethod.GET})
     public ConsoleBaseResponse<?> addPProxy(@RequestParam String cluster, @RequestParam String host) throws Exception {
         return topicService.addPProxy(cluster, host);
@@ -108,13 +98,6 @@ public class InternalController extends AbstractBaseController {
     @RequestMapping(value = {"/v4/addCProxy"}, method = {RequestMethod.GET})
     public ConsoleBaseResponse<?> addCProxy(@RequestParam String cluster, @RequestParam String host) throws Exception {
         return consumeSubscriptionService.addCProxy(cluster, host);
-    }
-
-    @ResponseBody
-    @RequestMapping(value = {"/v4/initTopicConfIdc"}, method = {RequestMethod.GET})
-    public ConsoleBaseResponse<?> initTopicConfIdc() throws Exception {
-        topicService.initTopicConfIdc();
-        return ConsoleBaseResponse.success();
     }
 
     @ResponseBody

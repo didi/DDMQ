@@ -85,12 +85,6 @@ public class TopicConfServiceImpl implements TopicConfService {
     }
 
 
-    private List<TopicConf> findByIdcId(Long idcId) {
-        TopicConfCriteria tcc = new TopicConfCriteria();
-        tcc.createCriteria().andIsDeleteEqualTo(IsDelete.NO.getIndex()).andServerIdcIdEqualTo(idcId);
-        return topicConfMapper.selectByExample(tcc);
-    }
-
     @Override
     public List<TopicConf> findByTopicClusterId(Long topicId, Long clusterId) {
         TopicConfCriteria tcc = new TopicConfCriteria();
@@ -144,19 +138,5 @@ public class TopicConfServiceImpl implements TopicConfService {
         }
 
         return ret[0];
-    }
-
-
-    @Override
-    public void updateIdcName(Long idcId, String idcName) {
-        List<TopicConf> confs = findByIdcId(idcId);
-        if (CollectionUtils.isEmpty(confs)) {
-            return;
-        }
-
-        for (TopicConf conf : confs) {
-            conf.setServerIdcName(idcName);
-            topicConfMapper.updateByPrimaryKeySelective(conf);
-        }
     }
 }

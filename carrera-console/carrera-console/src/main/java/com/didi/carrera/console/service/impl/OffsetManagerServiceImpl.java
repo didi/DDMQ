@@ -12,7 +12,7 @@ import com.didi.carrera.console.dao.model.TopicConf;
 import com.didi.carrera.console.service.ClusterService;
 import com.didi.carrera.console.service.ConsumeGroupService;
 import com.didi.carrera.console.service.ConsumeSubscriptionService;
-import com.didi.carrera.console.service.MqException;
+import com.didi.carrera.console.service.exception.MqException;
 import com.didi.carrera.console.service.MqServerService;
 import com.didi.carrera.console.service.OffsetManagerService;
 import com.didi.carrera.console.service.RmqAdminService;
@@ -56,7 +56,6 @@ public class OffsetManagerServiceImpl implements OffsetManagerService {
 
     @Resource(name = "didiRmqAdminServiceImpl")
     private RmqAdminService rmqAdminService;
-
 
     @Resource(name = "didiConsumeSubscriptionServiceImpl")
     private ConsumeSubscriptionService consumeSubscriptionService;

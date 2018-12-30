@@ -75,49 +75,10 @@
         </encoder>
     </appender>
 
-    <appender name="ZkDiffAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-diff.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-diff-%d{yyyyMMdd}.log</FileNamePattern>
-            <maxHistory>30</maxHistory>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>${FILE_LOG_FORMAT}</Pattern>
-        </encoder>
-    </appender>
-
     <appender name="ZkV4Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv4.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv4-%d{yyyyMMdd}.log</FileNamePattern>
-            <maxHistory>30</maxHistory>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>${FILE_LOG_FORMAT}</Pattern>
-        </encoder>
-    </appender>
-
-    <appender name="ZkV3V4Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv3v4.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-zkv3v4-%d{yyyyMMdd}.log</FileNamePattern>
-            <maxHistory>30</maxHistory>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>${FILE_LOG_FORMAT}</Pattern>
-        </encoder>
-    </appender>
-
-    <appender name="ProxyListAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_PATH:-.}/${LOG_FILE_NAME}-proxy.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${LOG_PATH:-.}/${LOG_FILE_NAME}-proxy-%d{yyyyMMdd}.log</FileNamePattern>
             <maxHistory>30</maxHistory>
             <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
@@ -143,10 +104,6 @@
 
     <logger name="com.didi.carrera.console.service.impl.ZKV4ConfigServiceImpl" level="INFO" additivity="false">
         <appender-ref ref="ZkV4Appender"/>
-    </logger>
-
-    <logger name="com.didi.carrera.console.service.CompareProxyListService" level="INFO" additivity="false">
-        <appender-ref ref="ProxyListAppender"/>
     </logger>
 
     <root level="INFO">

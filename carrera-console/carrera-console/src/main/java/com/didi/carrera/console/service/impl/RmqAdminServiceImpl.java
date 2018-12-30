@@ -8,7 +8,7 @@ import com.didi.carrera.console.dao.model.ClusterMqserverRelation;
 import com.didi.carrera.console.dao.model.MqServer;
 import com.didi.carrera.console.service.ClusterMqserverRelationService;
 import com.didi.carrera.console.service.ClusterService;
-import com.didi.carrera.console.service.MqException;
+import com.didi.carrera.console.service.exception.MqException;
 import com.didi.carrera.console.service.MqServerService;
 import com.didi.carrera.console.service.RmqAdminService;
 import com.google.common.collect.Lists;

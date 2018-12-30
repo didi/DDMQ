@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.TypeReference;
 import com.didi.carrera.console.common.util.FastJsonUtils;
 import com.didi.carrera.console.common.util.HostUtils;
+import com.didi.carrera.console.config.ConsoleConfig;
 import com.didi.carrera.console.dao.dict.ClusterMqServerRelationType;
 import com.didi.carrera.console.dao.dict.ConsumeSubscriptionAlarmType;
 import com.didi.carrera.console.dao.dict.ConsumeSubscriptionBigDataType;
@@ -37,13 +38,12 @@ import com.didi.carrera.console.service.NodeService;
 import com.didi.carrera.console.service.TopicConfService;
 import com.didi.carrera.console.service.TopicService;
 import com.didi.carrera.console.service.ZKV4ConfigService;
-import com.didi.carrera.console.service.ZkConfigException;
+import com.didi.carrera.console.service.exception.ZkConfigException;
 import com.didi.carrera.console.web.ConsoleBaseResponse;
 import com.didi.carrera.console.web.controller.bo.ConsumeSubscriptionOrderBo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.didi.carrera.console.config.ConsoleConfig;
 import com.xiaojukeji.carrera.biz.ZkService;
 import com.xiaojukeji.carrera.config.Actions;
 import com.xiaojukeji.carrera.config.CompressType;
@@ -85,8 +85,6 @@ import java.util.stream.Collectors;
 @Service
 public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZKV4ConfigServiceImpl.class);
-
-    public static final String HTTP_CLUSTER_SUFFIX = "_http";
 
     public static final int DEFAULT_BROKER_PORT = 10911;
     public static final int DEFAULT_PPROXY_PORT = 9613;
@@ -149,14 +147,13 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
             ParameterDynamicConfig config = new ParameterDynamicConfig(ConsoleConfig.instance().getZookeeper());
             config.setConfigCentre(true);
             parameterDynamic = new ParameterDynamicZookeeper(config);
-            parameterDynamic.setData("/carrera/v4/config/topic", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/group", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/pproxy", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/cproxy", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/broker", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/monitor/host", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/monitor/assigned", "carrera");
-            parameterDynamic.setData("/carrera/v4/config/schema/host", "carrera");
+            parameterDynamic.setData("/carrera/v4/config/topic", "default");
+            parameterDynamic.setData("/carrera/v4/config/group", "default");
+            parameterDynamic.setData("/carrera/v4/config/pproxy", "default");
+            parameterDynamic.setData("/carrera/v4/config/cproxy", "default");
+            parameterDynamic.setData("/carrera/v4/config/broker", "default");
+            parameterDynamic.setData("/carrera/v4/config/monitor/host", "default");
+            parameterDynamic.setData("/carrera/v4/config/monitor/assigned", "default");
 
             LOGGER.info("init all zk path success");
         } finally {
@@ -169,9 +166,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public ConsoleBaseResponse<?> pushCproxyConfig(String host) throws Exception {
-        List<Node> nodeList = nodeService.findByHostNodeType(host, Lists.newArrayList(NodeType.CONSUMER_PROXY, NodeType.CONSUME_HTTP_PROXY));
+        List<Node> nodeList = nodeService.findByHostNodeType(host, NodeType.CONSUMER_PROXY);
         if (CollectionUtils.isEmpty(nodeList)) {
-            nodeList = nodeService.findByHostNodeType(HostUtils.getIp(host), Lists.newArrayList(NodeType.CONSUMER_PROXY, NodeType.CONSUME_HTTP_PROXY));
+            nodeList = nodeService.findByHostNodeType(HostUtils.getIp(host), NodeType.CONSUMER_PROXY);
         }
 
         if (CollectionUtils.isEmpty(nodeList)) {
@@ -200,7 +197,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         return ConsoleBaseResponse.success();
     }
 
-
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public ConsoleBaseResponse<?> pushTopicConfig(String topicName) throws Exception {
@@ -222,7 +218,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
         return ConsoleBaseResponse.success();
     }
-
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -313,9 +308,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         if (cluster == null) {
             return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "集群不存在");
         }
-        List<Node> list = nodeService.findByClusterIdNodeType(cluster.getId(), Lists.newArrayList(NodeType.CONSUMER_PROXY, NodeType.CONSUME_HTTP_PROXY));
+        List<Node> list = nodeService.findByClusterIdNodeType(cluster.getId(), NodeType.CONSUMER_PROXY);
         if (CollectionUtils.isEmpty(list)) {
-            return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "集群暂无PProxy");
+            return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "集群暂无CProxy");
         }
 
         for (Node node : list) {
@@ -347,7 +342,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                     updatePProxyConfig(node.getId());
                     break;
                 case CONSUMER_PROXY:
-                case CONSUME_HTTP_PROXY:
                     updateCProxyConfig(node.getId());
                     break;
                 default:
@@ -420,7 +414,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
             return;
         }
         for (Long clusterId : clusterIdSet) {
-            List<Node> nodeList = nodeService.findByClusterIdNodeType(clusterId, Lists.newArrayList(NodeType.CONSUMER_PROXY, NodeType.CONSUME_HTTP_PROXY));
+            List<Node> nodeList = nodeService.findByClusterIdNodeType(clusterId, NodeType.CONSUMER_PROXY);
             if (CollectionUtils.isNotEmpty(nodeList)) {
                 for (Node node : nodeList) {
                     updateCProxyConfig(node.getId());
@@ -533,7 +527,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         LOGGER.info("[ZK_V4_Group] update group success, groupId={}, group={}, sub size={}", groupId, group.getGroupName(), subList.size());
     }
 
-
     @Override
     public void updateSubConfig(Long groupId, Set<Long> clusterIdSet) throws Exception {
         ConsumeGroup group = consumeGroupService.findById(groupId);
@@ -641,7 +634,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         return topicId + "_" + clusterId;
     }
 
-
     private String getSubExtraParamsMqServer(ConsumeSubscription sub) throws ZkConfigException {
         if (MapUtils.isNotEmpty(sub.getSubExtraParams()) && sub.getSubExtraParams().containsKey(ConsumeSubscriptionOrderBo.SUB_FLAG_EXTREA_PARAMS_MQ_CLUSTER)) {
             String tmpCluster = sub.getSubExtraParams().get(ConsumeSubscriptionOrderBo.SUB_FLAG_EXTREA_PARAMS_MQ_CLUSTER);
@@ -657,7 +649,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
         return null;
     }
-
 
     public UpstreamTopic buildUpstreamTopic(GroupConfig groupConfig, ConsumeSubscription subscription, String brokerCluster, String idc) throws ZkConfigException {
         UpstreamTopic upstreamTopic = new UpstreamTopic();
@@ -701,7 +692,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
         upstreamTopic.setTotalMaxTps(subscription.getMaxTps());
 
-        //同一个broker下如果绑定多个proxy，分摊总tps
         if (MapUtils.isNotEmpty(upstreamTopic.getProxies())) {
             int totalProxies = 0;
             for (Set<String> proxySet : upstreamTopic.getProxies().values()) {
@@ -741,7 +731,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                 } else if (subscription.getBigDataType() == ConsumeSubscriptionBigDataType.HBASE.getIndex()) {
                     upstreamTopic.setHbaseconfiguration(FastJsonUtils.toObject(subscription.getBigDataConfig(), HBaseConfiguration.class));
                 } else if (subscription.getBigDataType() == ConsumeSubscriptionBigDataType.REDIS.getIndex()) {
-//                    upstreamTopic.setRedisConfiguration(FastJsonUtils.toObject(subscription.getBigDataConfig(), RedisConfiguration.class));
                 } else {
                     throw new ZkConfigException(String.format("[Sub] subId(%s) bigDataType error", subscription.getId()));
                 }
@@ -885,8 +874,8 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
     }
 
 
-    private String getCProxyCluster(String clusterName, boolean isHttpCluster) {
-        return "C_" + clusterName + (isHttpCluster ? "_http" : "");
+    private String getCProxyCluster(String clusterName) {
+        return "C_" + clusterName;
     }
 
     private void updateBrokerConfigByMqserverId(List<ClusterMqserverRelation> relationList) throws Exception {
@@ -904,7 +893,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
             throw new ZkConfigException(String.format("[CProxy] node not found, nodeId=%s", nodeId));
         }
 
-        if (node.getNodeType() != NodeType.CONSUMER_PROXY.getIndex() && node.getNodeType() != NodeType.CONSUME_HTTP_PROXY.getIndex()) {
+        if (node.getNodeType() != NodeType.CONSUMER_PROXY.getIndex()) {
             LOGGER.warn("[ZK_V4_CProxy] node isn't cproxy node, nodeId={}", nodeId);
             throw new ZkConfigException(String.format("[CProxy] node isn't cproxy node, nodeId=%s", nodeId));
         }
@@ -932,7 +921,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
             return;
         }
 
-        CProxyConfig cProxyConfig = buildCProxyConfig(node, host, cluster, relationList);
+        CProxyConfig cProxyConfig = buildCProxyConfig(host, cluster, relationList);
         zkService.createOrUpdateCProxy(cProxyConfig);
         if (zkCProxyConfig == null) {
             updateBrokerConfigByMqserverId(relationList);
@@ -941,13 +930,10 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         LOGGER.info("[ZK_V4_CProxy] update cproxy success, nodeId={}, clusterId={}, host={}", nodeId, node.getClusterId(), node.getHost());
     }
 
-    private CProxyConfig buildCProxyConfig(Node node, String host, Cluster cluster, List<ClusterMqserverRelation> relationList) throws ZkConfigException {
-        boolean isHttpCproxy = (node.getNodeType() == NodeType.CONSUME_HTTP_PROXY.getIndex());
-        boolean isSupportHttpCluster = nodeService.isSupportHttpCluster(cluster.getId());
-
+    private CProxyConfig buildCProxyConfig(String host, Cluster cluster, List<ClusterMqserverRelation> relationList) throws ZkConfigException {
         CProxyConfig cProxyConfig = new CProxyConfig();
         cProxyConfig.setInstance(host);
-        cProxyConfig.setProxyCluster(getCProxyCluster(cluster.getName(), isHttpCproxy));
+        cProxyConfig.setProxyCluster(getCProxyCluster(cluster.getName()));
         cProxyConfig.setIdc(cluster.getIdc());
         cProxyConfig.setBrokerClusters(relationList.stream().map(ClusterMqserverRelation::getMqServerName).collect(Collectors.toList()));
 
@@ -1001,24 +987,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                 if (!groupMap.containsKey(sub.getGroupId())) {
                     throw new ZkConfigException(String.format("[CProxy] subId(%s) not found group, groupId=%s", sub.getId(), sub.getGroupId()));
                 }
-                ConsumeGroup group = groupMap.get(sub.getGroupId());
                 for (TopicConf topicConf : topicConfMap.get(topicConfMapKey)) {
-                    if (isHttpCproxy) {
-                        if (isSupportHttpCluster) {
-                            if (consumeGroupService.isHttpCluster(group) && cProxyConfig.getBrokerClusters().contains(topicConf.getMqServerName())) {
-                                groups.add(sub.getGroupName());
-                            }
-                        }
-                    } else {
-                        if (isSupportHttpCluster) {
-                            if (!consumeGroupService.isHttpCluster(group) && cProxyConfig.getBrokerClusters().contains(topicConf.getMqServerName())) {
-                                groups.add(sub.getGroupName());
-                            }
-                        } else {
-                            if (cProxyConfig.getBrokerClusters().contains(topicConf.getMqServerName())) {
-                                groups.add(sub.getGroupName());
-                            }
-                        }
+                    if (cProxyConfig.getBrokerClusters().contains(topicConf.getMqServerName())) {
+                        groups.add(sub.getGroupName());
                     }
                 }
             }
@@ -1114,10 +1085,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                         pproxies.computeIfAbsent(getPProxyCluster(relation.getClusterName()), s -> Sets.newHashSet()).add(node.getHost() + ":" + DEFAULT_PPROXY_PORT);
                         break;
                     case CONSUMER_PROXY:
-                        cproxies.computeIfAbsent(getCProxyCluster(relation.getClusterName(), false), s -> Sets.newHashSet()).add(node.getHost() + ":" + DEFAULT_CPROXY_PORT);
-                        break;
-                    case CONSUME_HTTP_PROXY:
-                        cproxies.computeIfAbsent(getCProxyCluster(relation.getClusterName(), true), s -> Sets.newHashSet()).add(node.getHost() + ":" + DEFAULT_CPROXY_PORT);
+                        cproxies.computeIfAbsent(getCProxyCluster(relation.getClusterName()), s -> Sets.newHashSet()).add(node.getHost() + ":" + DEFAULT_CPROXY_PORT);
                         break;
                     case ROCKETMQ_BROKER_SLAVE:
                         Optional<Node> masterNode = nodeList.stream().filter(n -> node.getMasterId().equals(n.getId())).findFirst();
@@ -1133,8 +1101,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                             LOGGER.warn("[ZK_V4_Broker] slave node<{}> can't find master node<{}>", node.getId(), node.getMasterId());
                             throw new ZkConfigException("unknown slave node:" + node.getId());
                         }
-                        break;
-                    case DEFAULT:
                         break;
                 }
             }
@@ -1153,5 +1119,4 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
         return idc;
     }
-
 }

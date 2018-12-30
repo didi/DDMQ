@@ -16,17 +16,12 @@ public interface NodeService {
 
     List<Node> findByClusterIdNodeType(Long clusterId, NodeType nodeType);
 
-    List<Node> findByClusterIdNodeType(Long clusterId, List<NodeType> nodeType);
-
     List<Node> findByHostNodeType(String host, NodeType nodeType);
 
     List<Node> findByClusterHostNodeType(Long clusterId, String host, NodeType nodeType);
-
-    List<Node> findByHostNodeType(String host, List<NodeType> nodeTypes);
 
     ConsoleBaseResponse<?> create(NodeBo bo) throws Exception;
 
     List<Node> findAll();
 
-    boolean isSupportHttpCluster(Long clusterId);
 }

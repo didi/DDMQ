@@ -25,7 +25,7 @@ import com.didi.carrera.console.service.NodeService;
 import com.didi.carrera.console.service.OffsetManagerService;
 import com.didi.carrera.console.service.TopicService;
 import com.didi.carrera.console.service.ZKV4ConfigService;
-import com.didi.carrera.console.service.ZkConfigException;
+import com.didi.carrera.console.service.exception.ZkConfigException;
 import com.didi.carrera.console.service.bean.PageModel;
 import com.didi.carrera.console.service.vo.SearchItemVo;
 import com.didi.carrera.console.service.vo.SubscriptionOrderListVo;
@@ -166,50 +166,15 @@ public class ConsumeSubscriptionServiceImpl implements ConsumeSubscriptionServic
         return consumeSubscriptionMapper.selectByExampleWithBLOBs(csc);
     }
 
-    @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void initConsumeSubscriptionConfig() throws Exception {
-        List<ConsumeGroup> groupList = consumeGroupService.findAll();
-        for (ConsumeGroup consumeGroup : groupList) {
-            List<ConsumeSubscription> subList = findByGroupId(consumeGroup.getId());
-            if (CollectionUtils.isEmpty(subList)) {
-                continue;
-            }
-
-            Map<Long, Boolean> supportHttpClusterMap = Maps.newHashMap();
-            for (Long clusterId : subList.stream().map(ConsumeSubscription::getClusterId).collect(Collectors.toSet())) {
-                supportHttpClusterMap.put(clusterId, nodeService.isSupportHttpCluster(clusterId));
-            }
-
-            boolean isHttpCluster = consumeGroupService.isHttpCluster(consumeGroup);
-            for (ConsumeSubscription sub : subList) {
-                if (sub.getConsumeSubscriptionConfig() == null) {
-                    ConsumeSubscriptionConfig config = new ConsumeSubscriptionConfig();
-                    if (sub.getSubActions().contains(Actions.PULL_SERVER)) {
-                        config.setAppendContext(null);
-                    }
-                    sub.setConsumeSubscriptionConfig(config);
-                }
-
-                initProxies(supportHttpClusterMap.containsKey(sub.getClusterId()) && supportHttpClusterMap.get(sub.getClusterId()), isHttpCluster, sub);
-
-                updateByPrimaryKey(sub);
-            }
-        }
-    }
-
     private void initProxies(ConsumeSubscription sub) {
         ConsumeGroup group = consumeGroupService.findById(sub.getGroupId());
         if (group == null) {
             throw new RuntimeException("group not found, subId=" + sub.getId());
         }
-
-        boolean isHttpCluster = consumeGroupService.isHttpCluster(group);
-        boolean clusterIsSupportHttp = nodeService.isSupportHttpCluster(sub.getClusterId());
-        initProxies(clusterIsSupportHttp, isHttpCluster, sub);
+        doInitProxies(sub);
     }
 
-    private void initProxies(boolean clusterIsSupportHttp, boolean isHttpCluster, ConsumeSubscription sub) {
+    private void doInitProxies(ConsumeSubscription sub) {
         ConsumeSubscriptionConfig config = sub.getConsumeSubscriptionConfig();
         if (config.getProxies() == null) {
             config.setProxies(Maps.newHashMap());
@@ -218,12 +183,8 @@ public class ConsumeSubscriptionServiceImpl implements ConsumeSubscriptionServic
 
         List<Node> nodeList;
         String clusterName = sub.getClusterName();
-        if (isHttpCluster && clusterIsSupportHttp) {
-            nodeList = nodeService.findByClusterIdNodeType(sub.getClusterId(), NodeType.CONSUME_HTTP_PROXY);
-            clusterName = clusterName + ZKV4ConfigServiceImpl.HTTP_CLUSTER_SUFFIX;
-        } else {
-            nodeList = nodeService.findByClusterIdNodeType(sub.getClusterId(), NodeType.CONSUMER_PROXY);
-        }
+
+        nodeList = nodeService.findByClusterIdNodeType(sub.getClusterId(), NodeType.CONSUMER_PROXY);
 
         if (CollectionUtils.isNotEmpty(nodeList)) {
             Set<String> hostSet = nodeList.stream().map(n -> HostUtils.getIpPortFromHost(n.getHost(), ZKV4ConfigServiceImpl.DEFAULT_CPROXY_PORT)).collect(Collectors.toSet());
@@ -239,21 +200,15 @@ public class ConsumeSubscriptionServiceImpl implements ConsumeSubscriptionServic
             return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "cluster not found");
         }
 
-        boolean isHttpNode = false;
         if (!validNodeExist(host, cluster, NodeType.CONSUMER_PROXY)) {
-            if (!validNodeExist(host, cluster, NodeType.CONSUME_HTTP_PROXY)) {
-                return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "host not found");
-            } else {
-                isHttpNode = true;
-            }
-
+            return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "host not found");
         }
 
         List<ConsumeSubscription> subscriptionList = findByClusterId(cluster.getId());
         if (CollectionUtils.isEmpty(subscriptionList)) {
             return ConsoleBaseResponse.success();
         }
-        addCProxy(host, isHttpNode, subscriptionList);
+        addCProxy(host, subscriptionList);
 
         return ConsoleBaseResponse.success();
     }
@@ -272,21 +227,15 @@ public class ConsumeSubscriptionServiceImpl implements ConsumeSubscriptionServic
             return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "cluster not found");
         }
 
-        boolean isHttpNode = false;
         if (!validNodeExist(host, cluster, NodeType.CONSUMER_PROXY)) {
-            if (!validNodeExist(host, cluster, NodeType.CONSUME_HTTP_PROXY)) {
-                return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "host not found");
-            } else {
-                isHttpNode = true;
-            }
-
+            return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "host not found");
         }
 
         List<ConsumeSubscription> subscriptionList = findByNotNullGroupClusterTopicId(group.getId(), cluster.getId(), null);
         if (CollectionUtils.isEmpty(subscriptionList)) {
             return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "subscription not found");
         }
-        addCProxy(host, isHttpNode, subscriptionList);
+        addCProxy(host, subscriptionList);
 
         return ConsoleBaseResponse.success();
     }
@@ -320,28 +269,22 @@ public class ConsumeSubscriptionServiceImpl implements ConsumeSubscriptionServic
         }
     }
 
-
-
-    private void addCProxy(String host, boolean isHttpNode, List<ConsumeSubscription> subList) throws Exception {
+    private void addCProxy(String host, List<ConsumeSubscription> subList) throws Exception {
         String ipPort = HostUtils.getIpPortFromHost(host, ZKV4ConfigServiceImpl.DEFAULT_CPROXY_PORT);
         Set<Long> clusterIds = Sets.newHashSet();
         for (ConsumeSubscription sub : subList) {
             if (sub.getConsumeSubscriptionConfig() != null && MapUtils.isNotEmpty(sub.getConsumeSubscriptionConfig().getProxies())) {
                 Map<String, Set<String>> proxyMap = sub.getConsumeSubscriptionConfig().getProxies();
                 for (Map.Entry<String, Set<String>> entry : proxyMap.entrySet()) {
-                    String key = entry.getKey();
                     Set<String> ipLists = entry.getValue();
-                    if ((isHttpNode && key.contains(ZKV4ConfigServiceImpl.HTTP_CLUSTER_SUFFIX)) || (!isHttpNode && !key.contains(ZKV4ConfigServiceImpl.HTTP_CLUSTER_SUFFIX))) {
-                        if (!ipLists.contains(ipPort)) {
-                            ipLists.add(ipPort);
-                            clusterIds.add(sub.getClusterId());
-                            updateByPrimaryKey(sub);
+                    if (!ipLists.contains(ipPort)) {
+                        ipLists.add(ipPort);
+                        clusterIds.add(sub.getClusterId());
+                        updateByPrimaryKey(sub);
 
-                            pushV4ZkInfo(sub.getGroupId(), null);
-                            LOGGER.info("add cproxy {} success, subId={}, group={}, topic={}, cluster={}", ipPort, sub.getId(), sub.getGroupName(), sub.getTopicName(), sub.getClusterName());
-                        }
+                        pushV4ZkInfo(sub.getGroupId(), null);
+                        LOGGER.info("add cproxy {} success, subId={}, group={}, topic={}, cluster={}", ipPort, sub.getId(), sub.getGroupName(), sub.getTopicName(), sub.getClusterName());
                     }
-
                 }
             }
         }
