@@ -1,4 +1,4 @@
-package com.didi.carrera.console.service;
+package com.didi.carrera.console.service.exception;
 
 
 public class MqException extends Exception {

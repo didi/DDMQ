@@ -5,7 +5,6 @@ import java.util.List;
 
 
 public enum NodeType {
-    DEFAULT((byte)0, "default"),
 
     ROCKETMQ_BROKER_MASTER((byte)1, "rocketmq broker master"),
 
@@ -14,8 +13,6 @@ public enum NodeType {
     PRODUCER_PROXY((byte)3, "producer proxy"),
 
     CONSUMER_PROXY((byte)4, "consumer proxy"),
-
-    CONSUME_HTTP_PROXY((byte)8, "consume http proxy"),
 
     ROCKETMQ_BROKER_SLAVE((byte)9, "rocketmq broker slave");
 

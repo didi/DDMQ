@@ -24,8 +24,6 @@ public interface TopicConfService {
 
     boolean deleteByIds(List<Long> configIds);
 
-    void updateIdcName(Long idcId, String idcName);
-
     List<TopicConf> findAll();
 
     List<Long> findTopicByClusterIdWithDeleted(Long clusterId);

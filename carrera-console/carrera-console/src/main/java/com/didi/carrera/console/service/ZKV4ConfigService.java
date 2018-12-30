@@ -3,6 +3,7 @@ package com.didi.carrera.console.service;
 import java.util.Set;
 
 import com.didi.carrera.console.dao.model.ConsumeSubscription;
+import com.didi.carrera.console.service.exception.ZkConfigException;
 import com.didi.carrera.console.web.ConsoleBaseResponse;
 import com.xiaojukeji.carrera.config.v4.GroupConfig;
 import com.xiaojukeji.carrera.config.v4.cproxy.UpstreamTopic;

@@ -41,8 +41,6 @@ public interface ConsumeGroupService {
 
     ConsoleBaseResponse<?> delete(String user, Long groupId) throws Exception;
 
-    boolean isHttpCluster(ConsumeGroup groupInfo);
-
     void insertOrUpdate(ConsumeGroup group);
 
 }

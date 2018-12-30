@@ -27,7 +27,6 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Service("didiNodeServiceImpl")
@@ -78,24 +77,6 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<Node> findByClusterIdNodeType(Long clusterId, List<NodeType> nodeType) {
-        NodeCriteria nc = new NodeCriteria();
-        nc.createCriteria().andIsDeleteEqualTo(IsDelete.NO.getIndex()).andClusterIdEqualTo(clusterId).andNodeTypeIn(nodeType.stream().map(NodeType::getIndex).collect(Collectors.toList()));
-        return nodeMapper.selectByExample(nc);
-    }
-
-    @Override
-    public boolean isSupportHttpCluster(Long clusterId) {
-        boolean ret = false;
-        List<Node> nodes = findByClusterIdNodeType(clusterId, NodeType.CONSUME_HTTP_PROXY);
-        if (nodes != null && nodes.size() > 0) {
-            ret = true;
-        }
-
-        return ret;
-    }
-
-    @Override
     public List<Node> findByHostNodeType(String host, NodeType nodeType) {
         NodeCriteria nc = new NodeCriteria();
         nc.createCriteria().andIsDeleteEqualTo(IsDelete.NO.getIndex()).andHostEqualTo(host).andNodeTypeEqualTo(nodeType.getIndex());
@@ -109,13 +90,6 @@ public class NodeServiceImpl implements NodeService {
         return nodeMapper.selectByExample(nc);
     }
 
-
-    @Override
-    public List<Node> findByHostNodeType(String host, List<NodeType> nodeTypes) {
-        NodeCriteria nc = new NodeCriteria();
-        nc.createCriteria().andIsDeleteEqualTo(IsDelete.NO.getIndex()).andHostEqualTo(host).andNodeTypeIn(nodeTypes.stream().map(NodeType::getIndex).collect(Collectors.toList()));
-        return nodeMapper.selectByExample(nc);
-    }
 
     private List<Node> findByCondition(Node node) {
         NodeCriteria nc = new NodeCriteria();
@@ -173,7 +147,7 @@ public class NodeServiceImpl implements NodeService {
 
     private void updateV4Zk(Node node, Cluster cluster) throws Exception {
         Byte nodeType = node.getNodeType();
-        if (nodeType == NodeType.CONSUMER_PROXY.getIndex() || nodeType == NodeType.CONSUME_HTTP_PROXY.getIndex()) {
+        if (nodeType == NodeType.CONSUMER_PROXY.getIndex()) {
             zkv4ConfigService.updateCProxyConfig(node.getId());
         } else if (nodeType == NodeType.PRODUCER_PROXY.getIndex()) {
             zkv4ConfigService.updatePProxyConfig(node.getId());

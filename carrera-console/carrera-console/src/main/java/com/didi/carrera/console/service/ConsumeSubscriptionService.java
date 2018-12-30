@@ -4,6 +4,7 @@ import com.didi.carrera.console.dao.model.ConsumeSubscription;
 import com.didi.carrera.console.dao.model.custom.CustomConsumeSubscription;
 import com.didi.carrera.console.dao.model.custom.CustomSubscriptionStateCount;
 import com.didi.carrera.console.service.bean.PageModel;
+import com.didi.carrera.console.service.exception.ZkConfigException;
 import com.didi.carrera.console.service.vo.SearchItemVo;
 import com.didi.carrera.console.service.vo.SubscriptionOrderListVo;
 import com.didi.carrera.console.web.ConsoleBaseResponse;
@@ -51,8 +52,6 @@ public interface ConsumeSubscriptionService {
     ConsoleBaseResponse<?> deleteByGroupId(String user, Long groupId) throws Exception;
 
     ConsoleBaseResponse<List<SearchItemVo>> findMsgPushType(String user);
-
-    void initConsumeSubscriptionConfig() throws Exception;
 
     List<ConsumeSubscription> findAll();
 

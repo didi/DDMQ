@@ -44,8 +44,6 @@ public interface TopicService {
     ConsoleBaseResponse<TopicMessageVo> findMessage(String user, Long topicId, Long clusterId);
 
     ConsoleBaseResponse<TopicOrderVo> findVoById(Long topicId);
-    
-    void initTopicConfIdc() throws Exception;
 
     ConsoleBaseResponse<?> addPProxy(String clusterName, String host) throws Exception;
     ConsoleBaseResponse<?> addPProxy(String topicName, String clusterName, String host) throws Exception;
