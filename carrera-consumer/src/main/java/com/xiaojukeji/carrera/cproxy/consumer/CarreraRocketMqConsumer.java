@@ -21,10 +21,10 @@ import static com.xiaojukeji.carrera.cproxy.consumer.ConsumeContext.MessageSourc
 
 public class CarreraRocketMqConsumer extends AbstractCarreraRocketMqConsumer {
 
-    public CarreraRocketMqConsumer(String idc, String brokerCluster, String group, GroupConfig groupConfig,
+    public CarreraRocketMqConsumer(String brokerCluster, String group, GroupConfig groupConfig,
                                    CProxyConfig cProxyConfig, RocketmqConfiguration rocketmqConfiguration,
                                    AsyncMessageHandler handler, Map<String, Long> maxCommitLagMap, int totalThreads) {
-        super(idc, brokerCluster, group, groupConfig, cProxyConfig, rocketmqConfiguration, handler, maxCommitLagMap, totalThreads);
+        super(brokerCluster, group, groupConfig, cProxyConfig, rocketmqConfiguration, handler, maxCommitLagMap, totalThreads);
     }
 
     @Override

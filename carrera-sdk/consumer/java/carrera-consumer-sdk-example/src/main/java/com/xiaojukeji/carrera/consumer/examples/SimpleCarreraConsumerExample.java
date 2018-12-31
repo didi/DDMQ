@@ -21,7 +21,7 @@ public class SimpleCarreraConsumerExample {
     public static void main(String[] args) throws TTransportException, InterruptedException {
 
         CarreraConfig config =
-                new CarreraConfig("test-thrift-client", "127.0.0.1:9713");
+                new CarreraConfig("cg_test", "127.0.0.1:9713");
         config.setRetryInterval(1000);
         final SimpleCarreraConsumer consumer = new SimpleCarreraConsumer(config);
 

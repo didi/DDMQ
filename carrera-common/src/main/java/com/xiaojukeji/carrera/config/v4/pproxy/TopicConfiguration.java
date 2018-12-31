@@ -16,9 +16,7 @@ public class TopicConfiguration implements ConfigurationValidator {
     private static final int DEFAULT_TOTAL_MAX_TPS = ConfigUtils.getDefaultConfig(
             "com.xiaojukeji.carrera.config.v4.pproxy.TopicConfiguration.totalMaxTps", 1024);
 
-    private String idc;
     private String brokerCluster;
-    private String clusterName;
     private Map<String/*proxyCluster*/, Set<String>> proxies = Maps.newHashMap();
 
     private int totalMaxTps = DEFAULT_TOTAL_MAX_TPS;
@@ -41,14 +39,6 @@ public class TopicConfiguration implements ConfigurationValidator {
         this.totalMaxTps = totalMaxTps;
     }
 
-    public String getIdc() {
-        return idc;
-    }
-
-    public void setIdc(String idc) {
-        this.idc = idc;
-    }
-
     public String getBrokerCluster() {
         return brokerCluster;
     }
@@ -65,25 +55,16 @@ public class TopicConfiguration implements ConfigurationValidator {
         this.proxies = proxies;
     }
 
-    public String getClusterName() {
-        return clusterName;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
 
     @Override
     public boolean validate() {
-        return StringUtils.isNotEmpty(idc) && StringUtils.isNotEmpty(brokerCluster) && totalMaxTps > 0;
+        return StringUtils.isNotEmpty(brokerCluster) && totalMaxTps > 0;
     }
 
     @Override
     public String toString() {
         return "TopicConfiguration{" +
-                "idc='" + idc + '\'' +
                 ", brokerCluster='" + brokerCluster + '\'' +
-                ", clusterName='" + clusterName + '\'' +
                 ", proxies=" + proxies +
                 ", totalMaxTps=" + totalMaxTps +
                 ", maxTps=" + maxTps +

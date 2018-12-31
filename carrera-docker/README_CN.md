@@ -17,6 +17,7 @@ DDMQ 涉及到的模块较多，集群部署步骤比较复杂。为了方便开
 ### 使用方式 ###
 * 安装 Docker
 * 安装 MySQL 客户端（建议使用 5.7.x版本）
+* 运行 ```build.sh``` 构建打包
 * 运行 ```play-ddmq.sh``` （首次执行将下载 centos7,mysql,tomcat,zookeeper 等依赖，大约20分钟，具体情况视网络情况）
 * 打开 DDMQ 用户控制台  
 

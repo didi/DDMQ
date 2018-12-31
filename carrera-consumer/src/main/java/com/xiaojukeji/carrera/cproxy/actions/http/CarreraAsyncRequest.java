@@ -5,18 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.xiaojukeji.carrera.chronos.enums.MsgTypes;
 import com.xiaojukeji.carrera.chronos.model.InternalKey;
 import com.xiaojukeji.carrera.config.v4.cproxy.UpstreamTopic;
-import com.xiaojukeji.carrera.cproxy.consumer.limiter.LimiterMgr;
-import com.xiaojukeji.carrera.producer.CarreraProducer;
-import com.xiaojukeji.carrera.producer.CarreraReturnCode;
-import com.xiaojukeji.carrera.thrift.DelayResult;
-import com.xiaojukeji.carrera.cproxy.consumer.UpstreamJob;
 import com.xiaojukeji.carrera.cproxy.actions.FormParamsExtractAction;
-import com.xiaojukeji.carrera.cproxy.actions.util.CarreraProducerManager;
-import com.xiaojukeji.carrera.cproxy.utils.JsonUtils;
-import com.xiaojukeji.carrera.cproxy.utils.LogUtils;
-import com.xiaojukeji.carrera.cproxy.utils.MetricUtils;
-import com.xiaojukeji.carrera.cproxy.utils.StringUtils;
-import com.xiaojukeji.carrera.cproxy.utils.TimeUtils;
+import com.xiaojukeji.carrera.cproxy.consumer.UpstreamJob;
+import com.xiaojukeji.carrera.cproxy.consumer.limiter.LimiterMgr;
+import com.xiaojukeji.carrera.cproxy.utils.*;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.http.HttpStatus;
 import org.asynchttpclient.AsyncCompletionHandler;
@@ -28,15 +20,11 @@ import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.xiaojukeji.carrera.thrift.consumer.consumerProxyConstants.CARRERA_HEADERS;
 import static com.xiaojukeji.carrera.cproxy.actions.FormParamsExtractAction.CARRERA_PROPERTIES;
+import static com.xiaojukeji.carrera.thrift.consumer.consumerProxyConstants.CARRERA_HEADERS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 
@@ -191,29 +179,6 @@ public class CarreraAsyncRequest extends AsyncCompletionHandler<Response> {
             slowDown();
             return ProcessResult.OK;
         } else if (code == HttpErrNo.IN_PROCESSABLE.code()) {
-            if (job.isFromChronos()) {
-                InternalKey internalKey = new InternalKey(job.getCommonMessage().getKey());
-                if (internalKey.getType() == MsgTypes.LOOP_DELAY.getValue()) {
-                    CarreraProducer producer = CarreraProducerManager.getProducer();
-
-                    if (producer != null) {
-                        DelayResult delayResult = producer.cancelDelayMessageBuilder()
-                                .setTopic(job.getTopic()).setUniqDelayMsgId(job.getCommonMessage().getKey()).send();
-                        if (delayResult.getCode() == CarreraReturnCode.OK) {
-                            LOGGER.info("succ cancel delay msg, delayResult:{}, topic:{}, uniqDelayMsgId:{}", delayResult,
-                                    job.getTopic(), job.getCommonMessage().getKey());
-                        } else {
-                            LOGGER.info("fail to cancel delay msg, delayResult:{}, topic:{}, uniqDelayMsgId:{}", delayResult,
-                                    job.getTopic(), job.getCommonMessage().getKey());
-                        }
-                    } else {
-                        LogUtils.logErrorInfo("CarreraAsyncRequest_error", "fail to cancel delay msg for carrera producer is null, topic:{}, uniqDelayMsgId:{}",
-                                job.getTopic(), job.getCommonMessage().getKey());
-                    }
-                }
-            }
-
-            // skip this msg
             return ProcessResult.OK;
         }
 

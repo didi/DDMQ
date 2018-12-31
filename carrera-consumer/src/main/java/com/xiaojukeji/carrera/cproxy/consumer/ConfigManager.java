@@ -4,29 +4,25 @@ import com.google.common.collect.Maps;
 import com.xiaojukeji.carrera.config.v4.CProxyConfig;
 import com.xiaojukeji.carrera.config.v4.GroupConfig;
 import com.xiaojukeji.carrera.config.v4.cproxy.ConsumeServerConfiguration;
-import com.xiaojukeji.carrera.cproxy.consumer.offset.CarreraOffsetManager;
-import com.xiaojukeji.carrera.cproxy.utils.ConfigUtils;
-import com.xiaojukeji.carrera.dynamic.ParameterDynamicZookeeper;
-import com.xiaojukeji.carrera.metric.MetricFactory;
-import com.xiaojukeji.carrera.utils.CommonUtils;
 import com.xiaojukeji.carrera.cproxy.concurrent.CarreraExecutors;
 import com.xiaojukeji.carrera.cproxy.config.ConfigurationLoader;
 import com.xiaojukeji.carrera.cproxy.config.ConsumeProxyConfiguration;
 import com.xiaojukeji.carrera.cproxy.config.ConsumerGroupConfig;
 import com.xiaojukeji.carrera.cproxy.config.LocalModeConfig;
-import com.xiaojukeji.carrera.cproxy.config.ProducerProxyConfiguration;
-import com.xiaojukeji.carrera.cproxy.actions.util.CarreraProducerManager;
+import com.xiaojukeji.carrera.cproxy.consumer.offset.CarreraOffsetManager;
 import com.xiaojukeji.carrera.cproxy.proxy.ConsumerProxyMain;
 import com.xiaojukeji.carrera.cproxy.proxy.ProxyApp;
+import com.xiaojukeji.carrera.cproxy.utils.ConfigUtils;
 import com.xiaojukeji.carrera.cproxy.utils.LogUtils;
 import com.xiaojukeji.carrera.cproxy.utils.MixAll;
 import com.xiaojukeji.carrera.cproxy.utils.StringUtils;
+import com.xiaojukeji.carrera.dynamic.ParameterDynamicZookeeper;
+import com.xiaojukeji.carrera.metric.MetricFactory;
+import com.xiaojukeji.carrera.utils.CommonUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -152,12 +148,6 @@ public class ConfigManager {
     }
 
 
-    private void initCarreraProducer(List<String> proxyList) {
-        ProducerProxyConfiguration producerProxyConfiguration = new ProducerProxyConfiguration();
-        producerProxyConfiguration.setCarreraProxyList(proxyList);
-        CarreraProducerManager.startCarreraProducer(producerProxyConfiguration);
-    }
-
     public ConsumeServerConfiguration getConsumeServerConfiguration() {
         return Optional.ofNullable(curCproxyConfig)
                 .map(CProxyConfig::getThriftServer)
@@ -281,11 +271,6 @@ public class ConfigManager {
             LogUtils.logMainInfo("BrokerCluster was channed, old :{}, new:{}.", oldConf, newConf);
             ConsumerManager.getInstance().updateCproxyConfig(newConf);
             CarreraOffsetManager.getInstance().update(newConf);
-        }
-
-        // pproxy addr was changed
-        if (ConfigUtils.pProxyListIsUpdated(oldConf, newConf)) {
-            initCarreraProducer(newConf.getPproxies().values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
         }
     }
 

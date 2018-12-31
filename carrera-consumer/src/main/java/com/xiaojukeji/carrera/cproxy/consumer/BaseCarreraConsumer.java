@@ -25,8 +25,6 @@ public abstract class BaseCarreraConsumer {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseCarreraConsumer.class);
 
-    protected String idc;
-
     protected String brokerCluster;
 
     protected String group;
@@ -47,9 +45,8 @@ public abstract class BaseCarreraConsumer {
 
     protected volatile boolean isRunning;
 
-    public BaseCarreraConsumer(String idc, String brokerCluster, String group, GroupConfig groupConfig,
+    public BaseCarreraConsumer(String brokerCluster, String group, GroupConfig groupConfig,
                                CProxyConfig cProxyConfig, AsyncMessageHandler handler, Map<String, Long> maxCommitLagMap) {
-        this.idc = idc;
         this.brokerCluster = brokerCluster;
         this.group = group;
         this.groupConfig = groupConfig;

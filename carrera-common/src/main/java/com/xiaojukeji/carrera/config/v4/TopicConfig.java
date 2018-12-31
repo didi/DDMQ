@@ -8,11 +8,9 @@ import com.xiaojukeji.carrera.config.v4.pproxy.TopicConfiguration;
 import com.xiaojukeji.carrera.utils.CommonFastJsonUtils;
 import com.xiaojukeji.carrera.utils.ConfigUtils;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 
 public class TopicConfig implements ConfigurationValidator, Cloneable {
@@ -28,13 +26,9 @@ public class TopicConfig implements ConfigurationValidator, Cloneable {
 
     private String topic;
 
-    private String schema;
     private List<String> alarmGroup;
 
     private List<TopicConfiguration> topicUnits;
-
-    private ProduceMode produceMode = ProduceMode.SAME_IDC;
-    private Map<String/*client idc*/, List<String/*pproxy idc*/>> produceModeMapper;
 
     private boolean delayTopic = DEFAULT_DELAY_TOPIC;
 
@@ -54,14 +48,6 @@ public class TopicConfig implements ConfigurationValidator, Cloneable {
         this.topic = topic;
     }
 
-    public String getSchema() {
-        return schema;
-    }
-
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
-
     public List<String> getAlarmGroup() {
         return alarmGroup;
     }
@@ -76,22 +62,6 @@ public class TopicConfig implements ConfigurationValidator, Cloneable {
 
     public void setTopicUnits(List<TopicConfiguration> topicUnits) {
         this.topicUnits = topicUnits;
-    }
-
-    public ProduceMode getProduceMode() {
-        return produceMode;
-    }
-
-    public void setProduceMode(ProduceMode produceMode) {
-        this.produceMode = produceMode;
-    }
-
-    public Map<String, List<String>> getProduceModeMapper() {
-        return produceModeMapper;
-    }
-
-    public void setProduceModeMapper(Map<String, List<String>> produceModeMapper) {
-        this.produceModeMapper = produceModeMapper;
     }
 
     public boolean isDelayTopic() {
@@ -148,11 +118,8 @@ public class TopicConfig implements ConfigurationValidator, Cloneable {
     public String toString() {
         return "TopicConfig{" +
                 "topic='" + topic + '\'' +
-                ", schema='" + schema + '\'' +
                 ", alarmGroup=" + alarmGroup +
                 ", topicUnits=" + topicUnits +
-                ", produceMode=" + produceMode +
-                ", produceModeMapper=" + produceModeMapper +
                 ", delayTopic=" + delayTopic +
                 ", autoBatch=" + autoBatch +
                 ", strongOrder=" + strongOrder +
@@ -167,10 +134,6 @@ public class TopicConfig implements ConfigurationValidator, Cloneable {
             throw new ConfigException("[TopicConfig] topic empty, topic=" + topic);
         } else if (CollectionUtils.isEmpty(this.topicUnits)) {
             throw new ConfigException("[TopicConfig] topicUnits empty, topic=" + topic);
-        } else if (produceMode == null) {
-            throw new ConfigException("[TopicConfig] produceMode is null, topic=" + topic);
-        } else if (produceMode == ProduceMode.OTHER && MapUtils.isEmpty(produceModeMapper)) {
-            throw new ConfigException("[TopicConfig] produceModeMapper is empty, topic=" + topic);
         } else if (!topicUnits.stream().allMatch(TopicConfiguration::validate)) {
             throw new ConfigException("[TopicConfig] topicUnits error, topic=" + topic);
         }

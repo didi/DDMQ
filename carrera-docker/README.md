@@ -17,6 +17,7 @@ Note：DDMQ Container requires a MySQL 5.7 container.
 ### Usage ###
 * Install Docker
 * Install MySQL Client（recommend 5.7.x）
+* run ```build.sh``` to build packages
 * run ```play-ddmq.sh``` （will download centos7,mysql,tomcat,zookeeper in first run）
 * Visit DDMQ Web Console  
 

@@ -156,7 +156,7 @@ public class ConsumeSubscriptionServiceImpl implements ConsumeSubscriptionServic
 
         ConsumeSubscriptionConfig config = new ConsumeSubscriptionConfig();
         subscription.setConsumeSubscriptionConfig(config);
-        return zkv4ConfigService.buildUpstreamTopic(new GroupConfig(), subscription, "0", "0");
+        return zkv4ConfigService.buildUpstreamTopic(new GroupConfig(), subscription, "0");
     }
 
     @Override

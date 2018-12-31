@@ -51,10 +51,10 @@ public class CarreraKafkaConsumer extends BaseCarreraConsumer {
     private Map<String, Integer> topicCountMap;
     private Map<String, UpstreamTopic> topicMap;
 
-    public CarreraKafkaConsumer(String idc, String brokerCluster, String group, GroupConfig groupConfig,
+    public CarreraKafkaConsumer(String brokerCluster, String group, GroupConfig groupConfig,
                                 CProxyConfig cProxyConfig, KafkaConfiguration kafkaConfiguration, AsyncMessageHandler handler,
                                 Map<String, Long> maxCommitLagMap, Map<String, Integer> topicCountMap, Map<String, UpstreamTopic> topicMap) {
-        super(idc, brokerCluster, group, groupConfig, cProxyConfig, handler, maxCommitLagMap);
+        super(brokerCluster, group, groupConfig, cProxyConfig, handler, maxCommitLagMap);
         this.kafkaConfiguration = kafkaConfiguration;
 
         this.topicCountMap = topicCountMap;

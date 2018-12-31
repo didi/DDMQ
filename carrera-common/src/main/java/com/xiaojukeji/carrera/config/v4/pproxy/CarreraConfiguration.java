@@ -25,8 +25,6 @@ public class CarreraConfiguration implements ConfigurationValidator {
 
     private int maxTps = 100000;
     private double tpsWarningRatio = 0.9;
-    private ParamLengthConfiguration paramLength;
-    private RateLimitConfiguration rateLimit;
     // 静态添加的配置。优先级低于动态配置。会被覆盖。
     private TopicInfoConfiguration defaultTopicInfoConf = new TopicInfoConfiguration();
 
@@ -146,22 +144,6 @@ public class CarreraConfiguration implements ConfigurationValidator {
         this.autoBatch = autoBatch;
     }
 
-    public ParamLengthConfiguration getParamLength() {
-        return paramLength;
-    }
-
-    public void setParamLength(ParamLengthConfiguration paramLength) {
-        this.paramLength = paramLength;
-    }
-
-    public RateLimitConfiguration getRateLimit() {
-        return rateLimit;
-    }
-
-    public void setRateLimit(RateLimitConfiguration rateLimit) {
-        this.rateLimit = rateLimit;
-    }
-
     public Map<String, KafkaConfiguration> getKafkaConfigurationMap() {
         return kafkaConfigurationMap;
     }
@@ -212,10 +194,6 @@ public class CarreraConfiguration implements ConfigurationValidator {
             throw new ConfigException("[CarreraConfiguration] tpsWarningRatio <= 0");
         } else if (defaultTopicInfoConf == null) {
             throw new ConfigException("[CarreraConfiguration] defaultTopicInfoConf is null");
-        } else if (paramLength == null || !paramLength.validate()) {
-            throw new ConfigException("[CarreraConfiguration] paramLength error");
-        } else if (rateLimit == null) {
-            throw new ConfigException("[CarreraConfiguration] rateLimit error");
         }
 
         return true;
@@ -239,8 +217,6 @@ public class CarreraConfiguration implements ConfigurationValidator {
                 ", warmUpConnection=" + warmUpConnection +
                 ", maxTps=" + maxTps +
                 ", tpsWarningRatio=" + tpsWarningRatio +
-                ", paramLength=" + paramLength +
-                ", rateLimit=" + rateLimit +
                 ", defaultTopicInfoConf=" + defaultTopicInfoConf +
                 ", warmUpFetchTopicRouteInfo=" + warmUpFetchTopicRouteInfo +
                 ", limiterFailureRetryQueueSize=" + limiterFailureRetryQueueSize +

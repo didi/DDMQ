@@ -3,7 +3,6 @@ package com.xiaojukeji.carrera.cproxy.actions.hdfs;
 import com.xiaojukeji.carrera.config.v4.cproxy.HdfsConfiguration;
 import com.xiaojukeji.carrera.cproxy.consumer.UpstreamJob;
 import com.xiaojukeji.carrera.cproxy.utils.MetricUtils;
-import com.xiaojukeji.carrera.utils.TimeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -14,22 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -173,7 +158,6 @@ public class DataFileManager {
             LOGGER.error("Failed to get result ", e);
         }
         executor.shutdown();
-        LOGGER.info("FileFlushScanner sync time is {} ms, group {}", TimeUtils.getElapseTime(start), group);
     }
 
     public void flush(boolean stop) {
