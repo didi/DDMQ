@@ -42,7 +42,7 @@ public interface ZKV4ConfigService {
 
     ConsoleBaseResponse<?> pushCProxyByCluster(String clusterName) throws Exception;
 
-    UpstreamTopic buildUpstreamTopic(GroupConfig groupConfig, ConsumeSubscription subscription, String brokerCluster, String idc) throws ZkConfigException;
+    UpstreamTopic buildUpstreamTopic(GroupConfig groupConfig, ConsumeSubscription subscription, String brokerCluster) throws ZkConfigException;
 
     void updatePProxyConfigByClusterId(String topic, Set<Long> clusterIdSet) throws Exception;
     void updateCProxyConfigByClusterId(String group, Set<Long> clusterIdSet) throws Exception;

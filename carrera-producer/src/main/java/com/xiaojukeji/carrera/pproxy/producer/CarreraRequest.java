@@ -108,15 +108,15 @@ public class CarreraRequest extends CarreraMessage implements SendCallback {
 
     protected boolean checkValidExceptBody(Message msg) {
         // check msg key.
-        if (StringUtils.isNotEmpty(msg.getKey()) && msg.getKey().length() > producerPool.getConfigManager().getCarreraConfig().getParamLength().getKeyLenMax()) {
+        if (StringUtils.isNotEmpty(msg.getKey()) && msg.getKey().length() > 255) {
             LOGGER.warn("key is too long, topic={}, key={}", msg.getTopic(), msg.getKey());
-            return !producerPool.getConfigManager().getCarreraConfig().getParamLength().isFailWhenIllegal();
+            return false;
         }
 
         // check msg tags.
-        if (StringUtils.isNotEmpty(msg.getTags()) && msg.getTags().length() > producerPool.getConfigManager().getCarreraConfig().getParamLength().getTagLenMax()) {
+        if (StringUtils.isNotEmpty(msg.getTags()) && msg.getTags().length() > 255) {
             LOGGER.warn("tag is too long, topic={},  tag={}", msg.getTopic(), msg.getTags());
-            return !producerPool.getConfigManager().getCarreraConfig().getParamLength().isFailWhenIllegal();
+            return false;
         }
 
         //check msg properties

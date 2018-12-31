@@ -1,30 +1,21 @@
 package com.xiaojukeji.carrera.config.v4;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.alibaba.fastjson.TypeReference;
 import com.xiaojukeji.carrera.config.ConfigurationValidator;
 import com.xiaojukeji.carrera.utils.CommonFastJsonUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
+import java.util.Set;
+
 
 public class BrokerConfig implements ConfigurationValidator, Cloneable {
-    private String idc;
     private String brokerCluster;
     private String brokerClusterAddrs;
     private Map<String/*master ip:port*/, Set<String>/*slave ip:port*/> brokers;
 
     private Map<String/*proxyCluster*/, Set<String>> pproxies;
     private Map<String/*proxyCluster*/, Set<String>> cproxies;
-
-    public String getIdc() {
-        return idc;
-    }
-
-    public void setIdc(String idc) {
-        this.idc = idc;
-    }
 
     public String getBrokerCluster() {
         return brokerCluster;
@@ -69,7 +60,6 @@ public class BrokerConfig implements ConfigurationValidator, Cloneable {
     @Override
     public String toString() {
         return "BrokerConfig{" +
-                "idc='" + idc + '\'' +
                 ", brokerCluster='" + brokerCluster + '\'' +
                 ", brokerClusterAddrs=" + brokerClusterAddrs +
                 ", brokers=" + brokers +
@@ -80,9 +70,7 @@ public class BrokerConfig implements ConfigurationValidator, Cloneable {
 
     @Override
     public boolean validate() throws ConfigException {
-        if (StringUtils.isEmpty(this.idc)) {
-            throw new ConfigException("[BrokerConfig] idc empty, brokerCluster=" + brokerCluster);
-        } else if (StringUtils.isEmpty(this.brokerCluster)) {
+        if (StringUtils.isEmpty(this.brokerCluster)) {
             throw new ConfigException("[BrokerConfig] brokerCluster empty, brokerCluster=" + brokerCluster);
         } else if (StringUtils.isEmpty(this.brokerClusterAddrs)) {
             throw new ConfigException("[BrokerConfig] brokerClusterAddrs empty, brokerCluster=" + brokerCluster);

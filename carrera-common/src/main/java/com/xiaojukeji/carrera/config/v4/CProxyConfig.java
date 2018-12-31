@@ -1,10 +1,5 @@
 package com.xiaojukeji.carrera.config.v4;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.xiaojukeji.carrera.config.ConfigurationValidator;
@@ -15,20 +10,22 @@ import com.xiaojukeji.carrera.utils.PropertyUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 
 public class CProxyConfig implements ConfigurationValidator, Cloneable {
     private String instance;
     private String proxyCluster;
-    private String idc;
     private List<String> brokerClusters;
 
     private Map<String/*brokerCluster*/, KafkaConfiguration> kafkaConfigs;
     private Map<String/*brokerCluster*/, RocketmqConfiguration> rocketmqConfigs;
     private ConsumeServerConfiguration thriftServer;
 
-    private Map<String/*proxyCluster*/, Set<String>> pproxies;
-
-    private Set<String> groups = Collections.emptySet();
+    private Set<String> groups = Collections.emptySet(); /* group white list. */
 
     @Override
     public boolean validate() throws ConfigException {
@@ -37,8 +34,6 @@ public class CProxyConfig implements ConfigurationValidator, Cloneable {
                 throw new ConfigException("[CProxyConfig] instance empty");
             } else if (StringUtils.isEmpty(this.proxyCluster)) {
                 throw new ConfigException("[CProxyConfig] proxyCluster empty");
-            } else if (StringUtils.isEmpty(this.idc)) {
-                throw new ConfigException("[CProxyConfig] idc empty");
             } else if (CollectionUtils.isEmpty(this.brokerClusters)) {
                 throw new ConfigException("[CProxyConfig] brokerClusters empty");
             }
@@ -89,11 +84,6 @@ public class CProxyConfig implements ConfigurationValidator, Cloneable {
         if (groups != null) {
             cProxyConfig.setGroups(Sets.newHashSet(groups));
         }
-        if (this.pproxies != null) {
-            Map<String, Set<String>> pproxiesConfig = Maps.newHashMap();
-            this.pproxies.forEach((bk, conf) -> pproxiesConfig.put(bk, Sets.newHashSet(conf)));
-            cProxyConfig.setPproxies(pproxiesConfig);
-        }
 
         return cProxyConfig;
     }
@@ -104,14 +94,6 @@ public class CProxyConfig implements ConfigurationValidator, Cloneable {
 
     public void setInstance(String instance) {
         this.instance = instance;
-    }
-
-    public String getIdc() {
-        return idc;
-    }
-
-    public void setIdc(String idc) {
-        this.idc = idc;
     }
 
     public List<String> getBrokerClusters() {
@@ -162,25 +144,15 @@ public class CProxyConfig implements ConfigurationValidator, Cloneable {
         this.thriftServer = thriftServer;
     }
 
-    public Map<String, Set<String>> getPproxies() {
-        return pproxies;
-    }
-
-    public void setPproxies(Map<String, Set<String>> pproxies) {
-        this.pproxies = pproxies;
-    }
-
     @Override
     public String toString() {
         return "CProxyConfig{" +
                 "instance='" + instance + '\'' +
                 ", proxyCluster='" + proxyCluster + '\'' +
-                ", idc='" + idc + '\'' +
                 ", brokerClusters=" + brokerClusters +
                 ", kafkaConfigs=" + kafkaConfigs +
                 ", rocketmqConfigs=" + rocketmqConfigs +
                 ", thriftServer=" + thriftServer +
-                ", pproxies=" + pproxies +
                 ", groups=" + groups +
                 '}';
     }
@@ -194,14 +166,12 @@ public class CProxyConfig implements ConfigurationValidator, Cloneable {
 
         if (instance != null ? !instance.equals(that.instance) : that.instance != null) return false;
         if (proxyCluster != null ? !proxyCluster.equals(that.proxyCluster) : that.proxyCluster != null) return false;
-        if (idc != null ? !idc.equals(that.idc) : that.idc != null) return false;
         if (brokerClusters != null ? !brokerClusters.equals(that.brokerClusters) : that.brokerClusters != null)
             return false;
         if (kafkaConfigs != null ? !kafkaConfigs.equals(that.kafkaConfigs) : that.kafkaConfigs != null) return false;
         if (rocketmqConfigs != null ? !rocketmqConfigs.equals(that.rocketmqConfigs) : that.rocketmqConfigs != null)
             return false;
         if (thriftServer != null ? !thriftServer.equals(that.thriftServer) : that.thriftServer != null) return false;
-        if (pproxies != null ? !pproxies.equals(that.pproxies) : that.pproxies != null) return false;
         return groups != null ? groups.equals(that.groups) : that.groups == null;
     }
 
@@ -209,12 +179,10 @@ public class CProxyConfig implements ConfigurationValidator, Cloneable {
     public int hashCode() {
         int result = instance != null ? instance.hashCode() : 0;
         result = 31 * result + (proxyCluster != null ? proxyCluster.hashCode() : 0);
-        result = 31 * result + (idc != null ? idc.hashCode() : 0);
         result = 31 * result + (brokerClusters != null ? brokerClusters.hashCode() : 0);
         result = 31 * result + (kafkaConfigs != null ? kafkaConfigs.hashCode() : 0);
         result = 31 * result + (rocketmqConfigs != null ? rocketmqConfigs.hashCode() : 0);
         result = 31 * result + (thriftServer != null ? thriftServer.hashCode() : 0);
-        result = 31 * result + (pproxies != null ? pproxies.hashCode() : 0);
         result = 31 * result + (groups != null ? groups.hashCode() : 0);
         return result;
     }

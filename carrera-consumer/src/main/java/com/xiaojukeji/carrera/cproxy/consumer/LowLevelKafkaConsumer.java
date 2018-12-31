@@ -9,7 +9,7 @@ import com.xiaojukeji.carrera.cproxy.config.ConsumerGroupConfig;
 public class LowLevelKafkaConsumer extends CarreraKafkaConsumer {
 
     public LowLevelKafkaConsumer(ConsumerGroupConfig config, AsyncMessageHandler handler) {
-        super(config.getcProxyConfig().getIdc(), config.getBrokerCluster(), config.getGroup(), config.getGroupConfig(),
+        super(config.getBrokerCluster(), config.getGroup(), config.getGroupConfig(),
                 config.getcProxyConfig(), config.getcProxyConfig().getKafkaConfigs().get(config.getBrokerCluster()),
                 handler, config.getMaxConsumeLagMap(), config.getTopicCount(), config.getTopicMap());
         commitLagLimiter = null;

@@ -4,6 +4,7 @@ FROM centos:7
 EXPOSE 9613
 EXPOSE 9713
 EXPOSE 8080
+EXPOSE 2181
 
 # Env
 ENV HOME_DIR /root
@@ -14,9 +15,9 @@ WORKDIR ${HOME_DIR}
 RUN yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel unzip gettext nmap-ncat openssl wget telnet\
   && yum clean all -y
 
-RUN curl http://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.13/bin/apache-tomcat-9.0.13.zip -o tomcat.zip \
+RUN curl http://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.14/bin/apache-tomcat-9.0.14.zip -o tomcat.zip \
   && unzip tomcat.zip \ 
-  && mv apache-tomcat-9.0.13 tomcat \
+  && mv apache-tomcat-9.0.14 tomcat \
   && rm tomcat.zip \ 
   && chmod +x tomcat/bin/*.sh
 

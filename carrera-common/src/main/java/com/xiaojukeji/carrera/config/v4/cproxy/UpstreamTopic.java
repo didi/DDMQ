@@ -29,28 +29,26 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
     public static final List<Integer> DEFAULT_RETRY_INTERVAL = Lists.newArrayList(100, 150, 300);
     public static final String HTTP_POST = "POST";
     public static final String HTTP_GET = "GET";
-    public static final String ORDER_BY_QID = "QID";
 
+    public static final String ORDER_BY_QID = "QID";
     public static final String ORDER_BY_KEY = "KEY";
+
     public static final int DEFAULT_MAX_CONSUME_LAG_FACTOR = 3;
 
-    private String idc;
     private String brokerCluster;
     private Map<String/*proxyCluster*/, Set<String>> proxies = Maps.newHashMap();
 
     private boolean isEnabled;  // is subscription enabled
 
-    //公共配置
     private String topic;
     private List<String> tags;
     private List<String> actions;
-    private int fetchThreads = 1;       // rmq / kafka client的消费线程数.
-    private double maxTps;              // kafka/rmq client拉取消息的最大tps,console计算出来的
+    private int fetchThreads = 1;       // rmq / kafka client 的消费线程数.
+    private double maxTps;              // kafka/rmq client拉取消息的最大tps
     private double totalMaxTps;         // kafka/rmq 真实最大tps
     private int concurrency = 1024;     // 同时未完成消费的消息数量.
     private long maxConsumeLag = -1;    // 第一条未完成消费的消息的offset 与 最后一条已完成消费的消息的offset的 最大差值. 默认-1,表示不限制. 取值为0表示：concurrency*DEFAULT_MAX_CONSUME_LAG_FACTOR;
     private String groovyScript;
-    private boolean isBinlog = false;   //是否消费的binlog，需要一些额外的日志。
     private int timeout = 5000;         //http 推送请求的超时时间; SDK消费时, 消息消费的超时时间.超时后,消息可以被重新消费.
     private boolean isPressureTraffic = false;
 
@@ -90,7 +88,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
     private String tokenKey = ""; //在form parameters中添加token
     private double httpMaxTps = -1; //通过http推送的最大tps。默认-1，表示等于maxTps.
 
-    //SDK拉取模式相关配置
     private int maxPullBatchSize = 8; //SDK消费时,client一次拉取的小大消息数量.
 
     // 写入 hdfs 相关配置
@@ -104,14 +101,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
     private long committedLagThreshold = 10000L;
 
     public UpstreamTopic() {
-    }
-
-    public boolean isBinlog() {
-        return isBinlog;
-    }
-
-    public void setBinlog(boolean binlog) {
-        isBinlog = binlog;
     }
 
     public String getGroovyScript() {
@@ -128,14 +117,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
 
     public void setHttpMaxTps(double httpMaxTps) {
         this.httpMaxTps = httpMaxTps;
-    }
-
-    public String getIdc() {
-        return idc;
-    }
-
-    public void setIdc(String idc) {
-        this.idc = idc;
     }
 
     public String getBrokerCluster() {
@@ -367,8 +348,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
 
     @Override
     public boolean validate() throws ConfigException {
-        if (StringUtils.isEmpty(this.idc))
-            throw new ConfigException("[UpstreamTopic] idc empty");
         if (StringUtils.isEmpty(this.brokerCluster))
             throw new ConfigException("[UpstreamTopic] brokerClusters empty");
         if (StringUtils.isEmpty(this.topic))
@@ -488,7 +467,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
     @Override
     public String toString() {
         return "UpstreamTopic{" +
-                "idc='" + idc + '\'' +
                 ", brokerCluster='" + brokerCluster + '\'' +
                 ", proxies=" + proxies +
                 ", isEnabled=" + isEnabled +
@@ -501,7 +479,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
                 ", concurrency=" + concurrency +
                 ", maxConsumeLag=" + maxConsumeLag +
                 ", groovyScript='" + groovyScript + '\'' +
-                ", isBinlog=" + isBinlog +
                 ", timeout=" + timeout +
                 ", isPressureTraffic=" + isPressureTraffic +
                 ", orderKey='" + orderKey + '\'' +
@@ -536,7 +513,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
         if (Double.compare(topic1.totalMaxTps, totalMaxTps) != 0) return false;
         if (concurrency != topic1.concurrency) return false;
         if (maxConsumeLag != topic1.maxConsumeLag) return false;
-        if (isBinlog != topic1.isBinlog) return false;
         if (timeout != topic1.timeout) return false;
         if (isPressureTraffic != topic1.isPressureTraffic) return false;
         if (maxRetry != topic1.maxRetry) return false;
@@ -545,7 +521,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
         if (enableAlarm != topic1.enableAlarm) return false;
         if (delayTimeThreshold != topic1.delayTimeThreshold) return false;
         if (committedLagThreshold != topic1.committedLagThreshold) return false;
-        if (idc != null ? !idc.equals(topic1.idc) : topic1.idc != null) return false;
         if (brokerCluster != null ? !brokerCluster.equals(topic1.brokerCluster) : topic1.brokerCluster != null)
             return false;
         if (proxies != null ? !proxies.equals(topic1.proxies) : topic1.proxies != null) return false;
@@ -578,13 +553,11 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
         if (Double.compare(topic1.totalMaxTps, totalMaxTps) != 0) return false;
         if (concurrency != topic1.concurrency) return false;
         if (maxConsumeLag != topic1.maxConsumeLag) return false;
-        if (isBinlog != topic1.isBinlog) return false;
         if (timeout != topic1.timeout) return false;
         if (isPressureTraffic != topic1.isPressureTraffic) return false;
         if (maxRetry != topic1.maxRetry) return false;
         if (Double.compare(topic1.httpMaxTps, httpMaxTps) != 0) return false;
         if (maxPullBatchSize != topic1.maxPullBatchSize) return false;
-        if (idc != null ? !idc.equals(topic1.idc) : topic1.idc != null) return false;
         if (brokerCluster != null ? !brokerCluster.equals(topic1.brokerCluster) : topic1.brokerCluster != null)
             return false;
         if (topic != null ? !topic.equals(topic1.topic) : topic1.topic != null) return false;
@@ -607,9 +580,8 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
 
     @Override
     public int hashCode() {
-        int result;
+        int result = 0;
         long temp;
-        result = idc != null ? idc.hashCode() : 0;
         result = 31 * result + (brokerCluster != null ? brokerCluster.hashCode() : 0);
         result = 31 * result + (proxies != null ? proxies.hashCode() : 0);
         result = 31 * result + (isEnabled ? 1 : 0);
@@ -624,7 +596,6 @@ public class UpstreamTopic implements ConfigurationValidator, Serializable, Clon
         result = 31 * result + concurrency;
         result = 31 * result + (int) (maxConsumeLag ^ (maxConsumeLag >>> 32));
         result = 31 * result + (groovyScript != null ? groovyScript.hashCode() : 0);
-        result = 31 * result + (isBinlog ? 1 : 0);
         result = 31 * result + timeout;
         result = 31 * result + (isPressureTraffic ? 1 : 0);
         result = 31 * result + (orderKey != null ? orderKey.hashCode() : 0);

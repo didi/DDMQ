@@ -5,39 +5,10 @@ import com.alibaba.fastjson.TypeReference;
 import com.didi.carrera.console.common.util.FastJsonUtils;
 import com.didi.carrera.console.common.util.HostUtils;
 import com.didi.carrera.console.config.ConsoleConfig;
-import com.didi.carrera.console.dao.dict.ClusterMqServerRelationType;
-import com.didi.carrera.console.dao.dict.ConsumeSubscriptionAlarmType;
-import com.didi.carrera.console.dao.dict.ConsumeSubscriptionBigDataType;
-import com.didi.carrera.console.dao.dict.ConsumeSubscriptionConsumeType;
-import com.didi.carrera.console.dao.dict.ConsumeSubscriptionHttpMethod;
-import com.didi.carrera.console.dao.dict.ConsumeSubscriptionPressureTraffic;
-import com.didi.carrera.console.dao.dict.IsDelete;
-import com.didi.carrera.console.dao.dict.IsEnable;
-import com.didi.carrera.console.dao.dict.MqServerType;
-import com.didi.carrera.console.dao.dict.NodeType;
-import com.didi.carrera.console.dao.dict.TopicCompressionType;
-import com.didi.carrera.console.dao.dict.TopicDelayTopic;
-import com.didi.carrera.console.dao.dict.TopicProduceMode;
-import com.didi.carrera.console.dao.model.Cluster;
-import com.didi.carrera.console.dao.model.ClusterMqserverRelation;
-import com.didi.carrera.console.dao.model.ConsumeGroup;
-import com.didi.carrera.console.dao.model.ConsumeSubscription;
-import com.didi.carrera.console.dao.model.Idc;
-import com.didi.carrera.console.dao.model.MqServer;
-import com.didi.carrera.console.dao.model.Node;
-import com.didi.carrera.console.dao.model.Topic;
-import com.didi.carrera.console.dao.model.TopicConf;
+import com.didi.carrera.console.dao.dict.*;
+import com.didi.carrera.console.dao.model.*;
 import com.didi.carrera.console.dao.model.custom.ConsumeGroupConfig;
-import com.didi.carrera.console.service.ClusterMqserverRelationService;
-import com.didi.carrera.console.service.ClusterService;
-import com.didi.carrera.console.service.ConsumeGroupService;
-import com.didi.carrera.console.service.ConsumeSubscriptionService;
-import com.didi.carrera.console.service.IdcService;
-import com.didi.carrera.console.service.MqServerService;
-import com.didi.carrera.console.service.NodeService;
-import com.didi.carrera.console.service.TopicConfService;
-import com.didi.carrera.console.service.TopicService;
-import com.didi.carrera.console.service.ZKV4ConfigService;
+import com.didi.carrera.console.service.*;
 import com.didi.carrera.console.service.exception.ZkConfigException;
 import com.didi.carrera.console.web.ConsoleBaseResponse;
 import com.didi.carrera.console.web.controller.bo.ConsumeSubscriptionOrderBo;
@@ -48,16 +19,8 @@ import com.xiaojukeji.carrera.biz.ZkService;
 import com.xiaojukeji.carrera.config.Actions;
 import com.xiaojukeji.carrera.config.CompressType;
 import com.xiaojukeji.carrera.config.ConfigurationValidator;
-import com.xiaojukeji.carrera.config.v4.BrokerConfig;
-import com.xiaojukeji.carrera.config.v4.CProxyConfig;
-import com.xiaojukeji.carrera.config.v4.GroupConfig;
-import com.xiaojukeji.carrera.config.v4.PProxyConfig;
-import com.xiaojukeji.carrera.config.v4.TopicConfig;
-import com.xiaojukeji.carrera.config.v4.cproxy.ConsumeServerConfiguration;
-import com.xiaojukeji.carrera.config.v4.cproxy.HBaseConfiguration;
-import com.xiaojukeji.carrera.config.v4.cproxy.HdfsConfiguration;
-import com.xiaojukeji.carrera.config.v4.cproxy.KafkaConfiguration;
-import com.xiaojukeji.carrera.config.v4.cproxy.UpstreamTopic;
+import com.xiaojukeji.carrera.config.v4.*;
+import com.xiaojukeji.carrera.config.v4.cproxy.*;
 import com.xiaojukeji.carrera.config.v4.pproxy.CarreraConfiguration;
 import com.xiaojukeji.carrera.config.v4.pproxy.RocketmqConfiguration;
 import com.xiaojukeji.carrera.config.v4.pproxy.TopicConfiguration;
@@ -118,9 +81,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
     @Autowired
     private ZkService zkService;
-
-    @Autowired
-    private IdcService idcService;
 
     private Map<Long, MqServer> getMqServerMap() {
         Map<Long, MqServer> mqServerMap = Maps.newHashMap();
@@ -427,11 +387,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setTopic(topic.getTopicName());
         topicConfig.setAlarmGroup(topic.getTopicAlarmGroup());
-        if (IsEnable.isEnable(topic.getEnableSchemaVerify())) {
-            topicConfig.setSchema(topic.getTopicSchema());
-        }
-        topicConfig.setProduceMode(TopicProduceMode.getZkMode(topic.getProduceMode()));
-
         topicConfig.setDelayTopic(topic.getDelayTopic() == TopicDelayTopic.DELAY_TOPIC.getIndex());
         topicConfig.setAutoBatch(topic.getTopicConfig().isAutoBatch());
 
@@ -446,9 +401,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
         Map<Long, MqServer> mqServerTypeTable = getMqServerMap();
         Map<Long, Cluster> clusterTable = getClusterMap();
-        Map<Long, Idc> idcMap = idcService.findMap();
 
-        Map<String, List<String>> produceModeMapper = Maps.newHashMap();
         for (TopicConf conf : topicConfList) {
             if (!mqServerTypeTable.containsKey(conf.getMqServerId())) {
                 throw new ZkConfigException(String.format("[Topic] topicConfId(%s) not found mqserver(%s)", conf.getId(), conf.getMqServerId()));
@@ -458,21 +411,8 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                 throw new ZkConfigException(String.format("[Topic] topicConfId(%s) not found cluster(%s)", conf.getId(), conf.getClusterId()));
             }
 
-            if (topic.getProduceMode() == TopicProduceMode.OTHER.getIndex()) {
-                if (MapUtils.isEmpty(conf.getTopicConfClientIdc())) {
-                    throw new ZkConfigException(String.format("[Topic] topicConfId(%s) not found clientIdc, clusterId=(%s), ", conf.getId(), conf.getClusterId()));
-                }
-                for (Long clientIdc : conf.getTopicConfClientIdc().values()) {
-                    if (conf.getServerIdcId() != null && conf.getServerIdcId() > 0) {
-                        produceModeMapper.computeIfAbsent(idcMap.get(clientIdc).getName(), s -> Lists.newArrayList()).add(idcMap.get(clusterTable.get(conf.getClusterId()).getIdcId()).getName());
-                    }
-                }
-            }
-
             TopicConfiguration topicConfiguration = new TopicConfiguration();
-            topicConfiguration.setIdc(clusterTable.get(conf.getClusterId()).getIdc());
             topicConfiguration.setBrokerCluster(mqServerTypeTable.get(conf.getMqServerId()).getName());
-            topicConfiguration.setClusterName(conf.getClusterName());
 
             if (conf.getTopicConfConfig() != null) {
                 if (MapUtils.isNotEmpty(conf.getTopicConfConfig().getProxies())) {
@@ -493,12 +433,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
             confList.add(topicConfiguration);
         }
 
-        if (topic.getProduceMode() == TopicProduceMode.OTHER.getIndex()) {
-            if (MapUtils.isEmpty(produceModeMapper)) {
-                throw new ZkConfigException(String.format("[Topic] ProduceModeMapper is empty, topicId=%s", topic.getId()));
-            }
-            topicConfig.setProduceModeMapper(produceModeMapper);
-        }
         return topicConfig;
     }
 
@@ -577,7 +511,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         groupConfig.setEnableAlarm(IsEnable.isEnable(group.getAlarmIsEnable()));
         groupConfig.setDelayTimeThreshold(group.getAlarmDelayTime());
         groupConfig.setCommittedLagThreshold(group.getAlarmMsgLag());
-        groupConfig.setBroadcast(IsEnable.isEnable(group.getBroadcastConsume()));
 
         List<UpstreamTopic> upstreamTopics = Lists.newArrayList();
         groupConfig.setTopics(upstreamTopics);
@@ -597,7 +530,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
             String mqServer = getSubExtraParamsMqServer(sub);
             if (StringUtils.isNotEmpty(mqServer)) {
-                UpstreamTopic upstreamTopic = buildUpstreamTopic(groupConfig, sub, mqServer, clusterTable.get(sub.getClusterId()).getIdc());
+                UpstreamTopic upstreamTopic = buildUpstreamTopic(groupConfig, sub, mqServer);
                 upstreamTopics.add(upstreamTopic);
                 continue;
             }
@@ -607,7 +540,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
                     throw new ZkConfigException(String.format("[Group] subId(%s) not found mqserverId, topicConfId=%s, mqServerId=%s", sub.getId(), topicConf.getId(), topicConf.getMqServerId()));
                 }
 
-                UpstreamTopic upstreamTopic = buildUpstreamTopic(groupConfig, sub, topicConf.getMqServerName(), clusterTable.get(sub.getClusterId()).getIdc());
+                UpstreamTopic upstreamTopic = buildUpstreamTopic(groupConfig, sub, topicConf.getMqServerName());
                 upstreamTopics.add(upstreamTopic);
             }
         }
@@ -650,10 +583,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         return null;
     }
 
-    public UpstreamTopic buildUpstreamTopic(GroupConfig groupConfig, ConsumeSubscription subscription, String brokerCluster, String idc) throws ZkConfigException {
+    public UpstreamTopic buildUpstreamTopic(GroupConfig groupConfig, ConsumeSubscription subscription, String brokerCluster) throws ZkConfigException {
         UpstreamTopic upstreamTopic = new UpstreamTopic();
 
-        upstreamTopic.setIdc(idc);
         upstreamTopic.setBrokerCluster(brokerCluster);
         if (subscription.getConsumeSubscriptionConfig() != null && MapUtils.isNotEmpty(subscription.getConsumeSubscriptionConfig().getProxies())) {
             upstreamTopic.setProxies(Maps.newHashMap(subscription.getConsumeSubscriptionConfig().getProxies()));
@@ -800,7 +732,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         PProxyConfig pProxyConfig = new PProxyConfig();
         pProxyConfig.setInstance(host);
         pProxyConfig.setProxyCluster(getPProxyCluster(cluster.getName()));
-        pProxyConfig.setIdc(cluster.getIdc());
         pProxyConfig.setBrokerClusters(relationList.stream().map(ClusterMqserverRelation::getMqServerName).collect(Collectors.toList()));
 
         Map<String, MqServer> mqServerTypeTable = getMqServerNameMap();
@@ -868,11 +799,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         return pProxyConfig;
     }
 
-
     private String getPProxyCluster(String clusterName) {
         return "P_" + clusterName;
     }
-
 
     private String getCProxyCluster(String clusterName) {
         return "C_" + clusterName;
@@ -934,11 +863,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         CProxyConfig cProxyConfig = new CProxyConfig();
         cProxyConfig.setInstance(host);
         cProxyConfig.setProxyCluster(getCProxyCluster(cluster.getName()));
-        cProxyConfig.setIdc(cluster.getIdc());
         cProxyConfig.setBrokerClusters(relationList.stream().map(ClusterMqserverRelation::getMqServerName).collect(Collectors.toList()));
 
         Map<String/*proxyCluster*/, Set<String>> pproxies = Maps.newHashMap();
-        cProxyConfig.setPproxies(pproxies);
 
         List<Node> pNodes = nodeService.findByClusterIdNodeType(cluster.getId(), NodeType.PRODUCER_PROXY);
         if (CollectionUtils.isNotEmpty(pNodes)) {
@@ -1037,7 +964,6 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         }
 
         BrokerConfig brokerConfig = new BrokerConfig();
-        brokerConfig.setIdc(getIdcFromMqServerName(mqServer.getName()));
         brokerConfig.setBrokerCluster(mqServer.getName());
         brokerConfig.setBrokerClusterAddrs(mqServer.getAddr());
         Map<String, Set<String>> brokers = Maps.newHashMap();
@@ -1107,16 +1033,5 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
 
             zkService.createOrUpdateBroker(brokerConfig);
         }
-    }
-
-    private String getIdcFromMqServerName(String mqServerName) {
-        String idc = mqServerName.split("_")[1];
-        if (idc.contains("test")) {
-            idc = "test";
-        } else  {
-            idc = "default";
-        }
-
-        return idc;
     }
 }

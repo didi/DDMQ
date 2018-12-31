@@ -40,8 +40,8 @@ public class CarreraConsumer implements AsyncMessageHandler {
     }
 
     public void start() throws CarreraClientException {
-        LogUtils.logMainInfo("CarreraConsumer.start, group:{}, idc:{}, brokerCluster:{}.",
-                config.getGroup(), config.getcProxyConfig().getIdc(), config.getBrokerCluster());
+        LogUtils.logMainInfo("CarreraConsumer.start, group:{}, brokerCluster:{}.",
+                config.getGroup(), config.getBrokerCluster());
         workingJobs = Sets.newConcurrentHashSet();
         buildActionMap();
 
@@ -52,11 +52,11 @@ public class CarreraConsumer implements AsyncMessageHandler {
 
             if (ConfigUtils.satisfyNewRmqConsumer(config.getGroupConfig())) {
                 LOGGER.debug("open a CarreraNewRocketMqConsumer client. group:{}.", config.getGroup());
-                consumer = new CarreraNewRocketMqConsumer(config.getcProxyConfig().getIdc(), config.getBrokerCluster(),
+                consumer = new CarreraNewRocketMqConsumer(config.getBrokerCluster(),
                         config.getGroup(), config.getGroupConfig(), config.getcProxyConfig(),
                         rocketmqConfiguration, this, config.getMaxConsumeLagMap(), config.getTotalThreads());
             } else {
-                consumer = new CarreraRocketMqConsumer(config.getcProxyConfig().getIdc(), config.getBrokerCluster(),
+                consumer = new CarreraRocketMqConsumer(config.getBrokerCluster(),
                         config.getGroup(), config.getGroupConfig(), config.getcProxyConfig(),
                         rocketmqConfiguration, this, config.getMaxConsumeLagMap(), config.getTotalThreads());
             }
@@ -65,7 +65,7 @@ public class CarreraConsumer implements AsyncMessageHandler {
         //kafka
         if (config.getcProxyConfig().getKafkaConfigs().containsKey(config.getBrokerCluster())) {
             KafkaConfiguration kafkaConfiguration = config.getcProxyConfig().getKafkaConfigs().get(config.getBrokerCluster());
-            consumer = new CarreraKafkaConsumer(config.getcProxyConfig().getIdc(), config.getBrokerCluster(),
+            consumer = new CarreraKafkaConsumer(config.getBrokerCluster(),
                     config.getGroup(), config.getGroupConfig(), config.getcProxyConfig(),
                     kafkaConfiguration, this, config.getMaxConsumeLagMap(), config.getTopicCount(), config.getTopicMap());
         }
@@ -82,8 +82,7 @@ public class CarreraConsumer implements AsyncMessageHandler {
     }
 
     public void stop() {
-        LogUtils.logMainInfo("CarreraConsumer.stop;group:{}, idc:{}, brokerCluster:{}", config.getGroup(),
-                config.getcProxyConfig().getIdc(), config.getBrokerCluster());
+        LogUtils.logMainInfo("CarreraConsumer.stop;group:{}, brokerCluster:{}", config.getGroup(), config.getBrokerCluster());
         if (consumer != null) {
             consumer.shutdown();
         }
@@ -137,8 +136,7 @@ public class CarreraConsumer implements AsyncMessageHandler {
 
     @Override
     public String toString() {
-        return "CarreraConsumer@" + config.getcProxyConfig().getIdc() + "@" +
-                config.getBrokerCluster() + "@" + config.getGroup();
+        return "CarreraConsumer@" + config.getBrokerCluster() + "@" + config.getGroup();
     }
 
     public String getBrokerCluster() {

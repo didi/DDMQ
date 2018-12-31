@@ -5,37 +5,17 @@ import com.didi.carrera.console.dao.dict.IsDelete;
 import com.didi.carrera.console.dao.dict.IsEnable;
 import com.didi.carrera.console.dao.dict.MqServerType;
 import com.didi.carrera.console.dao.dict.NodeType;
-import com.didi.carrera.console.dao.dict.TopicProduceMode;
 import com.didi.carrera.console.dao.mapper.TopicMapper;
 import com.didi.carrera.console.dao.mapper.custom.TopicCustomMapper;
-import com.didi.carrera.console.dao.model.Cluster;
-import com.didi.carrera.console.dao.model.Idc;
-import com.didi.carrera.console.dao.model.MqServer;
-import com.didi.carrera.console.dao.model.Node;
-import com.didi.carrera.console.dao.model.Topic;
-import com.didi.carrera.console.dao.model.TopicConf;
-import com.didi.carrera.console.dao.model.TopicCriteria;
+import com.didi.carrera.console.dao.model.*;
 import com.didi.carrera.console.dao.model.custom.CustomConsumeSubscription;
 import com.didi.carrera.console.dao.model.custom.CustomTopicConf;
 import com.didi.carrera.console.dao.model.custom.TopicConfConfig;
 import com.didi.carrera.console.dao.model.custom.TopicConfig;
 import com.didi.carrera.console.data.Message;
-import com.didi.carrera.console.service.ClusterService;
-import com.didi.carrera.console.service.ConsumeSubscriptionService;
-import com.didi.carrera.console.service.IdcService;
-import com.didi.carrera.console.service.MqServerService;
-import com.didi.carrera.console.service.NodeService;
-import com.didi.carrera.console.service.RmqAdminService;
-import com.didi.carrera.console.service.TopicConfService;
-import com.didi.carrera.console.service.TopicService;
-import com.didi.carrera.console.service.ZKV4ConfigService;
+import com.didi.carrera.console.service.*;
 import com.didi.carrera.console.service.bean.PageModel;
-import com.didi.carrera.console.service.vo.TopicConfVo;
-import com.didi.carrera.console.service.vo.TopicListGroupVo;
-import com.didi.carrera.console.service.vo.TopicMessageVo;
-import com.didi.carrera.console.service.vo.TopicOrderVo;
-import com.didi.carrera.console.service.vo.TopicSimpleVo;
-import com.didi.carrera.console.service.vo.TopicStateVo;
+import com.didi.carrera.console.service.vo.*;
 import com.didi.carrera.console.web.ConsoleBaseResponse;
 import com.didi.carrera.console.web.controller.bo.AcceptTopicConfBo;
 import com.didi.carrera.console.web.controller.bo.NodeBo;
@@ -60,11 +40,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -100,9 +76,6 @@ public class TopicServiceImpl implements TopicService {
 
     @Resource(name = "didiNodeServiceImpl")
     private NodeService nodeService;
-
-    @Autowired
-    private IdcService idcService;
 
     public <T extends TopicConfBo> ConsoleBaseResponse<?> validateTopicBo(TopicOrderBo<T> topicInfo) {
         if (!topicInfo.isModify() && CollectionUtils.isNotEmpty(findByTopicNameWithDelete(topicInfo.getTopicName()))) {
@@ -146,7 +119,6 @@ public class TopicServiceImpl implements TopicService {
             }
         }
 
-        Map<Long, Idc> idcMap = idcService.findMap();
         Map<Long, List<String>> confIdcMap = Maps.newHashMap();
         for (T bo : topicInfo.getConf()) {
             Cluster cluster = clusterService.findById(bo.getClusterId());
@@ -156,32 +128,10 @@ public class TopicServiceImpl implements TopicService {
                 bo.setClusterName(cluster.getName());
             }
 
-            if (bo.getServerIdcId() == null || bo.getServerIdcId() == 0L) {
-                bo.setServerIdcId(cluster.getIdcId());
-                bo.setServerIdcName(cluster.getIdc());
-            } else {
-                if (!cluster.getIdcId().equals(bo.getServerIdcId())) {
-                    return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "serverIdc<" + bo.getServerIdcId() + ">param error");
-                }
-            }
-
             if (confIdcMap.containsKey(bo.getServerIdcId())) {
                 return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "集群 " + confIdcMap.get(bo.getServerIdcId()).get(0) + " 和 " + bo.getClusterName() + " 同属于一个IDC, 不允许重复添加");
             } else {
                 confIdcMap.put(bo.getServerIdcId(), Lists.newArrayList(bo.getClusterName()));
-            }
-
-            if (topicInfo.getProduceMode() == TopicProduceMode.OTHER.getIndex()) {
-                if (MapUtils.isEmpty(bo.getClientIdcMap())) {
-                    return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "clientIdc不能为空");
-                }
-                for (Long idcId : bo.getClientIdcMap().values()) {
-                    if (!idcMap.containsKey(idcId)) {
-                        return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "clientIdc不存在");
-                    } else {
-                        bo.getClientIdcMap().put(idcMap.get(idcId).getName(), idcId);
-                    }
-                }
             }
 
             if (bo instanceof AcceptTopicConfBo) {

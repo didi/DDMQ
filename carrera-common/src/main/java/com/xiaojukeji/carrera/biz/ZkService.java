@@ -1,12 +1,6 @@
 package com.xiaojukeji.carrera.biz;
 
-import com.xiaojukeji.carrera.config.v4.BrokerConfig;
-import com.xiaojukeji.carrera.config.v4.CProxyConfig;
-import com.xiaojukeji.carrera.config.v4.GroupConfig;
-import com.xiaojukeji.carrera.config.v4.HostRegionConfig;
-import com.xiaojukeji.carrera.config.v4.MonitorAssignedConfig;
-import com.xiaojukeji.carrera.config.v4.PProxyConfig;
-import com.xiaojukeji.carrera.config.v4.TopicConfig;
+import com.xiaojukeji.carrera.config.v4.*;
 import com.xiaojukeji.carrera.dynamic.ParameterDynamicZookeeper;
 
 import java.util.List;
@@ -45,25 +39,13 @@ public interface ZkService {
 
     void getAndWatchBroker(ParameterDynamicZookeeper.DataChangeCallback<BrokerConfig> callback) throws Exception;
 
-    List<TopicConfig> getAllTopic();
-
     TopicConfig getTopic(String topic);
-
-    List<GroupConfig> getAllGroup();
 
     GroupConfig getGroup(String group);
 
     PProxyConfig getPProxy(String instance);
 
-    List<PProxyConfig> getAllPProxy();
-
     CProxyConfig getCProxy(String instance);
-
-    List<CProxyConfig> getAllCProxy();
-
-    List<BrokerConfig> getAllBroker();
-
-    BrokerConfig getBroker(String brokerCluster);
 
     boolean createOrUpdateTopic(TopicConfig config) throws Exception;
 
@@ -84,10 +66,6 @@ public interface ZkService {
     boolean createOrUpdateBroker(BrokerConfig config) throws Exception;
 
     boolean deleteBroker(String brokerCluster);
-
-    boolean createOrUpdateMonitorHost(String host, HostRegionConfig config);
-
-    boolean createOrUpdateMonitorAssigned(String broker, MonitorAssignedConfig config);
 
     List<String> getChildren(String path);
 

@@ -4,7 +4,6 @@ import com.xiaojukeji.carrera.cproxy.consumer.offset.CarreraOffsetManager;
 import com.xiaojukeji.carrera.cproxy.consumer.ConfigManager;
 import com.xiaojukeji.carrera.cproxy.consumer.ConsumerManager;
 import com.xiaojukeji.carrera.cproxy.consumer.SharedThreadPool;
-import com.xiaojukeji.carrera.cproxy.actions.util.CarreraProducerManager;
 import com.xiaojukeji.carrera.cproxy.server.ConsumeServer;
 import com.xiaojukeji.carrera.cproxy.utils.LogUtils;
 import com.xiaojukeji.carrera.cproxy.utils.StringUtils;
@@ -86,8 +85,6 @@ public class ProxyApp {
         }
 
         SharedThreadPool.shutdown();
-
-        CarreraProducerManager.shutdown();
 
         if (waitForShutdown != null) {
             waitForShutdown.countDown();

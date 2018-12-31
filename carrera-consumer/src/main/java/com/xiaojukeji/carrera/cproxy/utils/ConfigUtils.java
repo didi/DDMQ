@@ -85,17 +85,4 @@ public class ConfigUtils {
         return !oldcProxyConf.getRocketmqConfigs().equals(newcProxyConf.getRocketmqConfigs());
 
     }
-
-    public static boolean pProxyListIsUpdated(CProxyConfig oldcProxyConf, CProxyConfig newcProxyConf) {
-        if (oldcProxyConf == null) {
-            return newcProxyConf != null;
-        }
-        if (newcProxyConf == null) {
-            return false;
-        }
-
-        return !oldcProxyConf.getPproxies().equals(newcProxyConf.getPproxies());
-
-    }
-
 }

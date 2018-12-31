@@ -15,10 +15,9 @@ import java.util.Set;
 public class PProxyConfig implements ConfigurationValidator, Cloneable {
     private String instance/*ip:port*/;
     private String proxyCluster;
-    private String idc;
     private List<String> brokerClusters;
 
-    private Set<String> topics = Collections.emptySet();
+    private Set<String> topics = Collections.emptySet(); /* topic white list. */
 
     private CarreraConfiguration carreraConfiguration;
 
@@ -29,8 +28,6 @@ public class PProxyConfig implements ConfigurationValidator, Cloneable {
                 throw new ConfigException("[PProxyConfig] instance empty");
             } else if (StringUtils.isEmpty(this.proxyCluster)) {
                 throw new ConfigException("[PProxyConfig] proxyCluster empty");
-            } else if (StringUtils.isEmpty(this.idc)) {
-                throw new ConfigException("[PProxyConfig] idc empty");
             } else if (CollectionUtils.isEmpty(this.brokerClusters)) {
                 throw new ConfigException("[PProxyConfig] brokerClusters empty");
             } else if (carreraConfiguration == null || !carreraConfiguration.validate()) {
@@ -49,14 +46,6 @@ public class PProxyConfig implements ConfigurationValidator, Cloneable {
 
     public void setInstance(String instance) {
         this.instance = instance;
-    }
-
-    public String getIdc() {
-        return idc;
-    }
-
-    public void setIdc(String idc) {
-        this.idc = idc;
     }
 
     public List<String> getBrokerClusters() {
@@ -102,7 +91,6 @@ public class PProxyConfig implements ConfigurationValidator, Cloneable {
         return "PProxyConfig{" +
                 "instance='" + instance + '\'' +
                 ", proxyCluster='" + proxyCluster + '\'' +
-                ", idc='" + idc + '\'' +
                 ", brokerClusters=" + brokerClusters +
                 ", topics=" + topics +
                 ", carreraConfiguration=" + carreraConfiguration +

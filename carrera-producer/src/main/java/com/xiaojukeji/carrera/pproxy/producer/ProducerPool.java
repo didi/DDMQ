@@ -103,7 +103,7 @@ public class ProducerPool {
     private void initRateLimiter() throws Exception {
         requestLimiter = new TpsLimiter(configManager.getCarreraConfig().getTpsWarningRatio(),
                 configManager.getCarreraConfig().getMaxTps(), configManager.getTopicConfigManager());
-        LOGGER.info("initRateLimiter finished, rateLimit config info:{}", configManager.getCarreraConfig().getRateLimit());
+        LOGGER.info("initRateLimiter finished");
     }
 
     public void close() {

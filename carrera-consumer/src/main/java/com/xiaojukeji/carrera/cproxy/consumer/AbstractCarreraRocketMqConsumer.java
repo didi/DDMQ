@@ -45,10 +45,10 @@ abstract class AbstractCarreraRocketMqConsumer extends BaseCarreraConsumer {
 
     private int totalThreads;
 
-    public AbstractCarreraRocketMqConsumer(String idc, String brokerCluster, String group, GroupConfig groupConfig,
-                                    CProxyConfig cProxyConfig, RocketmqConfiguration rocketmqConfiguration,
-                                    AsyncMessageHandler handler, Map<String, Long> maxCommitLagMap, int totalThreads) {
-        super(idc, brokerCluster, group, groupConfig, cProxyConfig, handler, maxCommitLagMap);
+    public AbstractCarreraRocketMqConsumer(String brokerCluster, String group, GroupConfig groupConfig,
+                                           CProxyConfig cProxyConfig, RocketmqConfiguration rocketmqConfiguration,
+                                           AsyncMessageHandler handler, Map<String, Long> maxCommitLagMap, int totalThreads) {
+        super(brokerCluster, group, groupConfig, cProxyConfig, handler, maxCommitLagMap);
         this.rocketmqConfiguration = rocketmqConfiguration;
         this.totalThreads = totalThreads;
     }
@@ -179,7 +179,7 @@ abstract class AbstractCarreraRocketMqConsumer extends BaseCarreraConsumer {
 
         super.shutdown();
         isRunning = false;
-        LOGGER.info("consumer shutdown, group:{},idc:{},brokerCluster:{}.", group, idc, brokerCluster);
+        LOGGER.info("consumer shutdown, group:{}, brokerCluster:{}.", group, brokerCluster);
     }
 
     @Override
