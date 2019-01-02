@@ -2,7 +2,7 @@
 ## Usage for develop
 *  cd carrera-console-fe 
 *  npm i
-*  cd build, modify the config in webpack.base.config.js:
+*  cd build, and modify the config in webpack.base.config.js:
      ``` js
       devServer: {
         ...
@@ -24,5 +24,4 @@
 
 ## Usage for deploy
 * cd carrera-console-fe 
-* ./build.sh
-The generated static resources are placed in the dist folder
+* ./build.sh, the generated static resources are placed in the dist folder

@@ -152,12 +152,11 @@
       goBack () {
         if (this.isSubscribe) {
           this.$router.push({
-            name: 'subscribes',
+            name: 'subscribes'
           });
-
         } else {
           this.$router.push({
-            name: 'topics',
+            name: 'topics'
           });
         }
       }
