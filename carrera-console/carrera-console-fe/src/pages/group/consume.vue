@@ -242,6 +242,7 @@
 
       init () {
         this.getConsumeList();
+        this.$root.bus.$on('updateConsumeList', this.getConsumeList)
       },
 
       submit (data) {
