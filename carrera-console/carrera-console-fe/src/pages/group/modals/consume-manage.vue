@@ -108,11 +108,12 @@
 
         this.resetOffset({ params })
           .then((body) => {
-            if (body.message === 'ok') {
+            if (body.errno === 0) {
               this.$notice.success({
                 title: 'success'
               });
               this.$root.bus.$emit('updateConsumeList');
+              this.cancel();
             }
           }).finally(() => {
             this.isSubmitting = false;

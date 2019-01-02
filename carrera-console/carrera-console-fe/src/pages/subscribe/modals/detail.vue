@@ -129,12 +129,11 @@
                 <div class="detail-item-key">Message Push Type</div>
                 <div class="detail-item-value">{{basicInfo.msgPushTypeDesc}}</div>
               </div>
-
-              <div class="detail-item">
-                <div class="detail-item-key">HttpMethod</div>
-                <div class="detail-item-value">{{this.dictTranslate('topic', 'httpMethodTypes', basicInfo.httpMethod) }}</div>
-              </div>
+              
             </div>
+          </template>
+          <template v-else>
+            <div class="detail-item-key">Have no advanced config</div>
           </template>
         </div>
       </bc-col>
