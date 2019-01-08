@@ -121,6 +121,7 @@ Welcome to contribute by creating issues or sending pull requests. See [Contribu
 
 
 ### Community
+<img src="image/wechatGroup.png" alt="Mand Mobile Community" width="200"/>
 <img src="image/dingGroup.jpg" alt="Mand Mobile Community" width="200"/>
 
 
