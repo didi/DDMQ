@@ -3,4 +3,5 @@
 **/output
 **/logs
 *.idea
+*.jar
 *.DS_Store
