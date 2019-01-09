@@ -4,7 +4,7 @@
     <property name="LOG_LEVEL" value="INFO" />
     <property name="LOG_PATH" value="./logs" />
     <property name="LOG_FILE_NAME" value="carrera" />
-    <property name="LOG_MAX_HISTORY" value="3   " />
+    <property name="LOG_MAX_HISTORY" value="" />
 
     <property name="FILE_LOG_FORMAT" value="[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}] [%thread] [%level] | [%logger{0}:%line] | %msg%n" />
 

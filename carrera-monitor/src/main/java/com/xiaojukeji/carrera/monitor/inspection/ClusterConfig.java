@@ -26,7 +26,6 @@ public class ClusterConfig implements ConfigurationValidator {
     public ClusterConfig() {
     }
 
-
     public int getConcurrentMessages() {
         return concurrentMessages;
     }

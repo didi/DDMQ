@@ -156,7 +156,7 @@ public class ZkServiceImpl implements ZkService {
             LOGGER.error("get zk exception, path={}", path, e);
             return null;
         } catch (ZkNoNodeException e) {
-            LOGGER.warn("no node, path={}", path, e);
+            LOGGER.warn("no node, path={}", path);
             return null;
         }
     }

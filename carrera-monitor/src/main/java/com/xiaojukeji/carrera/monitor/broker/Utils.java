@@ -62,7 +62,6 @@ public class Utils {
         return nameSvrCheckMap.computeIfAbsent(key, s -> getDefaultMQPullConsumer(nameSvr, cluster, key));
     }
 
-
     private static DefaultMQPullConsumer getReceiveCheckConsumer(String nameSvr, String cluster, String broker) {
         String key = cluster + "_" + nameSvr + "_" + broker;
         return brokerReceiveCheckMap.computeIfAbsent(key, s -> getDefaultMQPullConsumer(nameSvr, cluster, key));
