@@ -1,6 +1,5 @@
 package com.xiaojukeji.carrera.metric;
 
-import com.xiaojukeji.carrera.metric.bean.Metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

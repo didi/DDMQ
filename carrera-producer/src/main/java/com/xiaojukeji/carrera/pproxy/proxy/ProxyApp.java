@@ -1,12 +1,10 @@
 package com.xiaojukeji.carrera.pproxy.proxy;
 
-import com.xiaojukeji.carrera.pproxy.producer.CarreraMessage;
 import com.xiaojukeji.carrera.pproxy.producer.ConfigManager;
 import com.xiaojukeji.carrera.pproxy.producer.ProducerPool;
 import com.xiaojukeji.carrera.pproxy.server.Server;
 import com.xiaojukeji.carrera.pproxy.server.ThreadedSelectorServer;
 import com.xiaojukeji.carrera.pproxy.utils.LogUtils;
-import com.xiaojukeji.carrera.utils.CommonFastJsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,6 @@ public class ProxyApp {
         }
 
         producerPool.warmUp();
-        CommonFastJsonUtils.warmUp(new CarreraMessage());
 
         server = new ThreadedSelectorServer(configManager.getProxyConfig().getCarreraConfiguration(), producerPool);
 

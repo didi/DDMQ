@@ -25,10 +25,10 @@ public class RocketMQProduceOffsetFetcher {
 
     private DefaultMQAdminExt defaultMQAdminExt;
 
-    public RocketMQProduceOffsetFetcher(String namesrvAddr) {
+    public RocketMQProduceOffsetFetcher(String namesvrAddr) {
         this.defaultMQAdminExt = new DefaultMQAdminExt();
-        defaultMQAdminExt.setNamesrvAddr(namesrvAddr);
-        defaultMQAdminExt.setInstanceName("admin-" + Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setNamesrvAddr(namesvrAddr);
+        defaultMQAdminExt.setInstanceName("admin-" + System.currentTimeMillis());
     }
 
     public void start() throws MQClientException {

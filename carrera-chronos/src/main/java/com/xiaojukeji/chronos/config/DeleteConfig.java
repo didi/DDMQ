@@ -1,7 +1,9 @@
 package com.xiaojukeji.chronos.config;
 
 
-public class DeleteConfig implements ConfigValidator {
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
+
+public class DeleteConfig implements ConfigurationValidator {
     private int deleteWhen;
     private int saveHours;
 

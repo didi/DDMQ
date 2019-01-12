@@ -1,7 +1,5 @@
 package com.xiaojukeji.carrera.metric;
 
-import com.xiaojukeji.carrera.utils.ConfigUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +12,11 @@ import java.util.concurrent.TimeUnit;
 
 public class MetricFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricFactory.class);
-    private static final int SCHEDULER_POOL_SIZE = 4;
     private static volatile boolean isInit = false;
     private static ScheduledExecutorService metricCalcScheduler;
-    private static final String TAG = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.tag", "carrera");
 
     static {
-        metricCalcScheduler = Executors.newScheduledThreadPool(SCHEDULER_POOL_SIZE, r -> {
+        metricCalcScheduler = Executors.newScheduledThreadPool(4, r -> {
             Thread t = new Thread(r, "MetricScheduler");
             t.setDaemon(true);
             return t;
@@ -34,7 +30,7 @@ public class MetricFactory {
         }
     }
 
-    public static void destory() {
+    public static void destroy() {
         if (isInit && metricCalcScheduler != null) {
             metricCalcScheduler.shutdown();
             MetricClient.getInstance().shutDown();
@@ -53,10 +49,6 @@ public class MetricFactory {
         return counterMetric;
     }
 
-    public static CounterMetric getCounterMetric(String metricName, long step, TimeUnit unit, String... metricTags) {
-        return getCounterMetric(metricName, step, unit, null, metricTags);
-    }
-
     public static RateMetric getRateMetric(String metricName, long step, TimeUnit unit, Logger metricLogger, String... metricTags) {
         if (!isInit) {
             throw new RuntimeException("not init");
@@ -66,10 +58,6 @@ public class MetricFactory {
         ScheduledFuture future = metricCalcScheduler.scheduleAtFixedRate(rateMetric::reportWorker, step, step, unit);
         rateMetric.setFuture(future);
         return rateMetric;
-    }
-
-    public static RateMetric getRateMetric(String metricName, long step, TimeUnit unit, String... metricTags) {
-        return getRateMetric(metricName, step, unit, null, metricTags);
     }
 
     public static PercentileMetric getPercentileMetric(String metricName, List<Integer> percents, long step, TimeUnit unit, Logger metricLogger, String... metricTags) {
@@ -83,14 +71,7 @@ public class MetricFactory {
         return percentileMetric;
     }
 
-    public static PercentileMetric getPercentileMetric(String metricName, List<Integer> percents, long step, TimeUnit unit, String... metricTags) {
-        return getPercentileMetric(metricName, percents, step, unit, null, metricTags);
-    }
-
     private static String getName(String name) {
-        if (!StringUtils.isEmpty(TAG)) {
-            return TAG + "." + name;
-        }
-        return name;
+        return "carrera." + name;
     }
 }

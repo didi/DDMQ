@@ -1,4 +1,4 @@
-package com.xiaojukeji.carrera.metric.bean;
+package com.xiaojukeji.carrera.metric;
 
 
 import java.util.HashMap;

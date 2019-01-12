@@ -117,7 +117,7 @@ public class ProducerPool {
             requestLimiter.shutdown();
         }
 
-        MetricFactory.destory();
+        MetricFactory.destroy();
         LOGGER.info("ProducerPool closed");
     }
 

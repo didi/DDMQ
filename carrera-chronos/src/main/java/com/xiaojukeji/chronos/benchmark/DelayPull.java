@@ -1,13 +1,13 @@
 package com.xiaojukeji.chronos.benchmark;
 
-import com.xiaojukeji.chronos.benchmark.config.BenchmarkConfig;
-import com.xiaojukeji.chronos.benchmark.config.PullConfig;
-import com.xiaojukeji.chronos.config.ConfigurationLoader;
 import com.xiaojukeji.carrera.consumer.thrift.Context;
 import com.xiaojukeji.carrera.consumer.thrift.Message;
 import com.xiaojukeji.carrera.consumer.thrift.client.CarreraConfig;
 import com.xiaojukeji.carrera.consumer.thrift.client.CarreraConsumer;
 import com.xiaojukeji.carrera.consumer.thrift.client.MessageProcessor;
+import com.xiaojukeji.carrera.utils.ConfigUtils;
+import com.xiaojukeji.chronos.benchmark.config.BenchmarkConfig;
+import com.xiaojukeji.chronos.benchmark.config.PullConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class DelayPull {
     }
 
     private static void init(final String configPath) throws Exception {
-        pullConfig = ConfigurationLoader.newConfig(configPath, BenchmarkConfig.class).getPullConfig();
+        pullConfig = ConfigUtils.newConfig(configPath, BenchmarkConfig.class).getPullConfig();
 
         CarreraConfig config = new CarreraConfig(pullConfig.getGroup(), pullConfig.getCproxyAddrs());
         config.setRetryInterval(pullConfig.getRetryIntervalMs());

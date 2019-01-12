@@ -1,7 +1,9 @@
 package com.xiaojukeji.chronos.config;
 
 
-public class PullConfig implements ConfigValidator {
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
+
+public class PullConfig implements ConfigurationValidator {
 
     private String innerGroup;
     private String innerTopic;
@@ -90,7 +92,6 @@ public class PullConfig implements ConfigValidator {
         if (msgByteBaseLen < 100) {
             return false;
         }
-        // TODO: 2017/9/19
         return true;
     }
 

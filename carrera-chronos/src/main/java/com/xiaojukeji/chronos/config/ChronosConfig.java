@@ -1,7 +1,9 @@
 package com.xiaojukeji.chronos.config;
 
 
-public class ChronosConfig implements ConfigValidator {
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
+
+public class ChronosConfig implements ConfigurationValidator {
     private String clusterName;
     private String groupName;
     private boolean pullOn;
@@ -114,8 +116,6 @@ public class ChronosConfig implements ConfigValidator {
 
     @Override
     public boolean validate() {
-        // TODO: 2017/9/18
-
         return true;
     }
 

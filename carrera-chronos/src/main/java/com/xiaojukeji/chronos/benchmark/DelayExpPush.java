@@ -1,9 +1,6 @@
 package com.xiaojukeji.chronos.benchmark;
 
 import com.google.common.util.concurrent.RateLimiter;
-import com.xiaojukeji.chronos.benchmark.config.BenchmarkConfig;
-import com.xiaojukeji.chronos.benchmark.config.PushConfig;
-import com.xiaojukeji.chronos.config.ConfigurationLoader;
 import com.xiaojukeji.carrera.chronos.enums.MsgTypes;
 import com.xiaojukeji.carrera.config.CarreraConfig;
 import com.xiaojukeji.carrera.producer.AddDelayMessageBuilder;
@@ -11,18 +8,16 @@ import com.xiaojukeji.carrera.producer.CarreraProducer;
 import com.xiaojukeji.carrera.producer.CarreraReturnCode;
 import com.xiaojukeji.carrera.thrift.DelayMeta;
 import com.xiaojukeji.carrera.thrift.DelayResult;
+import com.xiaojukeji.carrera.utils.ConfigUtils;
+import com.xiaojukeji.chronos.benchmark.config.BenchmarkConfig;
+import com.xiaojukeji.chronos.benchmark.config.PushConfig;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -141,7 +136,7 @@ public class DelayExpPush {
     }
 
     private static void init(final String configPath) throws Exception {
-        pushConfig = ConfigurationLoader.newConfig(configPath, BenchmarkConfig.class).getPushConfig();
+        pushConfig = ConfigUtils.newConfig(configPath, BenchmarkConfig.class).getPushConfig();
         pushConfig.setQpsLimit(pushConfig.getQpsLimit() == 0 ? 400000 : pushConfig.getQpsLimit());
         pushConfig.setRunTimeMinute(pushConfig.getRunTimeMinute() == 0 ? Integer.MAX_VALUE : pushConfig.getRunTimeMinute());
 

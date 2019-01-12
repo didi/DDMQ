@@ -33,10 +33,6 @@ public class ConfigUtils {
         return getDefaultConfig(configKey, defaultValue, Boolean::valueOf);
     }
 
-    public static String getDefaultConfig(String configKey, String defaultValue) {
-        return getDefaultConfig(configKey, defaultValue, Function.identity());
-    }
-
     public static int getDefaultConfig(String configKey, int defaultValue) {
         return getDefaultConfig(configKey, defaultValue, Integer::valueOf);
     }

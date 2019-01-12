@@ -2,6 +2,7 @@ package com.xiaojukeji.carrera.pproxy.config;
 
 import com.xiaojukeji.carrera.config.ConfigurationValidator;
 import com.xiaojukeji.carrera.config.v4.pproxy.TopicInfoConfiguration;
+import com.xiaojukeji.carrera.utils.ConfigUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -29,7 +30,7 @@ public class RemoteConfigInfo implements ConfigurationValidator {
     }
 
     public static RemoteConfigInfo loadFromFile(String path) throws Exception {
-        return ConfigurationLoader.newConfig(path, RemoteConfigInfo.class);
+        return ConfigUtils.newConfig(path, RemoteConfigInfo.class);
     }
 
     public TopicInfoConfiguration getDefaultTopicInfoConf() {

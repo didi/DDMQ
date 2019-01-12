@@ -1,7 +1,9 @@
 package com.xiaojukeji.chronos.config;
 
 
-public class DbConfig implements ConfigValidator {
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
+
+public class DbConfig implements ConfigurationValidator {
 
     private String dbPath;
     private String seekTimestampPath;
@@ -141,7 +143,6 @@ public class DbConfig implements ConfigValidator {
 
     @Override
     public boolean validate() {
-        // TODO: 2017/9/19
         return true;
     }
 

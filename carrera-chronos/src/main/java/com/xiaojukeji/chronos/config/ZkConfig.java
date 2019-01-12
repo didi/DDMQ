@@ -1,7 +1,9 @@
 package com.xiaojukeji.chronos.config;
 
 
-public class ZkConfig implements ConfigValidator {
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
+
+public class ZkConfig implements ConfigurationValidator {
     private String zkAddrs;
     private int zkSessionTimeoutMs;
     private String masterPathPrefix;

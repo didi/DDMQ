@@ -1,6 +1,7 @@
 package com.xiaojukeji.carrera.cproxy.config;
 
 import com.xiaojukeji.carrera.config.ConfigurationValidator;
+import com.xiaojukeji.carrera.utils.ConfigUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -39,7 +40,7 @@ public class ConsumeProxyConfiguration implements ConfigurationValidator {
     }
 
     public static ConsumeProxyConfiguration loadFromFile(String path) throws Exception {
-        return ConfigurationLoader.newConfig(path, ConsumeProxyConfiguration.class);
+        return ConfigUtils.newConfig(path, ConsumeProxyConfiguration.class);
     }
 
     @Override

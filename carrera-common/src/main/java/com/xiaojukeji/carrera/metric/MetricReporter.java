@@ -1,7 +1,6 @@
 package com.xiaojukeji.carrera.metric;
 
 import com.google.common.collect.Maps;
-import com.xiaojukeji.carrera.metric.bean.Metric;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +21,6 @@ public abstract class MetricReporter {
     protected final String[] metricTags;
     protected volatile int metricBufferIdx = 0;
     private ScheduledFuture future;
-
-    private final MetricClient metricClient = MetricClient.getInstance();
-
 
     public MetricReporter(String metricName, long step, TimeUnit unit, Logger metricLogger, String[] metricTags) {
         if (StringUtils.isEmpty(metricName) || step <= 0) {
@@ -74,15 +70,12 @@ public abstract class MetricReporter {
     protected abstract List<Metric> buildMetrics(int index);
 
     protected void reportMetrics(List<Metric> metrics) {
-        if (metrics == null) {
-            return;
-        }
         if (metricLogger != null) {
             for (Metric metric : metrics) {
                 metricLogger.info("[CarreraMetric] - metric:{}", metric);
             }
         }
-        metricClient.sendMetrics(metrics);
+        MetricClient.getInstance().sendMetrics(metrics);
     }
 
     public static String trimTag(String tag) {
@@ -91,11 +84,6 @@ public abstract class MetricReporter {
         }
         return StringUtils.replaceEach(tag, TRIM_KEYS, TRIM_VALUES);
     }
-
-    public static long avgAndCeil(long val, long step) {
-        return (long) Math.ceil((double) val / step);
-    }
-
 
     private static final String[] TRIM_KEYS;
     private static final String[] TRIM_VALUES;

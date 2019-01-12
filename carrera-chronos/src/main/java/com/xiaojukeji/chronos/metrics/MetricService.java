@@ -1,11 +1,9 @@
 package com.xiaojukeji.chronos.metrics;
 
-import com.xiaojukeji.chronos.config.ConfigManager;
-import com.xiaojukeji.chronos.utils.LogUtils;
 import com.xiaojukeji.carrera.metric.MetricFactory;
 import com.xiaojukeji.carrera.metric.PercentileMetric;
 import com.xiaojukeji.carrera.metric.RateMetric;
-import com.xiaojukeji.carrera.utils.ConfigUtils;
+import com.xiaojukeji.chronos.utils.LogUtils;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -15,10 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class MetricService {
     private static Logger LOGGER = LogUtils.METRIC_LOGGER;
 
-    private static final String CLUSTER_NAME = ConfigManager.getConfig().getClusterName();
     private static final int REPORT_INTERVAL_IN_SECOND = 10;
-    private static final String METRIC_REPORT_OPEN = "metric.report.open";
-    private static boolean started = ConfigUtils.getDefaultConfig(METRIC_REPORT_OPEN, true);
 
     private static RateMetric pullQps;
 

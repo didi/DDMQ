@@ -1,9 +1,9 @@
 package com.xiaojukeji.chronos.benchmark.config;
 
-import com.xiaojukeji.chronos.config.ConfigValidator;
 
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
 
-public class BenchmarkConfig implements ConfigValidator {
+public class BenchmarkConfig implements ConfigurationValidator {
 
     private PushConfig pushConfig;
     private PullConfig pullConfig;

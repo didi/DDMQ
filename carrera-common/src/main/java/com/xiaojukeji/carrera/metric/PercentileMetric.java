@@ -1,6 +1,6 @@
 package com.xiaojukeji.carrera.metric;
 
-import com.xiaojukeji.carrera.metric.bean.Metric;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
 public class PercentileMetric extends MetricReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PercentileMetric.class);
 
-    private List<MetricBuffer<RecycleArray>> metricBufferArray;
+    private List<MetricBuffer<RecycleArray>> metricBufferArray = new ArrayList<>();
     private Set<Integer> percents = new HashSet<>();
 
 
     public PercentileMetric(String metricName, List<Integer> percents, long step, TimeUnit unit, Logger metricLogger, String... metricTags) {
         super(metricName, step, unit, metricLogger, metricTags);
-        if (percents == null || percents.size() == 0) {
+        if (CollectionUtils.isEmpty(percents)) {
             throw new IllegalArgumentException("percent is empty or null");
         }
         if (!checkPercent(percents)) {
@@ -25,10 +25,8 @@ public class PercentileMetric extends MetricReporter {
         }
         this.percents.addAll(percents);
 
-        metricBufferArray = new ArrayList<>();
         metricBufferArray.add(new MetricBuffer<>());
         metricBufferArray.add(new MetricBuffer<>());
-        metricBufferIdx = 0;
     }
 
     private boolean checkPercent(List<Integer> percents) {
@@ -69,7 +67,7 @@ public class PercentileMetric extends MetricReporter {
         Arrays.sort(array.getData(), 0, dateLen);
 
         for (int percent : percents) {
-            long value = 0;
+            long value;
             if (percent == 100) {
                 value = array.getMax();
             } else {

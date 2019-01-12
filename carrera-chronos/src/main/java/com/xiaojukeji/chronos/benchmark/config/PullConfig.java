@@ -1,9 +1,9 @@
 package com.xiaojukeji.chronos.benchmark.config;
 
-import com.xiaojukeji.chronos.config.ConfigValidator;
 
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
 
-public class PullConfig implements ConfigValidator {
+public class PullConfig implements ConfigurationValidator {
     private String group;
     private String cproxyAddrs;
     private int retryIntervalMs;

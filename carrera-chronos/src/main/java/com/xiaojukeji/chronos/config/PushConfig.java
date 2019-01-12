@@ -1,9 +1,11 @@
 package com.xiaojukeji.chronos.config;
 
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
+
 import java.util.List;
 
 
-public class PushConfig implements ConfigValidator {
+public class PushConfig implements ConfigurationValidator {
     private List<String> pproxyAddrs;
     private int proxyTimeoutMs;
     private int clientRetry;
@@ -70,7 +72,6 @@ public class PushConfig implements ConfigValidator {
 
     @Override
     public boolean validate() {
-        // TODO: 2017/9/19
         return true;
     }
 

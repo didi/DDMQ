@@ -11,6 +11,6 @@ public class RateMetric extends CounterMetric {
     }
 
     protected long calcValue(long value) {
-        return avgAndCeil(value, step);
+        return (long) Math.ceil((double) value / step);
     }
 }

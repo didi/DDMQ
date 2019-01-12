@@ -1,7 +1,5 @@
 package com.xiaojukeji.carrera.utils;
 
-import java.io.InputStream;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
@@ -12,6 +10,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
 
 
 public class CommonFastJsonUtils {
@@ -29,10 +29,6 @@ public class CommonFastJsonUtils {
                 }
             });
 
-    public static Object getValueByPath(JSONObject jsonObject, String path) {
-        return jsonPathCache.getUnchecked(path).eval(jsonObject);
-    }
-
     public static boolean setValueByPath(JSONObject jsonObject, String path, Object value) {
         return jsonPathCache.getUnchecked(path).set(jsonObject, value);
     }
@@ -46,15 +42,6 @@ public class CommonFastJsonUtils {
     }
 
     public static <T> T toObject(String json, Class<T> cls) {
-        try {
-            return JSON.parseObject(json, cls);
-        } catch (Exception e) {
-            LOGGER.error("toObject exception, err:{}", e.getMessage(), e);
-        }
-        return null;
-    }
-
-    public static <T> T toObject(byte[] json, Class<T> cls) {
         try {
             return JSON.parseObject(json, cls);
         } catch (Exception e) {
@@ -80,12 +67,4 @@ public class CommonFastJsonUtils {
         }
         return null;
     }
-
-    public static void warmUp(Object object) {
-        long start = System.currentTimeMillis();
-        toJsonStringDefault(object);
-        LOGGER.debug("warm up JsonUtils cost {}ms", System.currentTimeMillis() - start);
-    }
-
-
 }

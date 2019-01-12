@@ -5,7 +5,6 @@ import com.xiaojukeji.carrera.config.v4.CProxyConfig;
 import com.xiaojukeji.carrera.config.v4.GroupConfig;
 import com.xiaojukeji.carrera.config.v4.cproxy.ConsumeServerConfiguration;
 import com.xiaojukeji.carrera.cproxy.concurrent.CarreraExecutors;
-import com.xiaojukeji.carrera.cproxy.config.ConfigurationLoader;
 import com.xiaojukeji.carrera.cproxy.config.ConsumeProxyConfiguration;
 import com.xiaojukeji.carrera.cproxy.config.ConsumerGroupConfig;
 import com.xiaojukeji.carrera.cproxy.config.LocalModeConfig;
@@ -90,7 +89,7 @@ public class ConfigManager {
     private void loadLocalConfig() throws Exception {
         try {
             configLock.lock();
-            LocalModeConfig localConfig = ConfigurationLoader.newConfig(configFilePath, LocalModeConfig.class);
+            LocalModeConfig localConfig = com.xiaojukeji.carrera.utils.ConfigUtils.newConfig(configFilePath, LocalModeConfig.class);
 
             if (!localConfig.validate()) {
                 throw new Exception("local config is invalid.");
@@ -169,7 +168,7 @@ public class ConfigManager {
             }
         }
         configScheduler.shutdown();
-        MetricFactory.destory();
+        MetricFactory.destroy();
         LOGGER.info("Carrera ConfigManager shutdown.");
     }
 

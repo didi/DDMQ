@@ -9,7 +9,7 @@ public class RecycleArray {
     private static final int INIT_LENGTH = 1024;
     private static final int MAX_LENGTH = 100 * 1024;
     private static final int STEP = 512;
-    private static final double RESIE_PERCENT = 0.2;
+    private static final double RESIZE_PERCENT = 0.2;
     private static final int WRITE_DATA_RECORD_COUNT_MAX = 3;
     private long array[];
     private int index = -1;
@@ -55,7 +55,7 @@ public class RecycleArray {
         writeDataCount[(++writeDataCountIndex) % WRITE_DATA_RECORD_COUNT_MAX] = index;
         index = -1;
         resize();
-        max = Long.MIN_VALUE;;
+        max = Long.MIN_VALUE;
         min = Long.MAX_VALUE;
     }
 
@@ -97,7 +97,7 @@ public class RecycleArray {
         }
 
         //resize, 尽量避免频繁抖动
-        if (max < cap - 2 * STEP && cap - max > cap * RESIE_PERCENT) {
+        if (max < cap - 2 * STEP && cap - max > cap * RESIZE_PERCENT) {
             int newCap = max - (max % STEP) + STEP;
             LOGGER.info("resize, shrink old={}, new={}", cap, newCap);
             array = new long[newCap];

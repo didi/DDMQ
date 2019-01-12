@@ -1,11 +1,11 @@
 package com.xiaojukeji.chronos.benchmark.config;
 
-import com.xiaojukeji.chronos.config.ConfigValidator;
+import com.xiaojukeji.carrera.config.ConfigurationValidator;
 
 import java.util.List;
 
 
-public class PushConfig implements ConfigValidator {
+public class PushConfig implements ConfigurationValidator {
     private List<String> pproxyAddrs;
     private int proxyTimeoutMs;
     private int clientRetry;

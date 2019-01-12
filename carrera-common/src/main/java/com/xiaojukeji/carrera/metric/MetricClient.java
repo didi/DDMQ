@@ -1,10 +1,10 @@
 package com.xiaojukeji.carrera.metric;
 
 import com.google.common.util.concurrent.RateLimiter;
-import com.xiaojukeji.carrera.metric.bean.Metric;
 import com.xiaojukeji.carrera.utils.CommonFastJsonUtils;
 import com.xiaojukeji.carrera.utils.ConfigUtils;
 import com.xiaojukeji.carrera.utils.HttpUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
@@ -30,9 +30,8 @@ public class MetricClient implements Runnable {
     private static final int POLL_WAIT_COUNT = 5;
     private static final int SEND_THREAD_POOL_SIZE = 5;
     private static final int BLOCK_QUEUE_SIZE = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.queue.size", 50 * 1024);
-    public static final boolean DISABLE_SEND_METRIC = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.disable", true);
+    private static final boolean DISABLE_SEND_METRIC = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.disable", true);
 
-    //max qps 100k, set limiter 2k
     private static final double RATE = 2000;
     private RateLimiter rateLimiter = RateLimiter.create(RATE);
     private String pushUrl;
@@ -63,7 +62,7 @@ public class MetricClient implements Runnable {
     }
 
     public void init() throws Exception {
-        // TODO: 2018/11/2 init purl etc here.
+        // init url and host etc.
     }
 
     public void shutDown() {
@@ -90,7 +89,7 @@ public class MetricClient implements Runnable {
 
     private void doMetricSend() throws Exception {
         List<Metric> batch = getBatch(BATCH_COUNT);
-        if (batch == null || batch.size() == 0) {
+        if (CollectionUtils.isEmpty(batch)) {
             Thread.sleep(POLL_WAIT_TIME_MS);
             return;
         }
@@ -100,7 +99,7 @@ public class MetricClient implements Runnable {
             LOGGER.error("metric to json failed, metrics=" + batch);
             return;
         }
-        LOGGER.debug("report metric, count={}, date={}", batch.size(), jsonData);
+        LOGGER.debug("report metric, count={}, data={}", batch.size(), jsonData);
         if (DISABLE_SEND_METRIC) {
             LOGGER.debug("disable report metric, count={}, date={}", batch.size(), jsonData);
             return;
