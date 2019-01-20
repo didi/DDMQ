@@ -19,6 +19,8 @@ package org.apache.rocketmq.remoting.common;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.Inet6Address;
@@ -31,13 +33,11 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RemotingUtil {
     public static final String OS_NAME = System.getProperty("os.name");
 
-    private static final Logger log = LoggerFactory.getLogger(RemotingHelper.ROCKETMQ_REMOTING);
+    private static final Logger log = null;
     private static boolean isLinuxPlatform = false;
     private static boolean isWindowsPlatform = false;
 

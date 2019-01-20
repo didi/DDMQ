@@ -20,4 +20,6 @@ public class ConfigName {
     public static final String BROKER_ROLE = "brokerRole";
     public static final String BROKER_PERMISSION = "brokerPermission";
     public static final String BROKER_ID = "brokerId";
+    public static final String REGISTER_RESPONSE_KV_KEY_TERM = "term";
+    public static final String ROLE_CONFIG_INIT = "roleConfigInit";
 }

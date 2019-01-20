@@ -149,17 +149,45 @@ public class PullAPIWrapper {
         final CommunicationMode communicationMode,
         final PullCallback pullCallback
     ) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
-        FindBrokerResult findBrokerResult =
+        return pullKernelImpl(mq, subExpression, expressionType, subVersion, offset, maxNums, sysFlag, commitOffset, brokerSuspendMaxTimeMillis,
+            timeoutMillis, communicationMode, pullCallback, false);
+    }
+
+    public PullResult pullKernelImpl(
+        final MessageQueue mq,
+        final String subExpression,
+        final String expressionType,
+        final long subVersion,
+        final long offset,
+        final int maxNums,
+        final int sysFlag,
+        final long commitOffset,
+        final long brokerSuspendMaxTimeMillis,
+        final long timeoutMillis,
+        final CommunicationMode communicationMode,
+        final PullCallback pullCallback,
+        final boolean isSlaveFirst
+    ) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        FindBrokerResult findBrokerResult = null;
+        if (isSlaveFirst) {
+            findBrokerResult = this.mQClientFactory.findBrokerAddressInSubscribeSlaveFirst(mq.getBrokerName());
+        } else {
             this.mQClientFactory.findBrokerAddressInSubscribe(mq.getBrokerName(),
                 this.recalculatePullFromWhichNode(mq), false);
+        }
         if (null == findBrokerResult) {
             this.mQClientFactory.updateTopicRouteInfoFromNameServer(mq.getTopic());
-            findBrokerResult =
-                this.mQClientFactory.findBrokerAddressInSubscribe(mq.getBrokerName(),
-                    this.recalculatePullFromWhichNode(mq), false);
+            if (isSlaveFirst) {
+                findBrokerResult = this.mQClientFactory.findBrokerAddressInSubscribeSlaveFirst(mq.getBrokerName());
+            } else {
+                findBrokerResult =
+                    this.mQClientFactory.findBrokerAddressInSubscribe(mq.getBrokerName(),
+                        this.recalculatePullFromWhichNode(mq), false);
+            }
         }
 
         if (findBrokerResult != null) {
+            log.debug("pull message from broker:{}, isSlaveFirst:{}", findBrokerResult, isSlaveFirst);
             {
                 // check version
                 if (!ExpressionType.isTagType(expressionType)
@@ -218,6 +246,24 @@ public class PullAPIWrapper {
         final CommunicationMode communicationMode,
         final PullCallback pullCallback
     ) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        return pullKernelImpl(mq, subExpression, subVersion, offset, maxNums, sysFlag, commitOffset, brokerSuspendMaxTimeMillis,
+            timeoutMillis, communicationMode, pullCallback, false);
+    }
+
+    public PullResult pullKernelImpl(
+        final MessageQueue mq,
+        final String subExpression,
+        final long subVersion,
+        final long offset,
+        final int maxNums,
+        final int sysFlag,
+        final long commitOffset,
+        final long brokerSuspendMaxTimeMillis,
+        final long timeoutMillis,
+        final CommunicationMode communicationMode,
+        final PullCallback pullCallback,
+        final boolean isSlaveFirst
+    ) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         return pullKernelImpl(
             mq,
             subExpression,
@@ -229,7 +275,8 @@ public class PullAPIWrapper {
             brokerSuspendMaxTimeMillis,
             timeoutMillis,
             communicationMode,
-            pullCallback
+            pullCallback,
+            isSlaveFirst
         );
     }
 

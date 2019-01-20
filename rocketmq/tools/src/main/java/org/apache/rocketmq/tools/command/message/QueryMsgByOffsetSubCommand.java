@@ -19,6 +19,7 @@ package org.apache.rocketmq.tools.command.message;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.common.MixAll;
@@ -58,6 +59,10 @@ public class QueryMsgByOffsetSubCommand implements SubCommand {
         opt.setRequired(true);
         options.addOption(opt);
 
+        opt = new Option("s", "slaveFirst", true, "Slave First");
+        opt.setRequired(false);
+        options.addOption(opt);
+
         return options;
     }
 
@@ -74,6 +79,8 @@ public class QueryMsgByOffsetSubCommand implements SubCommand {
             String brokerName = commandLine.getOptionValue('b').trim();
             String queueId = commandLine.getOptionValue('i').trim();
             String offset = commandLine.getOptionValue('o').trim();
+            String isSlaveFirstStr = commandLine.getOptionValue('s').trim();
+            boolean isSlaveFirst = StringUtils.isEmpty(isSlaveFirstStr) ? true : Boolean.valueOf(isSlaveFirstStr);
 
             MessageQueue mq = new MessageQueue();
             mq.setTopic(topic);
@@ -83,7 +90,7 @@ public class QueryMsgByOffsetSubCommand implements SubCommand {
             defaultMQPullConsumer.start();
             defaultMQAdminExt.start();
 
-            PullResult pullResult = defaultMQPullConsumer.pull(mq, "*", Long.parseLong(offset), 1);
+            PullResult pullResult = defaultMQPullConsumer.pull(mq, "*", Long.parseLong(offset), 1, isSlaveFirst);
             if (pullResult != null) {
                 switch (pullResult.getPullStatus()) {
                     case FOUND:

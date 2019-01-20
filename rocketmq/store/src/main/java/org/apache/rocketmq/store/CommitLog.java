@@ -16,13 +16,18 @@
  */
 package org.apache.rocketmq.store;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.io.FileUtils;
 import org.apache.rocketmq.common.ServiceThread;
 import org.apache.rocketmq.common.UtilAll;
 import org.apache.rocketmq.common.constant.LoggerName;
@@ -35,6 +40,7 @@ import org.apache.rocketmq.common.sysflag.MessageSysFlag;
 import org.apache.rocketmq.srvutil.ServerUtil;
 import org.apache.rocketmq.store.config.BrokerRole;
 import org.apache.rocketmq.store.config.FlushDiskType;
+import org.apache.rocketmq.store.config.StorePathConfigHelper;
 import org.apache.rocketmq.store.ha.HAService;
 import org.apache.rocketmq.store.schedule.ScheduleMessageService;
 import org.slf4j.Logger;
@@ -134,7 +140,54 @@ public class CommitLog {
         final long intervalForcibly,
         final boolean cleanImmediately
     ) {
+        deleteExpiredBackupFile(expiredTime, deleteFilesInterval, cleanImmediately);
         return this.mappedFileQueue.deleteExpiredFileByTime(expiredTime, deleteFilesInterval, intervalForcibly, cleanImmediately);
+    }
+
+    public void deleteExpiredBackupFile(final long expiredTime, final long deleteFilesInterval,
+        final boolean cleanImmediately) {
+        String path = StorePathConfigHelper.getBackupStoreDirPath(defaultMessageStore.getMessageStoreConfig().getStorePathRootDir());
+        File file = new File(path);
+        if (!file.exists()) {
+            return;
+        }
+
+        File[] subDirs = file.listFiles();
+        if (subDirs == null || subDirs.length == 0) {
+            return;
+        }
+
+        //sort
+        List<File> dirList = Arrays.asList(subDirs);
+        Collections.sort(dirList, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                if (o1.isDirectory() && o2.isFile())
+                    return -1;
+                if (o1.isFile() && o2.isDirectory())
+                    return 1;
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+
+        long curTime = this.defaultMessageStore.getSystemClock().now();
+        for (File dir : dirList) {
+            try {
+                boolean isExpire = curTime - Long.valueOf(dir.getName()) > expiredTime;
+                if (isExpire || cleanImmediately) {
+                    //latest one can be deleted when expired
+                    if (!isExpire && dirList.get(dirList.size() - 1).getName().equals(dir.getName())) {
+                        break;
+                    }
+
+                    FileUtils.forceDelete(dir);
+                    Thread.sleep(deleteFilesInterval);
+                    log.info("back up files delete, dir:{}", dir.getName());
+                }
+            } catch (Exception ex) {
+                log.warn("delete file failed, dir:" + dir.getName(), ex);
+            }
+        }
     }
 
     /**
@@ -159,7 +212,7 @@ public class CommitLog {
     /**
      * When the normal exit, data recovery, all memory data have been flush
      */
-    public void recoverNormally() {
+    public void recoverNormally(long maxPhyOffsetOfConsumeQueue) {
         boolean checkCRCOnRecover = this.defaultMessageStore.getMessageStoreConfig().isCheckCRCOnRecover();
         final List<MappedFile> mappedFiles = this.mappedFileQueue.getMappedFiles();
         if (!mappedFiles.isEmpty()) {
@@ -172,6 +225,7 @@ public class CommitLog {
             ByteBuffer byteBuffer = mappedFile.sliceByteBuffer();
             long processOffset = mappedFile.getFileFromOffset();
             long mappedFileOffset = 0;
+            boolean isDamaged = false;
             while (true) {
                 DispatchRequest dispatchRequest = this.checkMessageAndReturnSize(byteBuffer, checkCRCOnRecover);
                 int size = dispatchRequest.getMsgSize();
@@ -199,6 +253,7 @@ public class CommitLog {
                 // Intermediate file read error
                 else if (!dispatchRequest.isSuccess()) {
                     log.info("recover physics file end, " + mappedFile.getFileName());
+                    isDamaged = true;
                     break;
                 }
             }
@@ -207,6 +262,12 @@ public class CommitLog {
             this.mappedFileQueue.setFlushedWhere(processOffset);
             this.mappedFileQueue.setCommittedWhere(processOffset);
             this.mappedFileQueue.truncateDirtyFiles(processOffset);
+
+            // Clear ConsumeQueue redundant data
+            if (isDamaged && maxPhyOffsetOfConsumeQueue >= processOffset) {
+                log.warn("maxPhyOffsetOfConsumeQueue({}) >= processOffset({}), truncate dirty logic files", maxPhyOffsetOfConsumeQueue, processOffset);
+                this.defaultMessageStore.truncateDirtyLogicFiles(processOffset);
+            }
         }
     }
 
@@ -393,7 +454,7 @@ public class CommitLog {
         this.confirmOffset = phyOffset;
     }
 
-    public void recoverAbnormally() {
+    public void recoverAbnormally(long maxPhyOffsetOfConsumeQueue) {
         // recover by the minimum time stamp
         boolean checkCRCOnRecover = this.defaultMessageStore.getMessageStoreConfig().isCheckCRCOnRecover();
         final List<MappedFile> mappedFiles = this.mappedFileQueue.getMappedFiles();
@@ -421,40 +482,40 @@ public class CommitLog {
                 DispatchRequest dispatchRequest = this.checkMessageAndReturnSize(byteBuffer, checkCRCOnRecover);
                 int size = dispatchRequest.getMsgSize();
 
-                // Normal data
-                if (size > 0) {
-                    mappedFileOffset += size;
+                if (dispatchRequest.isSuccess()) {
+                    // Normal data
+                    if (size > 0) {
+                        mappedFileOffset += size;
 
-                    if (this.defaultMessageStore.getMessageStoreConfig().isDuplicationEnable()) {
-                        if (dispatchRequest.getCommitLogOffset() < this.defaultMessageStore.getConfirmOffset()) {
+                        if (this.defaultMessageStore.getMessageStoreConfig().isDuplicationEnable()) {
+                            if (dispatchRequest.getCommitLogOffset() < this.defaultMessageStore.getConfirmOffset()) {
+                                this.defaultMessageStore.doDispatch(dispatchRequest);
+                            }
+                        } else {
                             this.defaultMessageStore.doDispatch(dispatchRequest);
                         }
-                    } else {
-                        this.defaultMessageStore.doDispatch(dispatchRequest);
                     }
-                }
-                // Intermediate file read error
-                else if (size == -1) {
-                    log.info("recover physics file end, " + mappedFile.getFileName());
+                    // Come the end of the file, switch to the next file
+                    // Since the return 0 representatives met last hole, this can
+                    // not be included in truncate offset
+                    else if (size == 0) {
+                        index++;
+                        if (index >= mappedFiles.size()) {
+                            // The current branch under normal circumstances should
+                            // not happen
+                            log.info("recover physics file over, last mapped file " + mappedFile.getFileName());
+                            break;
+                        } else {
+                            mappedFile = mappedFiles.get(index);
+                            byteBuffer = mappedFile.sliceByteBuffer();
+                            processOffset = mappedFile.getFileFromOffset();
+                            mappedFileOffset = 0;
+                            log.info("recover next physics file, " + mappedFile.getFileName());
+                        }
+                    }
+                } else {
+                    log.info("recover physics file end, file:{}, size:{}", mappedFile.getFileName(), size);
                     break;
-                }
-                // Come the end of the file, switch to the next file
-                // Since the return 0 representatives met last hole, this can
-                // not be included in truncate offset
-                else if (size == 0) {
-                    index++;
-                    if (index >= mappedFiles.size()) {
-                        // The current branch under normal circumstances should
-                        // not happen
-                        log.info("recover physics file over, last mapped file " + mappedFile.getFileName());
-                        break;
-                    } else {
-                        mappedFile = mappedFiles.get(index);
-                        byteBuffer = mappedFile.sliceByteBuffer();
-                        processOffset = mappedFile.getFileFromOffset();
-                        mappedFileOffset = 0;
-                        log.info("recover next physics file, " + mappedFile.getFileName());
-                    }
                 }
             }
 
@@ -464,7 +525,10 @@ public class CommitLog {
             this.mappedFileQueue.truncateDirtyFiles(processOffset);
 
             // Clear ConsumeQueue redundant data
-            this.defaultMessageStore.truncateDirtyLogicFiles(processOffset);
+            if (maxPhyOffsetOfConsumeQueue >= processOffset) {
+                log.warn("maxPhyOffsetOfConsumeQueue({}) >= processOffset({}), truncate dirty logic files", maxPhyOffsetOfConsumeQueue, processOffset);
+                this.defaultMessageStore.truncateDirtyLogicFiles(processOffset);
+            }
         }
         // Commitlog case files are deleted
         else {
@@ -472,6 +536,23 @@ public class CommitLog {
             this.mappedFileQueue.setCommittedWhere(0);
             this.defaultMessageStore.destroyLogics();
         }
+    }
+
+    public void truncate(long phyOffset) {
+        String backupDirPath = StorePathConfigHelper.getBackupStoreSubDirPath(defaultMessageStore.getMessageStoreConfig().getStorePathRootDir(),
+            String.valueOf(defaultMessageStore.getSystemClock().now()));
+        File dir = new File(backupDirPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        this.mappedFileQueue.backupFiles(phyOffset, backupDirPath);
+
+        this.mappedFileQueue.setFlushedWhere(phyOffset);
+        this.mappedFileQueue.setCommittedWhere(phyOffset);
+        this.mappedFileQueue.truncateDirtyFiles(phyOffset);
+
+        // Clear ConsumeQueue redundant data
+        this.defaultMessageStore.truncateDirtyLogicFiles(phyOffset);
     }
 
     private boolean isMappedFileMatchedRecover(final MappedFile mappedFile) {
@@ -1419,7 +1500,8 @@ public class CommitLog {
             return result;
         }
 
-        private AppendMessageResult doAppendMultiTopic(long fileFromOffset, ByteBuffer byteBuffer, int maxBlank, MessageExtBatch messageExtBatch) {
+        private AppendMessageResult doAppendMultiTopic(long fileFromOffset, ByteBuffer byteBuffer, int maxBlank,
+            MessageExtBatch messageExtBatch) {
             //physical offset
             long wroteOffset = fileFromOffset + byteBuffer.position();
 
@@ -1546,7 +1628,6 @@ public class CommitLog {
                 int propertiesPos = messagesByteBuff.position();
                 messagesByteBuff.position(propertiesPos + propertiesLen);
 
-
                 byte[] topicData;
                 int queueId;
                 int topicIdx = 0;
@@ -1565,7 +1646,6 @@ public class CommitLog {
                     topicData = messageExtBatch.getTopic().getBytes(MessageDecoder.CHARSET_UTF8);
                     queueId = messageExtBatch.getQueueId();
                 }
-
 
                 final int topicLength = topicData.length;
 

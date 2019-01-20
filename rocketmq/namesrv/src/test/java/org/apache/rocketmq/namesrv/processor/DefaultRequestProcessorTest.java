@@ -25,13 +25,11 @@ import org.apache.rocketmq.common.protocol.RequestCode;
 import org.apache.rocketmq.common.protocol.ResponseCode;
 import org.apache.rocketmq.common.protocol.body.TopicConfigSerializeWrapper;
 import org.apache.rocketmq.common.protocol.header.namesrv.DeleteKVConfigRequestHeader;
-import org.apache.rocketmq.common.protocol.header.namesrv.DeleteTopicInNamesrvRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVConfigRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVConfigResponseHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.PutKVConfigRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.RegisterBrokerRequestHeader;
 import org.apache.rocketmq.common.protocol.route.BrokerData;
-import org.apache.rocketmq.common.protocol.route.QueueData;
 import org.apache.rocketmq.namesrv.NamesrvController;
 import org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager;
 import org.apache.rocketmq.remoting.exception.RemotingCommandException;
@@ -46,9 +44,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -184,7 +180,7 @@ public class DefaultRequestProcessorTest {
 
         BrokerData broker = new BrokerData();
         broker.setBrokerName("broker");
-        broker.setBrokerAddrs((HashMap) Maps.newHashMap(new Long(2333), "127.0.0.1"));
+        broker.setBrokerAddrs((HashMap) Maps.newHashMap(new Long(2333), "10.10.1.1"));
 
         assertThat((Map) brokerAddrTable.get(routes))
             .contains(new HashMap.SimpleEntry("broker", broker));
@@ -241,76 +237,6 @@ public class DefaultRequestProcessorTest {
         assertThat((Map) brokerAddrTable.get(routes)).isNotEmpty();
     }
 
-    @Test
-    public void testProcessRequest_DeleteTopicInNamesrv()throws RemotingCommandException, NoSuchFieldException, IllegalAccessException {
-        registerRouteInfoManager("127.0.0.2:10911","default-broker_1", 0, "unit-test_1");
-        registerRouteInfoManager("127.0.0.3:10911","default-broker_2", 0, "unit-test_1");
-        registerRouteInfoManager("127.0.0.4:10911","default-broker_3", 0, "unit-test_1");
-        registerRouteInfoManager("127.0.0.5:10911","default-broker_4", 0, "unit-test_1");
-        registerRouteInfoManager("127.0.0.5:10911","default-broker_5", 0, "unit-test_1");
-
-        //delete from one broker
-        {
-            DeleteTopicInNamesrvRequestHeader header = new DeleteTopicInNamesrvRequestHeader();
-            RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.DELETE_TOPIC_IN_NAMESRV,
-                header);
-            request.addExtField("topic", "unit-test_1");
-            request.addExtField("brokerAddrs", "127.0.0.2:10911");
-
-            RemotingCommand response = defaultRequestProcessor.processRequest(null, request);
-
-            assertThat(response.getCode()).isEqualTo(ResponseCode.SUCCESS);
-            assertThat(response.getRemark()).isNull();
-
-            final Set<String> brokers = new HashSet<>();
-            for (QueueData qd : namesrvController.getRouteInfoManager().pickupTopicRouteData("unit-test_1").getQueueDatas()) {
-                brokers.add(qd.getBrokerName());
-            }
-
-            assertThat(brokers.contains("default-broker_1")).isFalse();
-            assertThat(brokers.contains("default-broker_2")).isTrue();
-            assertThat(brokers.contains("default-broker_3")).isTrue();
-        }
-        //delete from two brokers
-        {
-            DeleteTopicInNamesrvRequestHeader header = new DeleteTopicInNamesrvRequestHeader();
-            RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.DELETE_TOPIC_IN_NAMESRV,
-                header);
-            request.addExtField("topic", "unit-test_1");
-            request.addExtField("brokerAddrs", "127.0.0.3:10911;127.0.0.4:10911");
-
-            RemotingCommand response = defaultRequestProcessor.processRequest(null, request);
-
-            assertThat(response.getCode()).isEqualTo(ResponseCode.SUCCESS);
-            assertThat(response.getRemark()).isNull();
-
-            final Set<String> brokers = new HashSet<>();
-            for (QueueData qd : namesrvController.getRouteInfoManager().pickupTopicRouteData("unit-test_1").getQueueDatas()) {
-                brokers.add(qd.getBrokerName());
-            }
-
-            assertThat(brokers.contains("default-broker_1")).isFalse();
-            assertThat(brokers.contains("default-broker_2")).isFalse();
-            assertThat(brokers.contains("default-broker_3")).isFalse();
-            assertThat(brokers.contains("default-broker_4")).isTrue();
-            assertThat(brokers.contains("default-broker_5")).isTrue();
-        }
-        //delete all
-        {
-            DeleteTopicInNamesrvRequestHeader header = new DeleteTopicInNamesrvRequestHeader();
-            RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.DELETE_TOPIC_IN_NAMESRV,
-                header);
-            request.addExtField("topic", "unit-test_1");
-
-            RemotingCommand response = defaultRequestProcessor.processRequest(null, request);
-
-            assertThat(response.getCode()).isEqualTo(ResponseCode.SUCCESS);
-            assertThat(response.getRemark()).isNull();
-
-            assertThat(namesrvController.getRouteInfoManager().pickupTopicRouteData("unit-test_1")).isNull();
-        }
-    }
-
     private static RemotingCommand genSampleRegisterCmd(boolean reg) {
         RegisterBrokerRequestHeader header = new RegisterBrokerRequestHeader();
         header.setBrokerName("broker");
@@ -333,23 +259,19 @@ public class DefaultRequestProcessorTest {
     }
 
     private void registerRouteInfoManager() {
-        registerRouteInfoManager("127.0.0.1:10911","default-broker", 1234, "unit-test");
-    }
-
-    private void registerRouteInfoManager(String brokerAddr, String brokerName, long brokerId, String topicName) {
         TopicConfigSerializeWrapper topicConfigSerializeWrapper = new TopicConfigSerializeWrapper();
         ConcurrentHashMap<String, TopicConfig> topicConfigConcurrentHashMap = new ConcurrentHashMap<>();
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setWriteQueueNums(8);
-        topicConfig.setTopicName(topicName);
+        topicConfig.setTopicName("unit-test");
         topicConfig.setPerm(6);
         topicConfig.setReadQueueNums(8);
         topicConfig.setOrder(false);
-        topicConfigConcurrentHashMap.put(topicName, topicConfig);
+        topicConfigConcurrentHashMap.put("unit-test", topicConfig);
         topicConfigSerializeWrapper.setTopicConfigTable(topicConfigConcurrentHashMap);
         Channel channel = mock(Channel.class);
-        RegisterBrokerResult registerBrokerResult = routeInfoManager.registerBroker("default-cluster", brokerAddr, brokerName, brokerId, "127.0.0.1:1001",
-            topicConfigSerializeWrapper, new ArrayList<String>(), channel);
+        RegisterBrokerResult registerBrokerResult = routeInfoManager.registerBroker("default-cluster", "127.0.0.1:10911", "default-broker", 1234, "127.0.0.1:1001",
+            1000L, 1000L, topicConfigSerializeWrapper, new ArrayList<String>(), channel);
 
     }
 }

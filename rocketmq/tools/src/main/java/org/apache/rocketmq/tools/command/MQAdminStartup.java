@@ -55,6 +55,7 @@ import org.apache.rocketmq.tools.command.message.QueryMsgByKeySubCommand;
 import org.apache.rocketmq.tools.command.message.QueryMsgByOffsetSubCommand;
 import org.apache.rocketmq.tools.command.message.QueryMsgByUniqueKeySubCommand;
 import org.apache.rocketmq.tools.command.namesrv.DeleteKvConfigCommand;
+import org.apache.rocketmq.tools.command.namesrv.EnableBrokerRoleSwitchCommand;
 import org.apache.rocketmq.tools.command.namesrv.GetNamesrvConfigCommand;
 import org.apache.rocketmq.tools.command.namesrv.UpdateKvConfigCommand;
 import org.apache.rocketmq.tools.command.namesrv.UpdateNamesrvConfigCommand;
@@ -193,6 +194,7 @@ public class MQAdminStartup {
         initCommand(new GetBrokerConfigCommand());
 
         initCommand(new QueryConsumeQueueCommand());
+        initCommand(new EnableBrokerRoleSwitchCommand());
     }
 
     private static void initLogback() throws JoranException {

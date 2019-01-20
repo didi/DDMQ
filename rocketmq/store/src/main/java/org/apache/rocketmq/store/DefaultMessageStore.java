@@ -59,10 +59,9 @@ import org.apache.rocketmq.store.stats.BrokerStatsManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.rocketmq.store.config.BrokerRole.SLAVE;
-
 public class DefaultMessageStore implements MessageStore {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
+    private static final long COMMIT_LOG_TRUNCATE_COUNT_MAX = 2;
 
     private final MessageStoreConfig messageStoreConfig;
     // CommitLog
@@ -192,6 +191,8 @@ public class DefaultMessageStore implements MessageStore {
                 this.recover(lastExitOK);
 
                 log.info("load over, and the max phy offset = {}", this.getMaxPhyOffset());
+
+                truncateNotSync();
             }
         } catch (Exception e) {
             log.error("load exception", e);
@@ -203,6 +204,62 @@ public class DefaultMessageStore implements MessageStore {
         }
 
         return result;
+    }
+
+    public boolean truncateNotSync() {
+        if (BrokerRole.SLAVE != messageStoreConfig.getBrokerRole()) {
+            log.warn("broker role is not slave, can not truncate data");
+            return true;
+        }
+
+        long phyOffsetSync = getInSyncOffsetSaved();
+        if (phyOffsetSync == -1) {
+            log.info("no offset save, do not check and truncate");
+            return true;
+        }
+
+        long startTime = getSystemClock().now();
+        long phyOffsetCur = getMaxPhyOffset();
+        if (phyOffsetSync > phyOffsetCur) {
+            log.warn("offset:{} > current offset:{}, no need to truncate", phyOffsetSync, phyOffsetCur);
+            return false;
+        } else if ((phyOffsetCur - phyOffsetSync) > COMMIT_LOG_TRUNCATE_COUNT_MAX * messageStoreConfig.getMapedFileSizeCommitLog()) {
+            log.warn("truncate size({}) exceeded the threshold({}), do not truncate", phyOffsetCur - phyOffsetSync,
+                COMMIT_LOG_TRUNCATE_COUNT_MAX * messageStoreConfig.getMapedFileSizeCommitLog());
+            return false;
+        }
+
+        indexService.deleteExpiredFile(phyOffsetSync);
+        log.info("truncate index file to offset:{}", phyOffsetSync);
+
+        //truncate commit log and consumer queue file
+        commitLog.truncate(phyOffsetSync);
+        log.info("truncate commit log to offset:{}", phyOffsetSync);
+
+        this.recoverTopicQueueTable();
+        log.info("update topic queue tables");
+
+        log.info("truncate completely, from {} back to {}, cost:{} ms", phyOffsetCur, phyOffsetSync, getSystemClock().now() - startTime);
+
+        return true;
+    }
+
+    private long getInSyncOffsetSaved() {
+        long offset = -1;
+        String fileName = StorePathConfigHelper.getOffsetInSyncStorePath(this.messageStoreConfig.getStorePathRootDir());
+        try {
+            File file = new File(fileName);
+            if (file.exists()) {
+                String offsetStr = MixAll.file2String(fileName);
+                if (offsetStr != null) {
+                    offset = Long.valueOf(offsetStr);
+                }
+                file.delete();
+            }
+        } catch (Exception ex) {
+            log.error("get offset in sync failed", ex);
+        }
+        return offset;
     }
 
     /**
@@ -222,7 +279,7 @@ public class DefaultMessageStore implements MessageStore {
         this.commitLog.start();
         this.storeStatsService.start();
 
-        if (this.scheduleMessageService != null && SLAVE != messageStoreConfig.getBrokerRole()) {
+        if (this.scheduleMessageService != null && BrokerRole.SLAVE != messageStoreConfig.getBrokerRole()) {
             this.scheduleMessageService.start();
         }
 
@@ -237,6 +294,9 @@ public class DefaultMessageStore implements MessageStore {
 
         this.createTempFile();
         this.addScheduleTask();
+        if (BrokerRole.SLAVE != messageStoreConfig.getBrokerRole()) {
+            this.haService.initInSyncOffset(getMaxPhyOffset());
+        }
         this.shutdown = false;
     }
 
@@ -309,12 +369,20 @@ public class DefaultMessageStore implements MessageStore {
             return false;
         }
         scheduleMessageService.load();
-        if (SLAVE != messageStoreConfig.getBrokerRole()) {
+        if (BrokerRole.SLAVE != messageStoreConfig.getBrokerRole()) {
             this.scheduleMessageService.start();
             this.recoverTopicQueueTable();
+            this.haService.initInSyncOffset(getMaxPhyOffset());
         } else {
             this.scheduleMessageService.shutdown();
+            truncateNotSync();
+            if (this.getMessageStoreConfig().isDuplicationEnable()) {
+                this.reputMessageService.setReputFromOffset(this.commitLog.getConfirmOffset());
+            } else {
+                this.reputMessageService.setReputFromOffset(this.commitLog.getMaxOffset());
+            }
         }
+        log.info("role change, current role:{}", messageStoreConfig.getBrokerRole());
 
         return true;
     }
@@ -1233,6 +1301,17 @@ public class DefaultMessageStore implements MessageStore {
             }
         }, 1, 1, TimeUnit.SECONDS);
 
+        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    DefaultMessageStore.this.haService.saveInSyncOffset();
+                } catch (Exception ex) {
+                    DefaultMessageStore.this.log.error("save in sync offset failed", ex);
+                }
+            }
+        }, DefaultMessageStore.this.messageStoreConfig.getHaSendHeartbeatInterval(), DefaultMessageStore.this.messageStoreConfig.getHaSendHeartbeatInterval(), TimeUnit.MILLISECONDS);
+
         // this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
         // @Override
         // public void run() {
@@ -1304,12 +1383,12 @@ public class DefaultMessageStore implements MessageStore {
     }
 
     private void recover(final boolean lastExitOK) {
-        this.recoverConsumeQueue();
+        long maxPhyOffsetOfConsumeQueue = this.recoverConsumeQueue();
 
         if (lastExitOK) {
-            this.commitLog.recoverNormally();
+            this.commitLog.recoverNormally(maxPhyOffsetOfConsumeQueue);
         } else {
-            this.commitLog.recoverAbnormally();
+            this.commitLog.recoverAbnormally(maxPhyOffsetOfConsumeQueue);
         }
 
         this.recoverTopicQueueTable();
@@ -1334,12 +1413,18 @@ public class DefaultMessageStore implements MessageStore {
         }
     }
 
-    private void recoverConsumeQueue() {
+    private long recoverConsumeQueue() {
+        long maxPhysicOffset = -1;
         for (ConcurrentMap<Integer, ConsumeQueue> maps : this.consumeQueueTable.values()) {
             for (ConsumeQueue logic : maps.values()) {
                 logic.recover();
+                if (logic.getMaxPhysicOffset() > maxPhysicOffset) {
+                    maxPhysicOffset = logic.getMaxPhysicOffset();
+                }
             }
         }
+
+        return maxPhysicOffset;
     }
 
     private void recoverTopicQueueTable() {
@@ -1460,9 +1545,20 @@ public class DefaultMessageStore implements MessageStore {
 
         @Override
         public void dispatch(DispatchRequest request) {
-            if (DefaultMessageStore.this.messageStoreConfig.isMessageIndexEnable()) {
+            if (isBuildIndex()) {
                 DefaultMessageStore.this.indexService.buildIndex(request);
             }
+        }
+
+        private boolean isBuildIndex() {
+            if (DefaultMessageStore.this.messageStoreConfig.isMessageIndexEnable()) {
+                if (DefaultMessageStore.this.messageStoreConfig.isMessageIndexOnlySlaveEnable()) {
+                    return BrokerRole.SLAVE.equals(DefaultMessageStore.this.messageStoreConfig.getBrokerRole());
+                } else {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -1637,6 +1733,7 @@ public class DefaultMessageStore implements MessageStore {
 
         private void deleteExpiredFiles() {
             int deleteLogicsFilesInterval = DefaultMessageStore.this.getMessageStoreConfig().getDeleteConsumeQueueFilesInterval();
+            int readConsumeQueueFilesMaxWhenDel = DefaultMessageStore.this.getMessageStoreConfig().getReadConsumeQueueFilesMaxWhenDel();
 
             long minOffset = DefaultMessageStore.this.commitLog.getMinOffset();
             if (minOffset > this.lastPhysicalMinOffset) {
@@ -1644,13 +1741,15 @@ public class DefaultMessageStore implements MessageStore {
 
                 ConcurrentMap<String, ConcurrentMap<Integer, ConsumeQueue>> tables = DefaultMessageStore.this.consumeQueueTable;
 
+                int readCount = 0;
                 for (ConcurrentMap<Integer, ConsumeQueue> maps : tables.values()) {
                     for (ConsumeQueue logic : maps.values()) {
                         int deleteCount = logic.deleteExpiredFile(minOffset);
 
-                        if (deleteCount > 0 && deleteLogicsFilesInterval > 0) {
+                        if ((deleteCount > 0 || readCount++ > readConsumeQueueFilesMaxWhenDel) && deleteLogicsFilesInterval > 0) {
                             try {
                                 Thread.sleep(deleteLogicsFilesInterval);
+                                readCount = 0;
                             } catch (InterruptedException ignored) {
                             }
                         }
@@ -1823,9 +1922,8 @@ public class DefaultMessageStore implements MessageStore {
                                 } else {
                                     doNext = false;
                                     if (DefaultMessageStore.this.brokerConfig.getBrokerId() == MixAll.MASTER_ID) {
-                                        log.error("[BUG]the master dispatch message to consume queue error, COMMITLOG OFFSET: {}",
-                                            this.reputFromOffset);
-
+                                        log.error("[BUG]dispatch message to consume queue error, COMMITLOG OFFSET: {}, readSize:{}",
+                                            this.reputFromOffset, readSize);
                                         this.reputFromOffset += result.getSize() - readSize;
                                     }
                                 }

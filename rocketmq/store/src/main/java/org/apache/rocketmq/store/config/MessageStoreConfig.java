@@ -53,8 +53,8 @@ public class MessageStoreConfig {
     private int commitIntervalCommitLog = 200;
 
     /**
-     * introduced since 4.0.x. Determine whether to use mutex reentrantLock when putting message.<br/>
-     * By default it is set to false indicating using spin lock when putting message.
+     * introduced since 4.0.x. Determine whether to use mutex reentrantLock when putting message.<br/> By default it is
+     * set to false indicating using spin lock when putting message.
      */
     private boolean useReentrantLockWhenPutMessage = false;
 
@@ -69,6 +69,7 @@ public class MessageStoreConfig {
     private int deleteCommitLogFilesInterval = 100;
     // ConsumeQueue removal interval
     private int deleteConsumeQueueFilesInterval = 100;
+    private int readConsumeQueueFilesMaxWhenDel = 100;
     private int destroyMapedFileIntervalForcibly = 1000 * 120;
     private int redeleteHangedFileInterval = 1000 * 120;
     // When to delete,default is at 4 am
@@ -109,6 +110,7 @@ public class MessageStoreConfig {
     private int accessMessageInMemoryMaxRatio = 40;
     @ImportantField
     private boolean messageIndexEnable = true;
+    private boolean messageIndexOnlySlaveEnable = true;
     private int maxHashSlotNum = 5000000;
     private int maxIndexNum = 5000000 * 4;
     private int maxMsgsNumBatch = 64;
@@ -683,5 +685,21 @@ public class MessageStoreConfig {
 
     public void setWaitIntervalInRoleChange(long waitIntervalInRoleChange) {
         this.waitIntervalInRoleChange = waitIntervalInRoleChange;
+    }
+
+    public boolean isMessageIndexOnlySlaveEnable() {
+        return messageIndexOnlySlaveEnable;
+    }
+
+    public void setMessageIndexOnlySlaveEnable(boolean messageIndexOnlySlaveEnable) {
+        this.messageIndexOnlySlaveEnable = messageIndexOnlySlaveEnable;
+    }
+
+    public int getReadConsumeQueueFilesMaxWhenDel() {
+        return readConsumeQueueFilesMaxWhenDel;
+    }
+
+    public void setReadConsumeQueueFilesMaxWhenDel(int readConsumeQueueFilesMaxWhenDel) {
+        this.readConsumeQueueFilesMaxWhenDel = readConsumeQueueFilesMaxWhenDel;
     }
 }

@@ -125,6 +125,24 @@ public class TopicConfigManager extends ConfigManager {
             topicConfig.setWriteQueueNums(1);
             this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
         }
+        {
+            // MixAll.LIVE_STATE_DETECT_TOPIC
+            String topic = MixAll.LIVE_STATE_DETECT_TOPIC;
+            TopicConfig topicConfig = new TopicConfig(topic);
+            this.systemTopicList.add(topic);
+            topicConfig.setReadQueueNums(1);
+            topicConfig.setWriteQueueNums(1);
+            this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
+        }
+        {
+            // MixAll.CARRERA_INSPECTION_TOPIC
+            String topic = MixAll.CARRERA_INSPECTION_TOPIC;
+            TopicConfig topicConfig = new TopicConfig(topic);
+            this.systemTopicList.add(topic);
+            topicConfig.setReadQueueNums(1);
+            topicConfig.setWriteQueueNums(1);
+            this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
+        }
     }
 
     public boolean isSystemTopic(final String topic) {
@@ -398,6 +416,25 @@ public class TopicConfigManager extends ConfigManager {
                 this.dataVersion.assignNewOne(topicConfigSerializeWrapper.getDataVersion());
                 this.printLoadDataWhenFirstBoot(topicConfigSerializeWrapper);
             }
+        }
+
+        if (!topicConfigTable.containsKey(MixAll.LIVE_STATE_DETECT_TOPIC)) {
+            // MixAll.LIVE_STATE_DETECT_TOPIC
+            String topic = MixAll.LIVE_STATE_DETECT_TOPIC;
+            TopicConfig topicConfig = new TopicConfig(topic);
+            this.systemTopicList.add(topic);
+            topicConfig.setReadQueueNums(1);
+            topicConfig.setWriteQueueNums(1);
+            this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
+        }
+        if (!topicConfigTable.containsKey(MixAll.CARRERA_INSPECTION_TOPIC)) {
+            // MixAll.CARRERA_INSPECTION_TOPIC
+            String topic = MixAll.CARRERA_INSPECTION_TOPIC;
+            TopicConfig topicConfig = new TopicConfig(topic);
+            this.systemTopicList.add(topic);
+            topicConfig.setReadQueueNums(1);
+            topicConfig.setWriteQueueNums(1);
+            this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
         }
     }
 

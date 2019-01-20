@@ -381,19 +381,12 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
     public void deleteTopicInNameServer(Set<String> addrs,
         String topic) throws RemotingException, MQBrokerException, InterruptedException,
         MQClientException {
-        deleteTopicInNameServer(addrs, topic, null);
-    }
-
-    @Override
-    public void deleteTopicInNameServer(Set<String> addrs,
-        String topic, final Set<String> brokerAddrs) throws RemotingException, MQBrokerException, InterruptedException,
-        MQClientException {
         if (addrs == null) {
             String ns = this.mqClientInstance.getMQClientAPIImpl().fetchNameServerAddr();
             addrs = new HashSet(Arrays.asList(ns.split(";")));
         }
         for (String addr : addrs) {
-            this.mqClientInstance.getMQClientAPIImpl().deleteTopicInNameServer(addr, topic, brokerAddrs, timeoutMillis);
+            this.mqClientInstance.getMQClientAPIImpl().deleteTopicInNameServer(addr, topic, timeoutMillis);
         }
     }
 
@@ -969,11 +962,22 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
         return this.mqClientInstance.getMQAdminImpl().viewMessage(msgId);
     }
 
+    public MessageExt viewMessage(String topic,
+        String msgId, boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        return this.mqClientInstance.getMQAdminImpl().viewMessage(topic, msgId, slaveFirst);
+    }
+
     @Override
     public QueryResult queryMessage(String topic, String key, int maxNum, long begin,
         long end) throws MQClientException,
         InterruptedException {
         return this.mqClientInstance.getMQAdminImpl().queryMessage(topic, key, maxNum, begin, end);
+    }
+
+    public QueryResult queryMessage(String topic, String key, int maxNum, long begin,
+        long end, boolean isSlaveFirst) throws MQClientException,
+        InterruptedException {
+        return this.mqClientInstance.getMQAdminImpl().queryMessage(topic, key, maxNum, begin, end, false, isSlaveFirst);
     }
 
     @Override
@@ -1015,5 +1019,13 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
     public AllMaxOffset getAllMaxOffset(String brokerAddr) throws InterruptedException, MQBrokerException,
         RemotingTimeoutException, RemotingSendRequestException, RemotingConnectException, RemotingCommandException {
         return this.mqClientInstance.getMQClientAPIImpl().getAllMaxOffset(brokerAddr);
+    }
+
+    public void enableBrokerRoleSwitch(final String clusterName, final String brokerName,
+        final List<String> nameServers) throws InterruptedException, RemotingConnectException,
+        UnsupportedEncodingException, RemotingSendRequestException, RemotingTimeoutException,
+        MQClientException, MQBrokerException, RemotingCommandException {
+
+        this.mqClientInstance.getMQClientAPIImpl().enableBrokerRoleSwitch(clusterName, brokerName, nameServers);
     }
 }

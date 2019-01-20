@@ -236,21 +236,6 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
         }
     }
 
-    @Override
-    public void submitConsumeRequestLater(
-            final List<MessageExt> msgs,
-            final ProcessQueue processQueue,
-            final MessageQueue messageQueue,
-            final boolean dispathToConsume,
-            final long timeMillis) {
-        this.scheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                ConsumeMessageConcurrentlyService.this.submitConsumeRequest(msgs, processQueue, messageQueue, true);
-            }
-        }, timeMillis, TimeUnit.MILLISECONDS);
-    }
-
     public void resetRetryTopic(final List<MessageExt> msgs) {
         final String groupTopic = MixAll.getRetryTopic(consumerGroup);
         for (MessageExt msg : msgs) {

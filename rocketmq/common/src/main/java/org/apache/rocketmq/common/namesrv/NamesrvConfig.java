@@ -35,6 +35,20 @@ public class NamesrvConfig {
     private String productEnvName = "center";
     private boolean clusterTest = false;
     private boolean orderMessageEnable = false;
+    private boolean roleSwitchEnable = false;
+    private boolean roleAutoSwitchEnable = false;
+    private String clusterName = null;
+    private String zkPath = null;
+    private String masterType = "SYNC_MASTER";
+    private long detectIntervalMs = 5 * 1000;
+    private long enableValidityPeriodMs = 3 * 5 * 1000;
+    private long detectMessageSendTimeoutMs = 500;
+    private int roleCheckTimesMax = 10;
+    private long roleCheckWaitMs = 100;
+    private int detectRecordCount = 10;
+    private int lastContinuousFailCount = 5;
+    private float unhealthyRateNsDetect = 0.6f;
+    private float unhealthyRateAllNs = 2 / 3.0f;
 
     public boolean isOrderMessageEnable() {
         return orderMessageEnable;
@@ -82,5 +96,117 @@ public class NamesrvConfig {
 
     public void setConfigStorePath(final String configStorePath) {
         this.configStorePath = configStorePath;
+    }
+
+    public boolean isRoleSwitchEnable() {
+        return roleSwitchEnable;
+    }
+
+    public void setRoleSwitchEnable(boolean roleSwitchEnable) {
+        this.roleSwitchEnable = roleSwitchEnable;
+    }
+
+    public boolean isRoleAutoSwitchEnable() {
+        return roleAutoSwitchEnable;
+    }
+
+    public void setRoleAutoSwitchEnable(boolean roleAutoSwitchEnable) {
+        this.roleAutoSwitchEnable = roleAutoSwitchEnable;
+    }
+
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public String getZkPath() {
+        return zkPath;
+    }
+
+    public void setZkPath(String zkPath) {
+        this.zkPath = zkPath;
+    }
+
+    public String getMasterType() {
+        return masterType;
+    }
+
+    public void setMasterType(String masterType) {
+        this.masterType = masterType;
+    }
+
+    public long getDetectIntervalMs() {
+        return detectIntervalMs;
+    }
+
+    public void setDetectIntervalMs(long detectIntervalMs) {
+        this.detectIntervalMs = detectIntervalMs;
+    }
+
+    public long getEnableValidityPeriodMs() {
+        return enableValidityPeriodMs;
+    }
+
+    public void setEnableValidityPeriodMs(long enableValidityPeriodMs) {
+        this.enableValidityPeriodMs = enableValidityPeriodMs;
+    }
+
+    public long getDetectMessageSendTimeoutMs() {
+        return detectMessageSendTimeoutMs;
+    }
+
+    public void setDetectMessageSendTimeoutMs(long detectMessageSendTimeoutMs) {
+        this.detectMessageSendTimeoutMs = detectMessageSendTimeoutMs;
+    }
+
+    public int getRoleCheckTimesMax() {
+        return roleCheckTimesMax;
+    }
+
+    public void setRoleCheckTimesMax(int roleCheckTimesMax) {
+        this.roleCheckTimesMax = roleCheckTimesMax;
+    }
+
+    public long getRoleCheckWaitMs() {
+        return roleCheckWaitMs;
+    }
+
+    public void setRoleCheckWaitMs(long roleCheckWaitMs) {
+        this.roleCheckWaitMs = roleCheckWaitMs;
+    }
+
+    public int getDetectRecordCount() {
+        return detectRecordCount;
+    }
+
+    public void setDetectRecordCount(int detectRecordCount) {
+        this.detectRecordCount = detectRecordCount;
+    }
+
+    public int getLastContinuousFailCount() {
+        return lastContinuousFailCount;
+    }
+
+    public void setLastContinuousFailCount(int lastContinuousFailCount) {
+        this.lastContinuousFailCount = lastContinuousFailCount;
+    }
+
+    public float getUnhealthyRateNsDetect() {
+        return unhealthyRateNsDetect;
+    }
+
+    public void setUnhealthyRateNsDetect(float unhealthyRateNsDetect) {
+        this.unhealthyRateNsDetect = unhealthyRateNsDetect;
+    }
+
+    public float getUnhealthyRateAllNs() {
+        return unhealthyRateAllNs;
+    }
+
+    public void setUnhealthyRateAllNs(float unhealthyRateAllNs) {
+        this.unhealthyRateAllNs = unhealthyRateAllNs;
     }
 }

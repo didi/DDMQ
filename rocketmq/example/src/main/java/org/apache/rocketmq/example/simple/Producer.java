@@ -16,7 +16,6 @@
  */
 package org.apache.rocketmq.example.simple;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -25,10 +24,6 @@ import org.apache.rocketmq.remoting.common.RemotingHelper;
 
 public class Producer {
     public static void main(String[] args) throws MQClientException, InterruptedException {
-        String topic = System.getenv("TOPIC");
-        if (StringUtils.isEmpty(topic)) {
-            topic = "TopicTest";
-        }
 
         DefaultMQProducer producer = new DefaultMQProducer("ProducerGroupName");
 
@@ -37,7 +32,7 @@ public class Producer {
         for (int i = 0; i < 10000000; i++)
             try {
                 {
-                    Message msg = new Message(topic,
+                    Message msg = new Message("TopicTest",
                         "TagA",
                         "OrderID188",
                         "Hello world".getBytes(RemotingHelper.DEFAULT_CHARSET));

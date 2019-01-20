@@ -311,30 +311,11 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                                     pullRequest.getMessageQueue().getTopic(), pullResult.getMsgFoundList().size());
 
                                 boolean dispathToConsume = processQueue.putMessage(pullResult.getMsgFoundList());
-
-                                boolean isSubmitConsumeRequest = false;
-                                long delayMills = DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getDelayPushMessageTimeMillis();
-                                if (delayMills > 0L) {
-                                    long timeMillis = System.currentTimeMillis() - pullResult.getMsgFoundList().get(0).getBornTimestamp();
-                                    if (timeMillis < delayMills) {
-                                        DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequestLater(
-                                                pullResult.getMsgFoundList(),
-                                                processQueue,
-                                                pullRequest.getMessageQueue(),
-                                                dispathToConsume,
-                                                delayMills - timeMillis);
-
-                                        isSubmitConsumeRequest = true;
-                                    }
-                                }
-
-                                if (!isSubmitConsumeRequest) {
-                                    DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
-                                            pullResult.getMsgFoundList(),
-                                            processQueue,
-                                            pullRequest.getMessageQueue(),
-                                            dispathToConsume);
-                                }
+                                DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
+                                    pullResult.getMsgFoundList(),
+                                    processQueue,
+                                    pullRequest.getMessageQueue(),
+                                    dispathToConsume);
 
                                 if (DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getPullInterval() > 0) {
                                     DefaultMQPushConsumerImpl.this.executePullRequestLater(pullRequest,

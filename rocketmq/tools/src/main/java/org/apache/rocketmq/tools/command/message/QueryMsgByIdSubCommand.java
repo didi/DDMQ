@@ -42,9 +42,10 @@ import org.apache.rocketmq.tools.command.SubCommand;
 import org.apache.rocketmq.tools.command.SubCommandException;
 
 public class QueryMsgByIdSubCommand implements SubCommand {
-    public static void queryById(final DefaultMQAdminExt admin, final String msgId) throws MQClientException,
+    public static void queryById(final DefaultMQAdminExt admin, final String msgId,
+        String topic) throws MQClientException,
         RemotingException, MQBrokerException, InterruptedException, IOException {
-        MessageExt msg = admin.viewMessage(msgId);
+        MessageExt msg = admin.viewMessage(topic, msgId, true);
 
         printMsg(admin, msg);
     }
@@ -206,6 +207,10 @@ public class QueryMsgByIdSubCommand implements SubCommand {
         opt.setRequired(false);
         options.addOption(opt);
 
+        opt = new Option("t", "topic", true, "topic name");
+        opt.setRequired(false);
+        options.addOption(opt);
+
         return options;
     }
 
@@ -249,7 +254,8 @@ public class QueryMsgByIdSubCommand implements SubCommand {
             } else {
                 for (String msgId : msgIdArr) {
                     if (StringUtils.isNotBlank(msgId)) {
-                        queryById(defaultMQAdminExt, msgId.trim());
+                        String topic = commandLine.hasOption('t') ? commandLine.getOptionValue('t').trim() : null;
+                        queryById(defaultMQAdminExt, msgId.trim(), topic);
                     }
                 }
 

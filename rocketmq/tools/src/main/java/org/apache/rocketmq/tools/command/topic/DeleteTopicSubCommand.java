@@ -17,7 +17,6 @@
 package org.apache.rocketmq.tools.command.topic;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.cli.CommandLine;
@@ -53,23 +52,6 @@ public class DeleteTopicSubCommand implements SubCommand {
         System.out.printf("delete topic [%s] from NameServer success.%n", topic);
     }
 
-    public static void deleteTopicByBroker(final DefaultMQAdminExt adminExt,
-        final Set<String> brokerAddrs,
-        final String topic
-    ) throws InterruptedException, MQBrokerException, RemotingException, MQClientException {
-        adminExt.deleteTopicInBroker(brokerAddrs, topic);
-        System.out.printf("delete topic [%s] from broker [%s] success.%n", topic, brokerAddrs);
-
-        Set<String> nameServerSet = null;
-        if (adminExt.getNamesrvAddr() != null) {
-            String[] ns = adminExt.getNamesrvAddr().trim().split(";");
-            nameServerSet = new HashSet(Arrays.asList(ns));
-        }
-
-        adminExt.deleteTopicInNameServer(nameServerSet, topic, brokerAddrs);
-        System.out.printf("delete topic [%s] from NameServer success.%n", topic);
-    }
-
     @Override
     public String commandName() {
         return "deleteTopic";
@@ -87,11 +69,7 @@ public class DeleteTopicSubCommand implements SubCommand {
         options.addOption(opt);
 
         opt = new Option("c", "clusterName", true, "delete topic from which cluster");
-        opt.setRequired(false);
-        options.addOption(opt);
-
-        opt = new Option("b", "brokerAddr", true, "create topic to which broker");
-        opt.setRequired(false);
+        opt.setRequired(true);
         options.addOption(opt);
 
         return options;
@@ -103,23 +81,12 @@ public class DeleteTopicSubCommand implements SubCommand {
         adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             String topic = commandLine.getOptionValue('t').trim();
-            adminExt.start();
 
             if (commandLine.hasOption('c')) {
                 String clusterName = commandLine.getOptionValue('c').trim();
 
+                adminExt.start();
                 deleteTopic(adminExt, clusterName, topic);
-                return;
-            } else if (commandLine.hasOption("b")) {
-                String brokerAddrs = commandLine.getOptionValue('b').trim();
-                String[] brokerArr = brokerAddrs.split(";");
-                if (brokerArr.length <= 0) {
-                    throw new IllegalArgumentException("not broker");
-                }
-                Set<String> brokerSet = new HashSet<>();
-                Collections.addAll(brokerSet, brokerArr);
-
-                deleteTopicByBroker(adminExt, brokerSet, topic);
                 return;
             }
 

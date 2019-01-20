@@ -43,6 +43,7 @@ public class MessageConst {
     public static final String PROPERTY_CONSUME_START_TIMESTAMP = "CONSUME_START_TIME";
 
     public static final String KEY_SEPARATOR = " ";
+    public static final String PROPERTY_USER_TRACE_ID = "traceId";
 
     public static final HashSet<String> STRING_HASH_SET = new HashSet<String>();
 

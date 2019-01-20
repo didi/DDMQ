@@ -132,6 +132,12 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         return defaultMQAdminExtImpl.queryMessage(topic, key, maxNum, begin, end);
     }
 
+    public QueryResult queryMessage(String topic, String key, int maxNum, long begin,
+        long end, boolean isSlaveFirst) throws MQClientException,
+        InterruptedException {
+        return defaultMQAdminExtImpl.queryMessage(topic, key, maxNum, begin, end, isSlaveFirst);
+    }
+
     @Override
     public void start() throws MQClientException {
         defaultMQAdminExtImpl.start();
@@ -283,13 +289,6 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         String topic) throws RemotingException, MQBrokerException, InterruptedException,
         MQClientException {
         defaultMQAdminExtImpl.deleteTopicInNameServer(addrs, topic);
-    }
-
-    @Override
-    public void deleteTopicInNameServer(Set<String> addrs,
-        String topic, final Set<String> brokerAddrs) throws RemotingException, MQBrokerException, InterruptedException,
-        MQClientException {
-        defaultMQAdminExtImpl.deleteTopicInNameServer(addrs, topic, brokerAddrs);
     }
 
     @Override
@@ -475,6 +474,11 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         return this.defaultMQAdminExtImpl.viewMessage(topic, msgId);
     }
 
+    public MessageExt viewMessage(String topic, String msgId,
+        boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        return this.defaultMQAdminExtImpl.viewMessage(topic, msgId, slaveFirst);
+    }
+
     public String getAdminExtGroup() {
         return adminExtGroup;
     }
@@ -522,8 +526,17 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         );
     }
 
-    public AllMaxOffset getAllMaxOffset(String brokerAddr) throws InterruptedException, RemotingConnectException, RemotingTimeoutException, RemotingSendRequestException, MQBrokerException, RemotingCommandException {
+    public AllMaxOffset getAllMaxOffset(
+        String brokerAddr) throws InterruptedException, RemotingConnectException, RemotingTimeoutException, RemotingSendRequestException, MQBrokerException, RemotingCommandException {
         return this.defaultMQAdminExtImpl.getAllMaxOffset(brokerAddr);
+    }
+
+    public void enableBrokerRoleSwitch(final String clusterName, final String brokerName,
+        final List<String> nameServers)
+        throws InterruptedException, RemotingConnectException,
+        UnsupportedEncodingException, RemotingSendRequestException, RemotingTimeoutException,
+        MQClientException, MQBrokerException, RemotingCommandException {
+        this.defaultMQAdminExtImpl.enableBrokerRoleSwitch(clusterName, brokerName, nameServers);
     }
 
 }

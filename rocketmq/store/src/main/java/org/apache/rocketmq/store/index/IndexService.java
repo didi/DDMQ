@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.rocketmq.common.UtilAll;
@@ -205,6 +206,7 @@ public class IndexService {
             DispatchRequest msg = req;
             String topic = msg.getTopic();
             String keys = msg.getKeys();
+            Map<String, String> properties = msg.getPropertiesMap();
             if (msg.getCommitLogOffset() < endPhyOffset) {
                 return;
             }
@@ -234,9 +236,20 @@ public class IndexService {
                     if (key.length() > 0) {
                         indexFile = putKey(indexFile, msg, buildKey(topic, key));
                         if (indexFile == null) {
-                            log.error("putKey error commitlog {} uniqkey {}", req.getCommitLogOffset(), req.getUniqKey());
+                            log.error("putKey error commitlog {} key {}", req.getCommitLogOffset(), key);
                             return;
                         }
+                    }
+                }
+            }
+
+            if (properties != null & properties.containsKey(MessageConst.PROPERTY_USER_TRACE_ID)) {
+                String traceId = properties.get(MessageConst.PROPERTY_USER_TRACE_ID);
+                if (traceId != null) {
+                    indexFile = putKey(indexFile, msg, buildKey(topic, traceId));
+                    if (indexFile == null) {
+                        log.error("putKey error commitlog {} traceId {}", req.getCommitLogOffset(), traceId);
+                        return;
                     }
                 }
             }

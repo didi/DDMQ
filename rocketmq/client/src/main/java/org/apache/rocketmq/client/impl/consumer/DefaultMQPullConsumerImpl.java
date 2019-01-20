@@ -156,6 +156,11 @@ public class DefaultMQPullConsumerImpl implements MQConsumerInner {
         return pull(mq, subExpression, offset, maxNums, this.defaultMQPullConsumer.getConsumerPullTimeoutMillis());
     }
 
+    public PullResult pull(MessageQueue mq, String subExpression, long offset, int maxNums, boolean isSlaveFirst)
+        throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        return pullSyncImpl(mq, subExpression, offset, maxNums, false, this.defaultMQPullConsumer.getConsumerPullTimeoutMillis(), isSlaveFirst);
+    }
+
     public PullResult pull(MessageQueue mq, String subExpression, long offset, int maxNums, long timeout)
         throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         return this.pullSyncImpl(mq, subExpression, offset, maxNums, false, timeout);
@@ -163,6 +168,12 @@ public class DefaultMQPullConsumerImpl implements MQConsumerInner {
 
     private PullResult pullSyncImpl(MessageQueue mq, String subExpression, long offset, int maxNums, boolean block,
         long timeout)
+        throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        return pullSyncImpl(mq, subExpression, offset, maxNums, block, timeout, false);
+    }
+
+    private PullResult pullSyncImpl(MessageQueue mq, String subExpression, long offset, int maxNums, boolean block,
+        long timeout, boolean isSlaveFirst)
         throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         this.makeSureStateOK();
 
@@ -204,7 +215,8 @@ public class DefaultMQPullConsumerImpl implements MQConsumerInner {
             this.defaultMQPullConsumer.getBrokerSuspendMaxTimeMillis(),
             timeoutMillis,
             CommunicationMode.SYNC,
-            null
+            null,
+            isSlaveFirst
         );
         this.pullAPIWrapper.processPullResult(mq, pullResult, subscriptionData);
         if (!this.consumeMessageHookList.isEmpty()) {
@@ -462,6 +474,12 @@ public class DefaultMQPullConsumerImpl implements MQConsumerInner {
         throws MQClientException, InterruptedException {
         this.makeSureStateOK();
         return this.mQClientFactory.getMQAdminImpl().queryMessage(topic, key, maxNum, begin, end);
+    }
+
+    public QueryResult queryMessage(String topic, String key, int maxNum, long begin, long end, boolean isSlaveFirst)
+        throws MQClientException, InterruptedException {
+        this.makeSureStateOK();
+        return this.mQClientFactory.getMQAdminImpl().queryMessage(topic, key, maxNum, begin, end, false, isSlaveFirst);
     }
 
     public MessageExt queryMessageByUniqKey(String topic, String uniqKey)

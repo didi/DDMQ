@@ -18,6 +18,9 @@ package org.apache.rocketmq.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -26,6 +29,7 @@ import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.rocketmq.common.UtilAll;
 import org.apache.rocketmq.common.constant.LoggerName;
+import org.apache.rocketmq.store.config.StorePathConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,6 +123,23 @@ public class MappedFileQueue {
         }
 
         this.deleteExpiredFile(willRemoveFiles);
+    }
+
+    public void backupFiles(long offset, String backupPath) {
+        for (MappedFile file : this.mappedFiles) {
+            long fileTailOffset = file.getFileFromOffset() + this.mappedFileSize;
+            if (fileTailOffset > offset) {
+                file.flush(0);
+                try {
+                    Path source = Paths.get(file.getFileName());
+                    Path target = Paths.get(StorePathConfigHelper.getBackupStoreFilePath(backupPath, new File(file.getFileName()).getName()));
+                    Files.copy(source, target);
+                    log.info("backup file:{} to {}", file.getFileName(), target);
+                } catch (Exception ex) {
+                    log.error("backup file failed", ex);
+                }
+            }
+        }
     }
 
     void deleteExpiredFile(List<MappedFile> files) {

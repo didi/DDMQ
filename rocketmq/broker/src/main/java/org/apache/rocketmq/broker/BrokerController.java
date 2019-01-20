@@ -33,6 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledFuture;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.broker.client.ClientHousekeepingService;
 import org.apache.rocketmq.broker.client.ConsumerIdsChangeListener;
 import org.apache.rocketmq.broker.client.ConsumerManager;
@@ -40,6 +41,7 @@ import org.apache.rocketmq.broker.client.DefaultConsumerIdsChangeListener;
 import org.apache.rocketmq.broker.client.ProducerManager;
 import org.apache.rocketmq.broker.client.net.Broker2Client;
 import org.apache.rocketmq.broker.client.rebalance.RebalanceLockManager;
+import org.apache.rocketmq.broker.config.ConfigUpdate;
 import org.apache.rocketmq.broker.filter.CommitLogDispatcherCalcBitMap;
 import org.apache.rocketmq.broker.filter.ConsumerFilterManager;
 import org.apache.rocketmq.broker.filtersrv.FilterServerManager;
@@ -147,6 +149,8 @@ public class BrokerController {
     private ScheduledFuture slaveSyncFuture;
     private ScheduledFuture masterAndSlaveDiffPrintFuture;
     private volatile RoleChangeState roleChangeState = RoleChangeState.SUCCESS;
+    private volatile long term = Long.MIN_VALUE;
+    private ConfigUpdate configUpdateDynamic;
 
     public BrokerController(
         final BrokerConfig brokerConfig,
@@ -181,7 +185,7 @@ public class BrokerController {
         this.clientManagerThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getClientManagerThreadPoolQueueCapacity());
         this.consumerManagerThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getConsumerManagerThreadPoolQueueCapacity());
 
-        this.brokerStatsManager = new BrokerStatsManager(this.brokerConfig.getBrokerClusterName());
+        this.brokerStatsManager = new BrokerStatsManager(this.brokerConfig.getBrokerClusterName(), brokerConfig);
         this.setStoreHost(new InetSocketAddress(this.getBrokerConfig().getBrokerIP1(), this.getNettyServerConfig().getListenPort()));
 
         this.brokerFastFailure = new BrokerFastFailure(this);
@@ -209,6 +213,14 @@ public class BrokerController {
     }
 
     public boolean initialize() throws CloneNotSupportedException {
+        if (StringUtils.isNotEmpty(brokerConfig.getZkPath())) {
+            configUpdateDynamic = new ConfigUpdate(this);
+            if (!configUpdateDynamic.init()) {
+                log.error("config update failed");
+                return false;
+            }
+        }
+
         boolean result = this.topicConfigManager.load();
 
         result = result && this.consumerOffsetManager.load();
@@ -667,6 +679,10 @@ public class BrokerController {
         if (this.consumerFilterManager != null) {
             this.consumerFilterManager.persist();
         }
+
+        if (configUpdateDynamic != null) {
+            configUpdateDynamic.shutdown();
+        }
     }
 
     private void unregisterBrokerAll() {
@@ -761,16 +777,34 @@ public class BrokerController {
             topicConfigWrapper.setTopicConfigTable(topicConfigTable);
         }
 
-        RegisterBrokerResult registerBrokerResult = this.brokerOuterAPI.registerBrokerAll(
-            this.brokerConfig.getBrokerClusterName(),
-            this.getBrokerAddr(),
-            this.brokerConfig.getBrokerName(),
-            this.brokerConfig.getBrokerId(),
-            this.getHAServerAddr(),
-            topicConfigWrapper,
-            this.filterServerManager.buildNewFilterServerList(),
-            oneway,
-            this.brokerConfig.getRegisterBrokerTimeoutMills());
+        RegisterBrokerResult registerBrokerResult = null;
+        for (int i = 0; i < 3; i++) {
+            registerBrokerResult = this.brokerOuterAPI.registerBrokerAll(
+                this.brokerConfig.getBrokerClusterName(),
+                this.getBrokerAddr(),
+                this.brokerConfig.getBrokerName(),
+                this.brokerConfig.getBrokerId(),
+                this.getHAServerAddr(),
+                this.messageStore.getMaxPhyOffset(),
+                this.term,
+                topicConfigWrapper,
+                this.filterServerManager.buildNewFilterServerList(),
+                oneway,
+                this.brokerConfig.getRegisterBrokerTimeoutMills());
+
+            if (registerBrokerResult != null && registerBrokerResult.getKvTable() != null
+                && registerBrokerResult.getKvTable().getTable().containsKey(ConfigName.REGISTER_RESPONSE_KV_KEY_TERM)) {
+                long termResponse = Long.valueOf(registerBrokerResult.getKvTable().getTable().get(ConfigName.REGISTER_RESPONSE_KV_KEY_TERM));
+                if (termResponse > this.term) {
+                    log.info("term update, new term:{}, old Term:{}, register again", termResponse, this.term);
+                    this.term = termResponse;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
 
         if (registerBrokerResult != null) {
             if (this.updateMasterHAServerAddrPeriodically && registerBrokerResult.getHaServerAddr() != null) {
@@ -1030,4 +1064,5 @@ public class BrokerController {
     public Configuration getConfiguration() {
         return this.configuration;
     }
+
 }

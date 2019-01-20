@@ -35,16 +35,4 @@ public class DeleteTopicSubCommandTest {
         assertThat(commandLine.getOptionValue('t').trim()).isEqualTo("unit-test");
         assertThat(commandLine.getOptionValue("c").trim()).isEqualTo("default-cluster");
     }
-
-
-    @Test
-    public void testExecuteBroker() {
-        DeleteTopicSubCommand cmd = new DeleteTopicSubCommand();
-        Options options = ServerUtil.buildCommandlineOptions(new Options());
-        String[] subargs = new String[] {"-t unit-test", "-b localhost:10911"};
-        final CommandLine commandLine =
-            ServerUtil.parseCmdLine("mqadmin " + cmd.commandName(), subargs, cmd.buildCommandlineOptions(options), new PosixParser());
-        assertThat(commandLine.getOptionValue('t').trim()).isEqualTo("unit-test");
-        assertThat(commandLine.getOptionValue("b").trim()).isEqualTo("localhost:10911");
-    }
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.store.ha;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -28,20 +29,26 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.ServiceThread;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.remoting.common.RemotingUtil;
 import org.apache.rocketmq.store.CommitLog;
 import org.apache.rocketmq.store.DefaultMessageStore;
+import org.apache.rocketmq.store.config.BrokerRole;
+import org.apache.rocketmq.store.config.StorePathConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HAService {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
+    private static final long IN_SYNC_OFFSET_ACK_INTERVAL_COUNT = 3;
 
     private final AtomicInteger connectionCount = new AtomicInteger(0);
 
@@ -57,6 +64,8 @@ public class HAService {
     private final GroupTransferService groupTransferService;
 
     private final HAClient haClient;
+
+    private final ConcurrentHashMap<HAConnection, OffsetAckInfo> slaveOffsetAck = new ConcurrentHashMap<>();
 
     public HAService(final DefaultMessageStore defaultMessageStore) throws IOException {
         this.defaultMessageStore = defaultMessageStore;
@@ -85,7 +94,7 @@ public class HAService {
         return result;
     }
 
-    public void notifyTransferSome(final long offset) {
+    public void notifyTransferSome(final HAConnection conn, final long offset) {
         for (long value = this.push2SlaveMaxOffset.get(); offset > value; ) {
             boolean ok = this.push2SlaveMaxOffset.compareAndSet(value, offset);
             if (ok) {
@@ -95,6 +104,64 @@ public class HAService {
                 value = this.push2SlaveMaxOffset.get();
             }
         }
+
+        if (slaveOffsetAck.containsKey(conn)) {
+            slaveOffsetAck.get(conn).update(offset, this.defaultMessageStore.getSystemClock().now());
+        }
+    }
+
+    private long getMinOffsetInSync() {
+        long minOffset = -1;
+        long curTime = this.defaultMessageStore.getSystemClock().now();
+        long inSyncInterval = IN_SYNC_OFFSET_ACK_INTERVAL_COUNT * this.defaultMessageStore.getMessageStoreConfig().getHaSendHeartbeatInterval();
+        for (Map.Entry<HAConnection, OffsetAckInfo> entry : slaveOffsetAck.entrySet()) {
+            if (curTime - entry.getValue().getTimestamp() < inSyncInterval) {
+                if (minOffset == -1 || minOffset < entry.getValue().getOffset()) {
+                    minOffset = entry.getValue().getOffset();
+                }
+            }
+        }
+
+        return minOffset;
+    }
+
+    public void saveInSyncOffset() {
+        if (this.defaultMessageStore.getMessageStoreConfig().getBrokerRole() == BrokerRole.SLAVE) {
+            return;
+        }
+
+        long minInSyncOffset = getMinOffsetInSync();
+        if (minInSyncOffset == -1) {
+            return;
+        }
+
+        String fileName = StorePathConfigHelper.getOffsetInSyncStorePath(this.defaultMessageStore.getMessageStoreConfig().getStorePathRootDir());
+        try {
+            MixAll.string2File(String.valueOf(minInSyncOffset), fileName);
+        } catch (IOException e) {
+            log.error("save phy offset slave reported [{}] exception", fileName, e);
+        }
+
+        log.info("save slave min offset in sync:{}", minInSyncOffset);
+    }
+
+    public void initInSyncOffset(long offset) {
+        if (this.defaultMessageStore.getMessageStoreConfig().getBrokerRole() == BrokerRole.SLAVE) {
+            return;
+        }
+        String fileName = StorePathConfigHelper.getOffsetInSyncStorePath(this.defaultMessageStore.getMessageStoreConfig().getStorePathRootDir());
+        File file = new File(fileName);
+        if (file.exists()) {
+            log.info("as master before, no need to sync offset");
+            return;
+        }
+
+        try {
+            MixAll.string2File(String.valueOf(offset), fileName);
+        } catch (IOException e) {
+            log.error("save phy offset slave reported [{}] exception", fileName, e);
+        }
+
     }
 
     public AtomicInteger getConnectionCount() {
@@ -115,12 +182,14 @@ public class HAService {
     public void addConnection(final HAConnection conn) {
         synchronized (this.connectionList) {
             this.connectionList.add(conn);
+            this.slaveOffsetAck.put(conn, new OffsetAckInfo());
         }
     }
 
     public void removeConnection(final HAConnection conn) {
         synchronized (this.connectionList) {
             this.connectionList.remove(conn);
+            this.slaveOffsetAck.remove(conn);
         }
     }
 
@@ -129,6 +198,8 @@ public class HAService {
         this.acceptSocketService.shutdown(true);
         this.destroyConnections();
         this.groupTransferService.shutdown();
+        saveInSyncOffset();
+        this.slaveOffsetAck.clear();
     }
 
     public void destroyConnections() {
@@ -151,6 +222,24 @@ public class HAService {
 
     public AtomicLong getPush2SlaveMaxOffset() {
         return push2SlaveMaxOffset;
+    }
+
+    class OffsetAckInfo {
+        private long timestamp = 0;
+        private long offset = -1;
+
+        public void update(long offset, long timestamp) {
+            this.offset = offset;
+            this.timestamp = timestamp;
+        }
+
+        public long getOffset() {
+            return offset;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
     }
 
     /**

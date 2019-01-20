@@ -30,6 +30,7 @@ public class TopicRouteData extends RemotingSerializable {
     private List<QueueData> queueDatas;
     private List<BrokerData> brokerDatas;
     private HashMap<String/* brokerAddr */, List<String>/* Filter Server */> filterServerTable;
+    private Long term;
 
     public TopicRouteData cloneTopicRouteData() {
         TopicRouteData topicRouteData = new TopicRouteData();
@@ -37,6 +38,7 @@ public class TopicRouteData extends RemotingSerializable {
         topicRouteData.setBrokerDatas(new ArrayList<BrokerData>());
         topicRouteData.setFilterServerTable(new HashMap<String, List<String>>());
         topicRouteData.setOrderTopicConf(this.orderTopicConf);
+        topicRouteData.setTerm(this.term);
 
         if (this.queueDatas != null) {
             topicRouteData.getQueueDatas().addAll(this.queueDatas);
@@ -85,6 +87,14 @@ public class TopicRouteData extends RemotingSerializable {
         this.orderTopicConf = orderTopicConf;
     }
 
+    public Long getTerm() {
+        return term;
+    }
+
+    public void setTerm(Long term) {
+        this.term = term;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -93,6 +103,7 @@ public class TopicRouteData extends RemotingSerializable {
         result = prime * result + ((orderTopicConf == null) ? 0 : orderTopicConf.hashCode());
         result = prime * result + ((queueDatas == null) ? 0 : queueDatas.hashCode());
         result = prime * result + ((filterServerTable == null) ? 0 : filterServerTable.hashCode());
+        result = prime * result + ((term == null) ? 0 : term.hashCode());
         return result;
     }
 
@@ -125,12 +136,22 @@ public class TopicRouteData extends RemotingSerializable {
                 return false;
         } else if (!filterServerTable.equals(other.filterServerTable))
             return false;
+        if (term == null) {
+            if (other.term != null)
+                return false;
+        } else if (!term.equals(other.term))
+            return false;
+
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "TopicRouteData [orderTopicConf=" + orderTopicConf + ", queueDatas=" + queueDatas
-            + ", brokerDatas=" + brokerDatas + ", filterServerTable=" + filterServerTable + "]";
+    @Override public String toString() {
+        return "TopicRouteData{" +
+            "orderTopicConf='" + orderTopicConf + '\'' +
+            ", queueDatas=" + queueDatas +
+            ", brokerDatas=" + brokerDatas +
+            ", filterServerTable=" + filterServerTable +
+            ", term=" + term +
+            '}';
     }
 }

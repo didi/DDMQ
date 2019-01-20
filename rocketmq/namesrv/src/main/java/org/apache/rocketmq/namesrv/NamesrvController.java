@@ -24,6 +24,7 @@ import org.apache.rocketmq.common.Configuration;
 import org.apache.rocketmq.common.ThreadFactoryImpl;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.namesrv.NamesrvConfig;
+import org.apache.rocketmq.namesrv.ha.HAManager;
 import org.apache.rocketmq.namesrv.kvconfig.KVConfigManager;
 import org.apache.rocketmq.namesrv.processor.ClusterTestRequestProcessor;
 import org.apache.rocketmq.namesrv.processor.DefaultRequestProcessor;
@@ -55,6 +56,8 @@ public class NamesrvController {
 
     private Configuration configuration;
 
+    private HAManager haManager;
+
     public NamesrvController(NamesrvConfig namesrvConfig, NettyServerConfig nettyServerConfig) {
         this.namesrvConfig = namesrvConfig;
         this.nettyServerConfig = nettyServerConfig;
@@ -66,6 +69,10 @@ public class NamesrvController {
             this.namesrvConfig, this.nettyServerConfig
         );
         this.configuration.setStorePathFromConfig(this.namesrvConfig, "configStorePath");
+        if (namesrvConfig.isRoleSwitchEnable()) {
+            haManager = new HAManager(this);
+        }
+        routeInfoManager.setHaManager(haManager);
     }
 
     public boolean initialize() {
@@ -111,12 +118,18 @@ public class NamesrvController {
 
     public void start() throws Exception {
         this.remotingServer.start();
+        if (this.haManager != null) {
+            this.haManager.start();
+        }
     }
 
     public void shutdown() {
         this.remotingServer.shutdown();
         this.remotingExecutor.shutdown();
         this.scheduledExecutorService.shutdown();
+        if (this.haManager != null) {
+            this.haManager.shutdown();
+        }
     }
 
     public NamesrvConfig getNamesrvConfig() {
@@ -145,5 +158,9 @@ public class NamesrvController {
 
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    public HAManager getHaManager() {
+        return haManager;
     }
 }

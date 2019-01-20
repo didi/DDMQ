@@ -68,6 +68,8 @@ public class MixAll {
     public static final String SELF_TEST_PRODUCER_GROUP = "SELF_TEST_P_GROUP";
     public static final String SELF_TEST_CONSUMER_GROUP = "SELF_TEST_C_GROUP";
     public static final String SELF_TEST_TOPIC = "SELF_TEST_TOPIC";
+    public static final String LIVE_STATE_DETECT_TOPIC = "LIVE_STATE_DETECT_TOPIC";
+    public static final String CARRERA_INSPECTION_TOPIC = "carrera_inspection";
     public static final String OFFSET_MOVED_EVENT = "OFFSET_MOVED_EVENT";
     public static final String ONS_HTTP_PROXY_GROUP = "CID_ONS-HTTP-PROXY";
     public static final String CID_ONSAPI_PERMISSION_GROUP = "CID_ONSAPI_PERMISSION";

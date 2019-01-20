@@ -1045,6 +1045,36 @@ public class MQClientInstance {
         return null;
     }
 
+    public FindBrokerResult findBrokerAddressInSubscribeSlaveFirst(final String brokerName) {
+        String brokerAddr = null;
+        boolean slave = false;
+        boolean found = false;
+
+        HashMap<Long/* brokerId */, String/* address */> map = this.brokerAddrTable.get(brokerName);
+        if (map != null && !map.isEmpty()) {
+            if (map.size() == 1) {
+                brokerAddr = map.values().iterator().next();
+                slave = map.keySet().iterator().next() == MixAll.MASTER_ID;
+                found = true;
+            } else {
+                for (Map.Entry<Long, String> entry : map.entrySet()) {
+                    if (entry.getKey() != MixAll.MASTER_ID) {
+                        brokerAddr = entry.getValue();
+                        slave = true;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (found) {
+            return new FindBrokerResult(brokerAddr, slave, findBrokerVersion(brokerName, brokerAddr));
+        }
+
+        return null;
+    }
+
     public int findBrokerVersion(String brokerName, String brokerAddr) {
         if (this.brokerVersionTable.containsKey(brokerName)) {
             if (this.brokerVersionTable.get(brokerName).containsKey(brokerAddr)) {

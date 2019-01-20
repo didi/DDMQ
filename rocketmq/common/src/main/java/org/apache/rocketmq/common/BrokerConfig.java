@@ -53,6 +53,12 @@ public class BrokerConfig {
     private boolean autoCreateSubscriptionGroup = true;
     private String messageStorePlugIn = "";
 
+    private String zkPath = "";
+    private boolean metricReportEnable = true;
+    private String metricNs = "";
+    private String metricNsFilter = "server";
+    private boolean roleConfigInit = false;
+
     /**
      * thread numbers for send message thread pool, since spin lock will be used by default since 4.0.x, the default
      * value is 1.
@@ -597,5 +603,45 @@ public class BrokerConfig {
 
     public void setEnablePropertyFilter(boolean enablePropertyFilter) {
         this.enablePropertyFilter = enablePropertyFilter;
+    }
+
+    public String getZkPath() {
+        return zkPath;
+    }
+
+    public void setZkPath(String zkPath) {
+        this.zkPath = zkPath;
+    }
+
+    public boolean isMetricReportEnable() {
+        return metricReportEnable;
+    }
+
+    public void setMetricReportEnable(boolean metricReportEnable) {
+        this.metricReportEnable = metricReportEnable;
+    }
+
+    public String getMetricNs() {
+        return metricNs;
+    }
+
+    public void setMetricNs(String metricNs) {
+        this.metricNs = metricNs;
+    }
+
+    public String getMetricNsFilter() {
+        return metricNsFilter;
+    }
+
+    public void setMetricNsFilter(String metricNsFilter) {
+        this.metricNsFilter = metricNsFilter;
+    }
+
+    public boolean isRoleConfigInit() {
+        return roleConfigInit;
+    }
+
+    public void setRoleConfigInit(boolean roleConfigInit) {
+        this.roleConfigInit = roleConfigInit;
     }
 }

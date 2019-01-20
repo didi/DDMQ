@@ -56,4 +56,20 @@ public class StorePathConfigHelper {
         return rootDir + File.separator + "transaction" + File.separator + "redolog";
     }
 
+    public static String getOffsetInSyncStorePath(final String rootDir) {
+        return rootDir + File.separator + "offsetinsync";
+    }
+
+    public static String getBackupStoreFilePath(final String dir, final String fileName) {
+        return dir + File.separator + fileName;
+    }
+
+    public static String getBackupStoreDirPath(final String rootDir) {
+        return rootDir + File.separator + "backup";
+    }
+
+    public static String getBackupStoreSubDirPath(final String rootDir, final String subDir) {
+        return getBackupStoreDirPath(rootDir) + File.separator + subDir;
+    }
+
 }

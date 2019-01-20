@@ -21,8 +21,6 @@ import org.apache.rocketmq.remoting.protocol.RemotingSerializable;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-
-
 public class AllMaxOffset extends RemotingSerializable {
 
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Long>> offsetTable;

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.common.MixAll;
+import org.apache.rocketmq.common.constant.ConfigName;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.namesrv.RegisterBrokerResult;
 import org.apache.rocketmq.common.namesrv.TopAddressing;
@@ -35,6 +36,7 @@ import org.apache.rocketmq.common.protocol.body.RegisterBrokerBody;
 import org.apache.rocketmq.common.protocol.body.SubscriptionGroupWrapper;
 import org.apache.rocketmq.common.protocol.body.TopicConfigSerializeWrapper;
 import org.apache.rocketmq.common.protocol.body.ClusterInfo;
+import org.apache.rocketmq.common.protocol.header.GetBrokerMaxPhyOffsetResponseHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.RegisterBrokerRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.RegisterBrokerResponseHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.UnRegisterBrokerRequestHeader;
@@ -42,6 +44,7 @@ import org.apache.rocketmq.remoting.RPCHook;
 import org.apache.rocketmq.remoting.RemotingClient;
 import org.apache.rocketmq.remoting.exception.RemotingCommandException;
 import org.apache.rocketmq.remoting.exception.RemotingConnectException;
+import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.apache.rocketmq.remoting.exception.RemotingSendRequestException;
 import org.apache.rocketmq.remoting.exception.RemotingTimeoutException;
 import org.apache.rocketmq.remoting.exception.RemotingTooMuchRequestException;
@@ -107,6 +110,8 @@ public class BrokerOuterAPI {
         final String brokerName,
         final long brokerId,
         final String haServerAddr,
+        final long maxPhyOffset,
+        final long term,
         final TopicConfigSerializeWrapper topicConfigWrapper,
         final List<String> filterServerList,
         final boolean oneway,
@@ -114,13 +119,21 @@ public class BrokerOuterAPI {
         RegisterBrokerResult registerBrokerResult = null;
 
         List<String> nameServerAddressList = this.remotingClient.getNameServerAddressList();
+        long minTerm = Long.MAX_VALUE;
         if (nameServerAddressList != null) {
             for (String namesrvAddr : nameServerAddressList) {
                 try {
                     RegisterBrokerResult result = this.registerBroker(namesrvAddr, clusterName, brokerAddr, brokerName, brokerId,
-                        haServerAddr, topicConfigWrapper, filterServerList, oneway, timeoutMills);
+                        haServerAddr, topicConfigWrapper, filterServerList, maxPhyOffset, term, oneway, timeoutMills);
                     if (result != null) {
                         registerBrokerResult = result;
+
+                        if (result.getKvTable() != null && result.getKvTable().getTable().containsKey(ConfigName.REGISTER_RESPONSE_KV_KEY_TERM)) {
+                            long termResponse = Long.valueOf(result.getKvTable().getTable().get(ConfigName.REGISTER_RESPONSE_KV_KEY_TERM));
+                            if (termResponse < minTerm) {
+                                minTerm = termResponse;
+                            }
+                        }
                     }
 
                     log.info("register broker to name server {} OK", namesrvAddr);
@@ -128,6 +141,13 @@ public class BrokerOuterAPI {
                     log.warn("registerBroker Exception, {}", namesrvAddr, e);
                 }
             }
+        }
+
+        if (registerBrokerResult != null && minTerm != Long.MAX_VALUE) {
+            if (registerBrokerResult.getKvTable() == null) {
+                registerBrokerResult.setKvTable(new KVTable());
+            }
+            registerBrokerResult.getKvTable().getTable().put(ConfigName.REGISTER_RESPONSE_KV_KEY_TERM, String.valueOf(minTerm));
         }
 
         return registerBrokerResult;
@@ -142,6 +162,8 @@ public class BrokerOuterAPI {
         final String haServerAddr,
         final TopicConfigSerializeWrapper topicConfigWrapper,
         final List<String> filterServerList,
+        final long maxPhyOffset,
+        final long term,
         final boolean oneway,
         final int timeoutMills
     ) throws RemotingCommandException, MQBrokerException, RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
@@ -152,6 +174,8 @@ public class BrokerOuterAPI {
         requestHeader.setBrokerName(brokerName);
         requestHeader.setClusterName(clusterName);
         requestHeader.setHaServerAddr(haServerAddr);
+        requestHeader.setMaxPhyOffset(maxPhyOffset);
+        requestHeader.setTerm(term);
         RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.REGISTER_BROKER, requestHeader);
 
         RegisterBrokerBody requestBody = new RegisterBrokerBody();
@@ -351,6 +375,26 @@ public class BrokerOuterAPI {
         switch (response.getCode()) {
             case ResponseCode.SUCCESS: {
                 return ClusterInfo.decode(response.getBody(), ClusterInfo.class);
+            }
+            default:
+                break;
+        }
+
+        throw new MQBrokerException(response.getCode(), response.getRemark());
+    }
+
+    public long getMasterPhyOffset(
+        final String addr) throws InterruptedException, MQBrokerException, RemotingException {
+        RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.GET_BROKER_MAX_PHY_OFFSET, null);
+
+        RemotingCommand response = this.remotingClient.invokeSync(addr, request, getTimeout());
+        assert response != null;
+        switch (response.getCode()) {
+            case ResponseCode.SUCCESS: {
+                GetBrokerMaxPhyOffsetResponseHeader responseHeader =
+                    (GetBrokerMaxPhyOffsetResponseHeader) response.decodeCommandCustomHeader(GetBrokerMaxPhyOffsetResponseHeader.class);
+
+                return responseHeader.getMaxPhyOffset();
             }
             default:
                 break;

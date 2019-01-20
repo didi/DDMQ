@@ -224,6 +224,8 @@ public class ConsumeQueue {
 
         int logicFileSize = this.mappedFileSize;
 
+        long queueOffsetOrigin = getMaxOffsetInQueue();
+
         this.maxPhysicOffset = phyOffet - 1;
         long maxExtAddr = 1;
         while (true) {
@@ -260,6 +262,9 @@ public class ConsumeQueue {
                         if (offset >= 0 && size > 0) {
 
                             if (offset >= phyOffet) {
+                                log.info("topic:{}, queue:{}, queue offset after truncate:{}, origin:{}",
+                                    topic, queueId, getMaxOffsetInQueue(), queueOffsetOrigin);
+                                mappedFile.truncateDirty(mappedFile.getWrotePosition());
                                 return;
                             }
 
@@ -273,9 +278,13 @@ public class ConsumeQueue {
                             }
 
                             if (pos == logicFileSize) {
+                                log.info("topic:{}, queue:{}, queue offset after truncate:{}, origin:{}",
+                                    topic, queueId, getMaxOffsetInQueue(), queueOffsetOrigin);
                                 return;
                             }
                         } else {
+                            log.info("topic:{}, queue:{}, queue offset after truncate:{}, origin:{}",
+                                topic, queueId, getMaxOffsetInQueue(), queueOffsetOrigin);
                             return;
                         }
                     }
@@ -284,6 +293,9 @@ public class ConsumeQueue {
                 break;
             }
         }
+
+        log.info("topic:{}, queue:{}, queue offset after truncate:{}, origin:{}",
+            topic, queueId, getMaxOffsetInQueue(), queueOffsetOrigin);
 
         if (isExtReadEnable()) {
             this.consumeQueueExt.truncateByMaxAddress(maxExtAddr);

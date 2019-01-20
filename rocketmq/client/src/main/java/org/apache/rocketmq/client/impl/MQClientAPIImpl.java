@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.PullCallback;
 import org.apache.rocketmq.client.consumer.PullResult;
@@ -127,6 +126,7 @@ import org.apache.rocketmq.common.protocol.header.ViewBrokerStatsDataRequestHead
 import org.apache.rocketmq.common.protocol.header.ViewMessageRequestHeader;
 import org.apache.rocketmq.common.protocol.header.filtersrv.RegisterMessageFilterClassRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.DeleteKVConfigRequestHeader;
+import org.apache.rocketmq.common.protocol.header.namesrv.EnableBrokerRoleSwitchRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVConfigRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVConfigResponseHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVListByNamespaceRequestHeader;
@@ -1210,7 +1210,7 @@ public class MQClientAPIImpl {
         GetRouteInfoRequestHeader requestHeader = new GetRouteInfoRequestHeader();
         requestHeader.setTopic(topic);
 
-        RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.GET_ROUTEINTO_BY_TOPIC, requestHeader);
+        final RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.GET_ROUTEINTO_BY_TOPIC, requestHeader);
 
         RemotingCommand response = this.remotingClient.invokeSync(null, request, timeoutMillis);
         assert response != null;
@@ -1300,19 +1300,8 @@ public class MQClientAPIImpl {
 
     public void deleteTopicInNameServer(final String addr, final String topic, final long timeoutMillis)
         throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
-        deleteTopicInNameServer(addr, topic, null, timeoutMillis);
-    }
-
-    public void deleteTopicInNameServer(final String addr, final String topic, Set<String> brokerAddrs,
-        final long timeoutMillis)
-        throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
         DeleteTopicRequestHeader requestHeader = new DeleteTopicRequestHeader();
         requestHeader.setTopic(topic);
-        if (brokerAddrs != null && !brokerAddrs.isEmpty()) {
-            requestHeader.setBrokerAddrs(StringUtils.join(brokerAddrs, ";"));
-        } else {
-            requestHeader.setBrokerAddrs(null);
-        }
         RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.DELETE_TOPIC_IN_NAMESRV, requestHeader);
 
         RemotingCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
@@ -2120,5 +2109,36 @@ public class MQClientAPIImpl {
                 break;
         }
         throw new MQBrokerException(response.getCode(), response.getRemark());
+    }
+
+    public void enableBrokerRoleSwitch(final String clusterName, final String brokerName,
+        final List<String> nameServers) throws InterruptedException, RemotingTimeoutException, RemotingSendRequestException, RemotingConnectException, MQBrokerException, RemotingCommandException, MQClientException {
+        List<String> invokeNameServers = (nameServers == null || nameServers.isEmpty()) ?
+            this.remotingClient.getNameServerAddressList() : nameServers;
+        if (invokeNameServers == null || invokeNameServers.isEmpty()) {
+            return;
+        }
+
+        EnableBrokerRoleSwitchRequestHeader requestHeader = new EnableBrokerRoleSwitchRequestHeader();
+        requestHeader.setClusterName(clusterName);
+        requestHeader.setBrokerName(brokerName);
+
+        RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.ENABLE_BROKER_ROLE_SWITCH, requestHeader);
+
+        RemotingCommand errResponse = null;
+        for (String namesrvAddr : invokeNameServers) {
+            RemotingCommand response = this.remotingClient.invokeSync(namesrvAddr, request, 3000);
+            assert response != null;
+            switch (response.getCode()) {
+                case ResponseCode.SUCCESS: {
+                    break;
+                }
+                default:
+                    errResponse = response;
+            }
+        }
+        if (errResponse != null) {
+            throw new MQClientException(errResponse.getCode(), errResponse.getRemark());
+        }
     }
 }

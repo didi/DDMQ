@@ -76,6 +76,7 @@ import org.apache.rocketmq.common.protocol.header.DeleteSubscriptionGroupRequest
 import org.apache.rocketmq.common.protocol.header.DeleteTopicRequestHeader;
 import org.apache.rocketmq.common.protocol.header.GetAllTopicConfigResponseHeader;
 import org.apache.rocketmq.common.protocol.header.GetBrokerConfigResponseHeader;
+import org.apache.rocketmq.common.protocol.header.GetBrokerMaxPhyOffsetResponseHeader;
 import org.apache.rocketmq.common.protocol.header.GetConsumeStatsInBrokerHeader;
 import org.apache.rocketmq.common.protocol.header.GetConsumeStatsRequestHeader;
 import org.apache.rocketmq.common.protocol.header.GetConsumerConnectionListRequestHeader;
@@ -174,6 +175,8 @@ public class AdminBrokerProcessor implements NettyRequestProcessor {
                 return this.getAllConsumerOffset(ctx, request);
             case RequestCode.GET_ALL_DELAY_OFFSET:
                 return this.getAllDelayOffset(ctx, request);
+            case RequestCode.GET_BROKER_MAX_PHY_OFFSET:
+                return this.getBrokerMaxPhyOffset(ctx, request);
             case RequestCode.INVOKE_BROKER_TO_RESET_OFFSET:
                 return this.resetOffset(ctx, request);
             case RequestCode.INVOKE_BROKER_TO_GET_CONSUMER_STATUS:
@@ -810,6 +813,19 @@ public class AdminBrokerProcessor implements NettyRequestProcessor {
             return response;
         }
 
+        response.setCode(ResponseCode.SUCCESS);
+        response.setRemark(null);
+
+        return response;
+    }
+
+    private RemotingCommand getBrokerMaxPhyOffset(ChannelHandlerContext ctx,
+        RemotingCommand request) throws RemotingCommandException {
+        final RemotingCommand response = RemotingCommand.createResponseCommand(GetBrokerMaxPhyOffsetResponseHeader.class);
+        final GetBrokerMaxPhyOffsetResponseHeader responseHeader = (GetBrokerMaxPhyOffsetResponseHeader) response.readCustomHeader();
+
+        long offset = this.brokerController.getMessageStore().getMaxPhyOffset();
+        responseHeader.setMaxPhyOffset(offset);
         response.setCode(ResponseCode.SUCCESS);
         response.setRemark(null);
 

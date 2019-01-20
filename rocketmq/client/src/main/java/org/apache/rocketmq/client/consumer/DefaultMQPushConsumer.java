@@ -174,14 +174,6 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     private int consumeConcurrentlyMaxSpan = 2000;
 
     /**
-     * Flow control threshold on queue level, each message queue will cache at least 128 messages by default,
-     * Consider the {@code pullBatchSize}, the instantaneous value may exceed the limit
-     *
-     * Take effect on {@code pullThresholdForTopic} and {@code pullThresholdForQueue}
-     */
-    private int minPullThresholdForQueue = 128;
-
-    /**
      * Flow control threshold on queue level, each message queue will cache at most 1000 messages by default,
      * Consider the {@code pullBatchSize}, the instantaneous value may exceed the limit
      */
@@ -276,11 +268,6 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
      * shared schedule thread pool for consume message
      */
     private ScheduledExecutorService sharedScheduledExecutorService = null;
-
-    /**
-     * Delay push message in millisecond
-     */
-    private long delayPushMessageTimeMillis = 0L;
 
     /**
      * Default constructor.
@@ -761,21 +748,5 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
 
     public void setMessageQueueListener(MessageQueueListener messageQueueListener) {
         this.messageQueueListener = messageQueueListener;
-    }
-
-    public long getDelayPushMessageTimeMillis() {
-        return delayPushMessageTimeMillis;
-    }
-
-    public void setDelayPushMessageTimeMillis(long delayPushMessageTimeMillis) {
-        this.delayPushMessageTimeMillis = delayPushMessageTimeMillis;
-    }
-
-    public int getMinPullThresholdForQueue() {
-        return minPullThresholdForQueue;
-    }
-
-    public void setMinPullThresholdForQueue(int minPullThresholdForQueue) {
-        this.minPullThresholdForQueue = minPullThresholdForQueue;
     }
 }

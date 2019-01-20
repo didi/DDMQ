@@ -523,6 +523,14 @@ public class MappedFile extends ReferenceResource {
         this.mlock();
     }
 
+    public void truncateDirty(int pos) {
+        for (int i = pos; i < fileSize; i++) {
+            mappedByteBuffer.put(i, (byte) 0);
+        }
+        mappedByteBuffer.force();
+        log.info("file:{}, truncate to {}", fileName, pos);
+    }
+
     public String getFileName() {
         return fileName;
     }

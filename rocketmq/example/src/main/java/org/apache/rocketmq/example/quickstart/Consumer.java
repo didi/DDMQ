@@ -29,13 +29,16 @@ import org.apache.rocketmq.common.message.MessageExt;
  * This example shows how to subscribe and consume messages using providing {@link DefaultMQPushConsumer}.
  */
 public class Consumer {
+    private final static String TOPIC_ENV = System.getenv("TOPIC");
+    private final static String GROUP_ENV = System.getenv("GROUP");
 
     public static void main(String[] args) throws InterruptedException, MQClientException {
-
+        String group = GROUP_ENV == null ? "please_rename_unique_group_name_4" : GROUP_ENV;
+        String topic = TOPIC_ENV == null ? "TopicTest" : TOPIC_ENV;
         /*
          * Instantiate with specified consumer group name.
          */
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("please_rename_unique_group_name_4");
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(group);
 
         /*
          * Specify name server addresses.
@@ -57,7 +60,7 @@ public class Consumer {
         /*
          * Subscribe one more more topics to consume.
          */
-        consumer.subscribe("TopicTest", "*");
+        consumer.subscribe(topic, "*");
 
         /*
          *  Register callback to execute on arrival of messages fetched from brokers.
@@ -68,6 +71,9 @@ public class Consumer {
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
                 ConsumeConcurrentlyContext context) {
                 System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), msgs);
+                for (MessageExt msg : msgs) {
+                    System.out.printf("get msg:%s%n", new String(msg.getBody()));
+                }
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });

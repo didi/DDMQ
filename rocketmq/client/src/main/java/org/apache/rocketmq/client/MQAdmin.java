@@ -48,8 +48,8 @@ public interface MQAdmin {
         throws MQClientException;
 
     /**
-     * Gets the message queue offset according to some time in milliseconds<br>
-     * be cautious to call because of more IO overhead
+     * Gets the message queue offset according to some time in milliseconds<br> be cautious to call because of more IO
+     * overhead
      *
      * @param mq Instance of MessageQueue
      * @param timestamp from when in milliseconds.

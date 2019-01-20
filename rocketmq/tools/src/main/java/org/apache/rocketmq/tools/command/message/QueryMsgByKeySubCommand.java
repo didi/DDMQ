@@ -19,6 +19,7 @@ package org.apache.rocketmq.tools.command.message;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.QueryResult;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
@@ -49,6 +50,10 @@ public class QueryMsgByKeySubCommand implements SubCommand {
         opt.setRequired(true);
         options.addOption(opt);
 
+        opt = new Option("s", "slaveFirst", true, "Slave First");
+        opt.setRequired(false);
+        options.addOption(opt);
+
         return options;
     }
 
@@ -61,8 +66,10 @@ public class QueryMsgByKeySubCommand implements SubCommand {
         try {
             final String topic = commandLine.getOptionValue('t').trim();
             final String key = commandLine.getOptionValue('k').trim();
+            String isSlaveFirstStr = commandLine.getOptionValue('s').trim();
+            boolean isSlaveFirst = StringUtils.isEmpty(isSlaveFirstStr) ? true : Boolean.valueOf(isSlaveFirstStr);
 
-            this.queryByKey(defaultMQAdminExt, topic, key);
+            this.queryByKey(defaultMQAdminExt, topic, key, isSlaveFirst);
         } catch (Exception e) {
             throw new SubCommandException(this.getClass().getSimpleName() + " command failed", e);
         } finally {
@@ -70,11 +77,11 @@ public class QueryMsgByKeySubCommand implements SubCommand {
         }
     }
 
-    private void queryByKey(final DefaultMQAdminExt admin, final String topic, final String key)
+    private void queryByKey(final DefaultMQAdminExt admin, final String topic, final String key, boolean isSlaveFirst)
         throws MQClientException, InterruptedException {
         admin.start();
 
-        QueryResult queryResult = admin.queryMessage(topic, key, 64, 0, Long.MAX_VALUE);
+        QueryResult queryResult = admin.queryMessage(topic, key, 64, 0, Long.MAX_VALUE, isSlaveFirst);
         System.out.printf("%-50s %4s %40s%n",
             "#Message ID",
             "#QID",

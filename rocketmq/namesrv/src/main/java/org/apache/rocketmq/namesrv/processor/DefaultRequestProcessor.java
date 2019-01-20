@@ -34,6 +34,7 @@ import org.apache.rocketmq.common.protocol.body.TopicConfigSerializeWrapper;
 import org.apache.rocketmq.common.protocol.header.GetTopicsByClusterRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.DeleteKVConfigRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.DeleteTopicInNamesrvRequestHeader;
+import org.apache.rocketmq.common.protocol.header.namesrv.EnableBrokerRoleSwitchRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVConfigRequestHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVConfigResponseHeader;
 import org.apache.rocketmq.common.protocol.header.namesrv.GetKVListByNamespaceRequestHeader;
@@ -114,6 +115,8 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
                 return this.updateConfig(ctx, request);
             case RequestCode.GET_NAMESRV_CONFIG:
                 return this.getConfig(ctx, request);
+            case RequestCode.ENABLE_BROKER_ROLE_SWITCH:
+                return this.enableBrokerRoleSwitch(ctx, request);
             default:
                 break;
         }
@@ -211,6 +214,8 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
             requestHeader.getBrokerName(),
             requestHeader.getBrokerId(),
             requestHeader.getHaServerAddr(),
+            requestHeader.getMaxPhyOffset(),
+            requestHeader.getTerm(),
             registerBrokerBody.getTopicConfigSerializeWrapper(),
             registerBrokerBody.getFilterServerList(),
             ctx.channel());
@@ -254,6 +259,8 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
             requestHeader.getBrokerName(),
             requestHeader.getBrokerId(),
             requestHeader.getHaServerAddr(),
+            requestHeader.getMaxPhyOffset(),
+            requestHeader.getTerm(),
             topicConfigWrapper,
             null,
             ctx.channel()
@@ -363,7 +370,7 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
         final DeleteTopicInNamesrvRequestHeader requestHeader =
             (DeleteTopicInNamesrvRequestHeader) request.decodeCommandCustomHeader(DeleteTopicInNamesrvRequestHeader.class);
 
-        this.namesrvController.getRouteInfoManager().deleteTopic(requestHeader.getTopic(), requestHeader.getBrokerAddrs());
+        this.namesrvController.getRouteInfoManager().deleteTopic(requestHeader.getTopic());
 
         response.setCode(ResponseCode.SUCCESS);
         response.setRemark(null);
@@ -509,6 +516,24 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
 
         response.setCode(ResponseCode.SUCCESS);
         response.setRemark(null);
+        return response;
+    }
+
+    private RemotingCommand enableBrokerRoleSwitch(ChannelHandlerContext ctx,
+        RemotingCommand request) throws RemotingCommandException {
+        final RemotingCommand response = RemotingCommand.createResponseCommand(null);
+        final EnableBrokerRoleSwitchRequestHeader requestHeader =
+            (EnableBrokerRoleSwitchRequestHeader) request.decodeCommandCustomHeader(EnableBrokerRoleSwitchRequestHeader.class);
+
+        if (this.namesrvController.getHaManager() != null) {
+            this.namesrvController.getHaManager().enableBrokerRoleSwitch(requestHeader.getClusterName(), requestHeader.getBrokerName());
+            response.setCode(ResponseCode.SUCCESS);
+            response.setRemark(null);
+        } else {
+            response.setCode(ResponseCode.SYSTEM_ERROR);
+            response.setRemark("ha manager is disabled");
+        }
+
         return response;
     }
 

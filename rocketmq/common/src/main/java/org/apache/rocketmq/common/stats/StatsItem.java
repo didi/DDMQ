@@ -17,12 +17,14 @@
 
 package org.apache.rocketmq.common.stats;
 
+import org.apache.rocketmq.common.BrokerConfig;
+import org.apache.rocketmq.common.UtilAll;
+import org.slf4j.Logger;
+
 import java.util.LinkedList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import org.apache.rocketmq.common.UtilAll;
-import org.slf4j.Logger;
 
 public class StatsItem {
 
@@ -40,13 +42,15 @@ public class StatsItem {
     private final String statsKey;
     private final ScheduledExecutorService scheduledExecutorService;
     private final Logger log;
+    private final BrokerConfig brokerConfig;
 
     public StatsItem(String statsName, String statsKey, ScheduledExecutorService scheduledExecutorService,
-        Logger log) {
+        Logger log, BrokerConfig brokerConfig) {
         this.statsName = statsName;
         this.statsKey = statsKey;
         this.scheduledExecutorService = scheduledExecutorService;
         this.log = log;
+        this.brokerConfig = brokerConfig;
     }
 
     private static StatsSnapshot computeStatsData(final LinkedList<CallSnapshot> csList) {

@@ -17,7 +17,7 @@
 package org.apache.rocketmq.namesrv.routeinfo;
 
 import io.netty.channel.Channel;
-import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.common.DataVersion;
 import org.apache.rocketmq.common.MixAll;
@@ -43,6 +44,7 @@ import org.apache.rocketmq.common.protocol.route.BrokerData;
 import org.apache.rocketmq.common.protocol.route.QueueData;
 import org.apache.rocketmq.common.protocol.route.TopicRouteData;
 import org.apache.rocketmq.common.sysflag.TopicSysFlag;
+import org.apache.rocketmq.namesrv.ha.HAManager;
 import org.apache.rocketmq.remoting.common.RemotingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,7 @@ public class RouteInfoManager {
     private final HashMap<String/* clusterName */, Set<String/* brokerName */>> clusterAddrTable;
     private final HashMap<String/* brokerAddr */, BrokerLiveInfo> brokerLiveTable;
     private final HashMap<String/* brokerAddr */, List<String>/* Filter Server */> filterServerTable;
+    private HAManager haManager = null;
 
     public RouteInfoManager() {
         this.topicQueueTable = new HashMap<String, List<QueueData>>(1024);
@@ -65,6 +68,10 @@ public class RouteInfoManager {
         this.filterServerTable = new HashMap<String, List<String>>(256);
     }
 
+    public void setHaManager(HAManager haManager) {
+        this.haManager = haManager;
+    }
+
     public byte[] getAllClusterInfo() {
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
         clusterInfoSerializeWrapper.setBrokerAddrTable(this.brokerAddrTable);
@@ -72,32 +79,11 @@ public class RouteInfoManager {
         return clusterInfoSerializeWrapper.encode();
     }
 
-    public void deleteTopic(final String topic, final String brokerAddrs) {
+    public void deleteTopic(final String topic) {
         try {
             try {
-                log.info("delete topic, topic name:{}, broker names:{}", topic, brokerAddrs);
                 this.lock.writeLock().lockInterruptibly();
-                if (StringUtils.isEmpty(brokerAddrs)) {
-                    this.topicQueueTable.remove(topic);
-                } else {
-                    List<QueueData> qds = this.topicQueueTable.get(topic);
-                    if (qds == null || qds.isEmpty()) {
-                        return;
-                    }
-                    String[] arr = brokerAddrs.split(";");
-                    Set<String> brokerSet = new HashSet<>();
-                    brokerSet.addAll(Arrays.asList(arr));
-
-                    Iterator<QueueData> iterator = qds.iterator();
-                    while (iterator.hasNext()) {
-                        QueueData qd = iterator.next();
-                        String brokerAddr = brokerAddrTable.get(qd.getBrokerName()).getBrokerAddrs().get(MixAll.MASTER_ID);
-                        if (StringUtils.isNotEmpty(brokerAddr) && brokerSet.contains(brokerAddr)) {
-                            iterator.remove();
-                            log.info("delete info, queue data of broker:{}", qd.getBrokerName());
-                        }
-                    }
-                }
+                this.topicQueueTable.remove(topic);
             } finally {
                 this.lock.writeLock().unlock();
             }
@@ -128,6 +114,8 @@ public class RouteInfoManager {
         final String brokerName,
         final long brokerId,
         final String haServerAddr,
+        final Long maxPhyOffset,
+        final Long term,
         final TopicConfigSerializeWrapper topicConfigWrapper,
         final List<String> filterServerList,
         final Channel channel) {
@@ -137,6 +125,16 @@ public class RouteInfoManager {
                 long start = System.currentTimeMillis();
                 this.lock.writeLock().lockInterruptibly();
                 long getLock = System.currentTimeMillis();
+
+                if (isBrokerIdExist(clusterName, brokerAddr, brokerName, brokerId)) {
+                    log.error("brokerId is exist already, broker addr:{}, broker name:{}, broker Id:{}",
+                        brokerAddr, brokerName, brokerId);
+                    if (haManager != null) {
+                        boolean ret = haManager.changeToSlave(clusterName, brokerName, brokerAddr);
+                        log.info("broker addr:{}, broker name:{},change to slave:{}", brokerAddr, brokerName, ret);
+                    }
+                    return result;
+                }
 
                 Set<String> brokerNames = this.clusterAddrTable.get(clusterName);
                 if (null == brokerNames) {
@@ -177,7 +175,9 @@ public class RouteInfoManager {
                         System.currentTimeMillis(),
                         topicConfigWrapper.getDataVersion(),
                         channel,
-                        haServerAddr));
+                        haServerAddr,
+                        maxPhyOffset,
+                        term));
                 if (null == prevBrokerLiveInfo) {
                     log.info("new broker registered, {} HAServer: {}", brokerAddr, haServerAddr);
                 }
@@ -212,6 +212,21 @@ public class RouteInfoManager {
         }
 
         return result;
+    }
+
+    private boolean isBrokerIdExist(final String clusterName, final String brokerAddr, final String brokerName,
+        final long brokerId) {
+        boolean brokerIdExist = false;
+        BrokerData brokerData = brokerAddrTable.get(brokerName);
+        if (brokerData != null && brokerData.getCluster().equals(clusterName) && brokerData.getBrokerAddrs() != null) {
+            if (StringUtils.isNotEmpty(brokerData.getBrokerAddrs().get(brokerId)) &&
+                !brokerAddr.equals(brokerData.getBrokerAddrs().get(brokerId))) {
+                brokerIdExist = true;
+                log.error("brokers:{}, {} have the same id:{} , cluster name:{}, broker name:{}", brokerAddr, brokerData.getBrokerAddrs().get(brokerId),
+                    brokerId, clusterName, brokerName);
+            }
+        }
+        return brokerIdExist;
     }
 
     private boolean isBrokerTopicConfigChanged(final String brokerAddr, final DataVersion dataVersion) {
@@ -316,11 +331,15 @@ public class RouteInfoManager {
                 boolean removeBrokerName = false;
                 BrokerData brokerData = this.brokerAddrTable.get(brokerName);
                 if (null != brokerData) {
-                    String addr = brokerData.getBrokerAddrs().remove(brokerId);
-                    log.info("unregisterBroker, remove addr from brokerAddrTable {}, {}",
-                        addr != null ? "OK" : "Failed",
-                        brokerAddr
-                    );
+                    String addr = brokerData.getBrokerAddrs().get(brokerId);
+                    if (StringUtils.isNotEmpty(addr) && addr.equals(brokerAddr)) {
+                        brokerData.getBrokerAddrs().remove(brokerId);
+                        log.info("unregisterBroker, remove addr from brokerAddrTable {}, {}",
+                            "OK", brokerAddr);
+                    } else {
+                        log.info("unregisterBroker, remove addr from brokerAddrTable {}, to remove:{}, current with the same id:{}",
+                            "Failed", brokerAddr, addr);
+                    }
 
                     if (brokerData.getBrokerAddrs().isEmpty()) {
                         this.brokerAddrTable.remove(brokerName);
@@ -405,6 +424,7 @@ public class RouteInfoManager {
                         brokerNameSet.add(qd.getBrokerName());
                     }
 
+                    long minTerm = Long.MAX_VALUE;
                     for (String brokerName : brokerNameSet) {
                         BrokerData brokerData = this.brokerAddrTable.get(brokerName);
                         if (null != brokerData) {
@@ -415,8 +435,18 @@ public class RouteInfoManager {
                             for (final String brokerAddr : brokerDataClone.getBrokerAddrs().values()) {
                                 List<String> filterServerList = this.filterServerTable.get(brokerAddr);
                                 filterServerMap.put(brokerAddr, filterServerList);
+                                BrokerLiveInfo brokerLiveInfo = brokerLiveTable.get(brokerAddr);
+                                if (brokerLiveInfo != null && brokerLiveInfo.getTerm() != null) {
+                                    if (minTerm > brokerLiveInfo.getTerm()) {
+                                        minTerm = brokerLiveInfo.getTerm();
+                                    }
+                                }
                             }
                         }
+                    }
+
+                    if (minTerm < Long.MAX_VALUE) {
+                        topicRouteData.setTerm(minTerm);
                     }
                 }
             } finally {
@@ -435,6 +465,16 @@ public class RouteInfoManager {
         }
 
         return null;
+    }
+
+    public void destroyByBrokerAddr(String addr) {
+        BrokerLiveInfo brokerLiveInfo = brokerLiveTable.get(addr);
+        if (brokerLiveInfo == null || brokerLiveInfo.getChannel() == null) {
+            log.warn("do not get channel by broker addr:{}", addr);
+            return;
+        }
+        RemotingUtil.closeChannel(brokerLiveInfo.getChannel());
+        this.onChannelDestroy(addr, brokerLiveInfo.getChannel());
     }
 
     public void scanNotActiveBroker() {
@@ -761,6 +801,50 @@ public class RouteInfoManager {
 
         return topicList.encode();
     }
+
+    public HashMap<String, Set<String>> getClusterAddrTable() {
+        try {
+            try {
+                this.lock.readLock().lockInterruptibly();
+                return new HashMap<>(clusterAddrTable);
+            } finally {
+                this.lock.readLock().unlock();
+            }
+        } catch (Exception ex) {
+            log.error("getClusterAddrTable Exception", ex);
+        }
+        return null;
+    }
+
+    public BrokerData getBrokerData(String brokerName) {
+        try {
+            try {
+                this.lock.readLock().lockInterruptibly();
+                return brokerAddrTable.get(brokerName);
+            } finally {
+                this.lock.readLock().unlock();
+            }
+        } catch (Exception ex) {
+            log.error("getClusterAddrTable Exception", ex);
+        }
+        return null;
+    }
+
+    public long getBrokerMaxPhyOffset(String brokerAddr) {
+        try {
+            try {
+                this.lock.readLock().lockInterruptibly();
+                return (brokerLiveTable.get(brokerAddr) != null && brokerLiveTable.get(brokerAddr).getMaxPhyOffset() != null)
+                    ? brokerLiveTable.get(brokerAddr).getMaxPhyOffset() : -1;
+            } finally {
+                this.lock.readLock().unlock();
+            }
+        } catch (Exception ex) {
+            log.error("getBrokerMaxPhyOffset Exception", ex);
+        }
+
+        return -1;
+    }
 }
 
 class BrokerLiveInfo {
@@ -768,13 +852,17 @@ class BrokerLiveInfo {
     private DataVersion dataVersion;
     private Channel channel;
     private String haServerAddr;
+    private Long maxPhyOffset;
+    private Long term;
 
     public BrokerLiveInfo(long lastUpdateTimestamp, DataVersion dataVersion, Channel channel,
-        String haServerAddr) {
+        String haServerAddr, Long maxPhyOffset, Long term) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
         this.dataVersion = dataVersion;
         this.channel = channel;
         this.haServerAddr = haServerAddr;
+        this.maxPhyOffset = maxPhyOffset;
+        this.term = term;
     }
 
     public long getLastUpdateTimestamp() {
@@ -809,9 +897,30 @@ class BrokerLiveInfo {
         this.haServerAddr = haServerAddr;
     }
 
-    @Override
-    public String toString() {
-        return "BrokerLiveInfo [lastUpdateTimestamp=" + lastUpdateTimestamp + ", dataVersion=" + dataVersion
-            + ", channel=" + channel + ", haServerAddr=" + haServerAddr + "]";
+    public Long getMaxPhyOffset() {
+        return maxPhyOffset;
+    }
+
+    public void setMaxPhyOffset(Long maxPhyOffset) {
+        this.maxPhyOffset = maxPhyOffset;
+    }
+
+    public Long getTerm() {
+        return term;
+    }
+
+    public void setTerm(Long term) {
+        this.term = term;
+    }
+
+    @Override public String toString() {
+        return "BrokerLiveInfo{" +
+            "lastUpdateTimestamp=" + lastUpdateTimestamp +
+            ", dataVersion=" + dataVersion +
+            ", channel=" + channel +
+            ", haServerAddr='" + haServerAddr + '\'' +
+            ", maxPhyOffset=" + maxPhyOffset +
+            ", term=" + term +
+            '}';
     }
 }

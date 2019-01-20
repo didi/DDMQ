@@ -58,6 +58,21 @@ public interface MQPullConsumer extends MQConsumer {
         InterruptedException;
 
     /**
+     * Pulling the messages slave first,not blocking
+     *
+     * @param mq from which message queue
+     * @param subExpression subscription expression.it only support or operation such as "tag1 || tag2 || tag3" <br> if
+     * null or * expression,meaning subscribe
+     * all
+     * @param offset from where to pull
+     * @param maxNums max pulling numbers
+     * @return The resulting {@code PullRequest}
+     */
+    PullResult pull(final MessageQueue mq, final String subExpression, final long offset,
+        final int maxNums, boolean isSlaveFirst) throws MQClientException, RemotingException, MQBrokerException,
+        InterruptedException;
+
+    /**
      * Pulling the messages in the specified timeout
      *
      * @return The resulting {@code PullRequest}

@@ -44,4 +44,13 @@ public class FindBrokerResult {
     public int getBrokerVersion() {
         return brokerVersion;
     }
+
+    @Override
+    public String toString() {
+        return "FindBrokerResult{" +
+            "brokerAddr='" + brokerAddr + '\'' +
+            ", slave=" + slave +
+            ", brokerVersion=" + brokerVersion +
+            '}';
+    }
 }

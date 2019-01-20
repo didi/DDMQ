@@ -70,6 +70,8 @@ public class RequestCode {
 
     public static final int CHECK_CLIENT_CONFIG = 46;
 
+    public static final int GET_BROKER_MAX_PHY_OFFSET = 47;
+
     public static final int PUT_KV_CONFIG = 100;
 
     public static final int GET_KV_CONFIG = 101;
@@ -165,6 +167,8 @@ public class RequestCode {
     public static final int SEND_BATCH_MESSAGE = 320;
 
     public static final int QUERY_CONSUME_QUEUE = 321;
+
+    public static final int ENABLE_BROKER_ROLE_SWITCH = 322;
 
     public static final int GET_ALL_MAX_OFFSET = 1000001;
 }
