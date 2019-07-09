@@ -261,10 +261,11 @@ public abstract class CarreraProducerBase implements ProducerInterface {
         }
         Map<Long, List<Message>> msgMap = new HashMap<>();
         for (Message msg : messages) {
-            List<Message> msgList = msgMap.get(msg.getHashId() % config.getBatchSendThreadNumber());
+            Long key = msg.getHashId() % config.getBatchSendThreadNumber();
+            List<Message> msgList = msgMap.get(key);
             if (msgList == null) {
                 msgList = new ArrayList<>();
-                msgMap.put(msg.getHashId(), msgList);
+                msgMap.put(key, msgList);
             }
             msgList.add(msg);
         }
