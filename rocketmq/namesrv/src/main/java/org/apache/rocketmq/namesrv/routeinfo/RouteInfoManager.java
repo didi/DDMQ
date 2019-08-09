@@ -17,7 +17,7 @@
 package org.apache.rocketmq.namesrv.routeinfo;
 
 import io.netty.channel.Channel;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -79,11 +79,31 @@ public class RouteInfoManager {
         return clusterInfoSerializeWrapper.encode();
     }
 
-    public void deleteTopic(final String topic) {
+    public void deleteTopic(final String topic, final String brokerAddrs) {
         try {
             try {
+                log.info("delete topic, topic name:{}, broker names:{}", topic, brokerAddrs);
                 this.lock.writeLock().lockInterruptibly();
-                this.topicQueueTable.remove(topic);
+                if (StringUtils.isEmpty(brokerAddrs)) {
+                    this.topicQueueTable.remove(topic);
+                } else {
+                    List<QueueData> qds = this.topicQueueTable.get(topic);
+                    if (qds == null || qds.isEmpty()) {
+                        return;
+                    }
+                    String[] arr = brokerAddrs.split(";");
+                    Set<String> brokerSet = new HashSet<>();
+                    brokerSet.addAll(Arrays.asList(arr));
+                    Iterator<QueueData> iterator = qds.iterator();
+                    while (iterator.hasNext()) {
+                        QueueData qd = iterator.next();
+                        String brokerAddr = brokerAddrTable.get(qd.getBrokerName()).getBrokerAddrs().get(MixAll.MASTER_ID);
+                        if (StringUtils.isNotEmpty(brokerAddr) && brokerSet.contains(brokerAddr)) {
+                            iterator.remove();
+                            log.info("delete info, queue data of broker:{}", qd.getBrokerName());
+                        }
+                    }
+                }
             } finally {
                 this.lock.writeLock().unlock();
             }

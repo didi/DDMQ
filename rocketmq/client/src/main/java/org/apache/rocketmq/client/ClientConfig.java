@@ -48,7 +48,15 @@ public class ClientConfig {
 
     private boolean useTLS = TlsSystemConfig.tlsEnable;
 
+    private String clientId;
+
+    private boolean shareThread = false; //only for default pull consumer.
+
     public String buildMQClientId() {
+        if (clientId != null) {
+            return clientId;
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append(this.getClientIP());
 
@@ -60,6 +68,22 @@ public class ClientConfig {
         }
 
         return sb.toString();
+    }
+
+    public boolean isShareThread() {
+        return shareThread;
+    }
+
+    public void setShareThread(boolean shareThread) {
+        this.shareThread = shareThread;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public String getClientIP() {
@@ -96,6 +120,13 @@ public class ClientConfig {
         this.unitName = cc.unitName;
         this.vipChannelEnabled = cc.vipChannelEnabled;
         this.useTLS = cc.useTLS;
+        this.shareThread = cc.shareThread;
+    }
+
+    //custom clientid
+    public void resetClientConfig(final ClientConfig cc, final String clientId) {
+        resetClientConfig(cc);
+        this.clientId = clientId;
     }
 
     public ClientConfig cloneClientConfig() {
@@ -111,6 +142,8 @@ public class ClientConfig {
         cc.unitName = unitName;
         cc.vipChannelEnabled = vipChannelEnabled;
         cc.useTLS = useTLS;
+        cc.clientId = clientId;
+        cc.shareThread = shareThread;
         return cc;
     }
 
@@ -192,6 +225,6 @@ public class ClientConfig {
             + ", clientCallbackExecutorThreads=" + clientCallbackExecutorThreads + ", pollNameServerInterval=" + pollNameServerInterval
             + ", heartbeatBrokerInterval=" + heartbeatBrokerInterval + ", persistConsumerOffsetInterval="
             + persistConsumerOffsetInterval + ", unitMode=" + unitMode + ", unitName=" + unitName + ", vipChannelEnabled="
-            + vipChannelEnabled + ", useTLS=" + useTLS + "]";
+            + vipChannelEnabled + ", useTLS=" + useTLS + ", clientId=" + clientId + ", shareThread=" + shareThread + "]";
     }
 }

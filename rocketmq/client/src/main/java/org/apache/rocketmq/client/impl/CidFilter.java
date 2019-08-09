@@ -14,34 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.rocketmq.common.protocol.header.namesrv;
+package org.apache.rocketmq.client.impl;
 
-import org.apache.rocketmq.remoting.CommandCustomHeader;
-import org.apache.rocketmq.remoting.annotation.CFNotNull;
-import org.apache.rocketmq.remoting.exception.RemotingCommandException;
+import java.util.List;
 
-public class DeleteTopicInNamesrvRequestHeader implements CommandCustomHeader {
-    @CFNotNull
-    private String topic;
-    private String brokerAddrs;
-
-    @Override
-    public void checkFields() throws RemotingCommandException {
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public String getBrokerAddrs() {
-        return brokerAddrs;
-    }
-
-    public void setBrokerAddrs(String brokerAddrs) {
-        this.brokerAddrs = brokerAddrs;
-    }
+public interface CidFilter {
+    List<String> filtering(List<String> cids, String topic);
 }

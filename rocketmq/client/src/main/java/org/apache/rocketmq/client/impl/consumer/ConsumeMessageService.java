@@ -41,4 +41,11 @@ public interface ConsumeMessageService {
         final ProcessQueue processQueue,
         final MessageQueue messageQueue,
         final boolean dispathToConsume);
+
+    void submitConsumeRequestLater(
+            final List<MessageExt> msgs,
+            final ProcessQueue processQueue,
+            final MessageQueue messageQueue,
+            final boolean dispathToConsume,
+            final long timeMillis);
 }

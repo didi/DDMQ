@@ -22,4 +22,7 @@ public class ConfigName {
     public static final String BROKER_ID = "brokerId";
     public static final String REGISTER_RESPONSE_KV_KEY_TERM = "term";
     public static final String ROLE_CONFIG_INIT = "roleConfigInit";
+    public static final String NAME_SRV_ADDR = "namesrvAddr";
+    public static final String BROKER_CLUSTER_NAME = "brokerClusterName";
+    public static final String BROKER_NAME = "brokerName";
 }

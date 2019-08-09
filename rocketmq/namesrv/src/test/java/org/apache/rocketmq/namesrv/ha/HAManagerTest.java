@@ -1,5 +1,7 @@
 package org.apache.rocketmq.namesrv.ha;
 
+import java.util.Arrays;
+import java.util.TreeSet;
 import org.apache.rocketmq.common.namesrv.NamesrvConfig;
 import org.apache.rocketmq.common.protocol.body.TopicConfigSerializeWrapper;
 import org.apache.rocketmq.namesrv.NamesrvController;
@@ -7,8 +9,6 @@ import org.apache.rocketmq.remoting.netty.NettyServerConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.TreeSet;
 
 
 

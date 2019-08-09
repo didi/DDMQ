@@ -16,6 +16,8 @@
  */
 package org.apache.rocketmq.namesrv.ha;
 
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.ThreadFactoryImpl;
 import org.apache.rocketmq.common.constant.LoggerName;
@@ -28,14 +30,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class HAManager {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);
@@ -260,11 +259,17 @@ public class HAManager {
             return null;
         }
 
-        HashMap<Long, String> brokerAddrs = brokerData.getBrokerAddrs();
+        HashMap<Long, String> brokerAddrs = new HashMap<>(brokerData.getBrokerAddrs());
+        for (Iterator<Map.Entry<Long, String>> it = brokerAddrs.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, String> item = it.next();
+            if (item.getKey() > namesrvController.getNamesrvConfig().getMaxIdForRoleSwitch()) {
+                it.remove();
+            }
+        }
 
         //no broker
         if (brokerAddrs == null || brokerAddrs.isEmpty()) {
-            log.warn("no broker adds, for broker name:{}, broker data:{}", brokerName, brokerData);
+            log.warn("no broker addrs, for broker name:{}, broker data:{}", brokerName, brokerData);
             return null;
         }
 
@@ -283,7 +288,9 @@ public class HAManager {
 
         long newMasterId = pickMaster(brokerAddrs);
         if (newMasterId == -1) {
-            newMasterId = ids.last();
+            //newMasterId = ids.last();
+            log.error("do not get master, broker name:{}", brokerName);
+            return null;
         }
         roleChangeInfo.newMaster = new RoleInChange(brokerAddrs.get(newMasterId), newMasterId, MixAll.MASTER_ID);
 
@@ -303,7 +310,7 @@ public class HAManager {
                 maxOffset = offset;
             }
         }
-        log.info("get new master id:{}", brokerId);
+        log.info("get new master id:{}, maxOffset:{}", brokerId, maxOffset);
         return brokerId;
     }
 

@@ -56,7 +56,7 @@ public class BrokerConfig {
     private String zkPath = "";
     private boolean metricReportEnable = true;
     private String metricNs = "";
-    private String metricNsFilter = "server";
+    private String metricNsFilter = ".server";
     private boolean roleConfigInit = false;
 
     /**

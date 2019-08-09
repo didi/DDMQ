@@ -37,6 +37,7 @@ public class NamesrvConfig {
     private boolean orderMessageEnable = false;
     private boolean roleSwitchEnable = false;
     private boolean roleAutoSwitchEnable = false;
+    private int maxIdForRoleSwitch = 99;
     private String clusterName = null;
     private String zkPath = null;
     private String masterType = "SYNC_MASTER";
@@ -208,5 +209,13 @@ public class NamesrvConfig {
 
     public void setUnhealthyRateAllNs(float unhealthyRateAllNs) {
         this.unhealthyRateAllNs = unhealthyRateAllNs;
+    }
+
+    public int getMaxIdForRoleSwitch() {
+        return maxIdForRoleSwitch;
+    }
+
+    public void setMaxIdForRoleSwitch(int maxIdForRoleSwitch) {
+        this.maxIdForRoleSwitch = maxIdForRoleSwitch;
     }
 }

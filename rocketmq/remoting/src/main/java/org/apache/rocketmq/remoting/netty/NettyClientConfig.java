@@ -36,7 +36,7 @@ public class NettyClientConfig {
     private int clientSocketSndBufSize = NettySystemConfig.socketSndbufSize;
     private int clientSocketRcvBufSize = NettySystemConfig.socketRcvbufSize;
     private boolean clientPooledByteBufAllocatorEnable = false;
-    private boolean clientCloseSocketIfTimeout = false;
+    private boolean clientCloseSocketIfTimeout = true;
 
     private boolean useTLS;
 

@@ -31,6 +31,7 @@ import org.apache.rocketmq.client.consumer.rebalance.AllocateMessageQueueAverage
 import org.apache.rocketmq.client.consumer.store.OffsetStore;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.client.impl.CidFilter;
 import org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl;
 import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.UtilAll;
@@ -174,6 +175,14 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     private int consumeConcurrentlyMaxSpan = 2000;
 
     /**
+     * Flow control threshold on queue level, each message queue will cache at least 128 messages by default,
+     * Consider the {@code pullBatchSize}, the instantaneous value may exceed the limit
+     *
+     * Take effect on {@code pullThresholdForTopic} and {@code pullThresholdForQueue}
+     */
+    private int minPullThresholdForQueue = 128;
+
+    /**
      * Flow control threshold on queue level, each message queue will cache at most 1000 messages by default,
      * Consider the {@code pullBatchSize}, the instantaneous value may exceed the limit
      */
@@ -268,6 +277,11 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
      * shared schedule thread pool for consume message
      */
     private ScheduledExecutorService sharedScheduledExecutorService = null;
+
+    /**
+     * Delay push message in millisecond
+     */
+    private long delayPushMessageTimeMillis = 0L;
 
     /**
      * Default constructor.
@@ -748,5 +762,25 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
 
     public void setMessageQueueListener(MessageQueueListener messageQueueListener) {
         this.messageQueueListener = messageQueueListener;
+    }
+
+    public long getDelayPushMessageTimeMillis() {
+        return delayPushMessageTimeMillis;
+    }
+
+    public void setDelayPushMessageTimeMillis(long delayPushMessageTimeMillis) {
+        this.delayPushMessageTimeMillis = delayPushMessageTimeMillis;
+    }
+
+    public int getMinPullThresholdForQueue() {
+        return minPullThresholdForQueue;
+    }
+
+    public void setMinPullThresholdForQueue(int minPullThresholdForQueue) {
+        this.minPullThresholdForQueue = minPullThresholdForQueue;
+    }
+
+    public void setCidFilter(CidFilter cidFilter) {
+        this.defaultMQPushConsumerImpl.setCidFilter(cidFilter);
     }
 }

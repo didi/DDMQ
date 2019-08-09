@@ -61,6 +61,7 @@ public class MessageStoreConfig {
     // Whether schedule flush,default is real-time
     @ImportantField
     private boolean flushCommitLogTimed = false;
+    private boolean flushCommitLogEnable = true;
     // ConsumeQueue flush interval
     private int flushIntervalConsumeQueue = 1000;
     // Resource reclaim interval
@@ -148,6 +149,8 @@ public class MessageStoreConfig {
     private int waitCountInRoleChange = 10;
     private long waitIntervalInRoleChange = 500;
 
+    private boolean reputConcurrentEnable = false;
+    private int reputConcurrentThreadCount = 4;
     public boolean isDebugLockEnable() {
         return debugLockEnable;
     }
@@ -701,5 +704,23 @@ public class MessageStoreConfig {
 
     public void setReadConsumeQueueFilesMaxWhenDel(int readConsumeQueueFilesMaxWhenDel) {
         this.readConsumeQueueFilesMaxWhenDel = readConsumeQueueFilesMaxWhenDel;
+    }
+    public boolean isReputConcurrentEnable() {
+        return reputConcurrentEnable;
+    }
+    public void setReputConcurrentEnable(boolean reputConcurrentEnable) {
+        this.reputConcurrentEnable = reputConcurrentEnable;
+    }
+    public int getReputConcurrentThreadCount() {
+        return reputConcurrentThreadCount;
+    }
+    public void setReputConcurrentThreadCount(int reputConcurrentThreadCount) {
+        this.reputConcurrentThreadCount = reputConcurrentThreadCount;
+    }
+    public boolean isFlushCommitLogEnable() {
+        return flushCommitLogEnable;
+    }
+    public void setFlushCommitLogEnable(boolean flushCommitLogEnable) {
+        this.flushCommitLogEnable = flushCommitLogEnable;
     }
 }

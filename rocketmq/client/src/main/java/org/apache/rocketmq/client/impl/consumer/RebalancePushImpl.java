@@ -63,9 +63,11 @@ public class RebalancePushImpl extends RebalanceImpl {
         if (currentQueueCount != 0) {
             int pullThresholdForTopic = this.defaultMQPushConsumerImpl.getDefaultMQPushConsumer().getPullThresholdForTopic();
             if (pullThresholdForTopic != -1) {
-                int newVal = Math.max(1, pullThresholdForTopic / currentQueueCount);
-                log.info("The pullThresholdForQueue is changed from {} to {}",
-                    this.defaultMQPushConsumerImpl.getDefaultMQPushConsumer().getPullThresholdForQueue(), newVal);
+                int minPullThresholdForQueue = defaultMQPushConsumerImpl.getDefaultMQPushConsumer().getMinPullThresholdForQueue();
+                int newVal = Math.max(minPullThresholdForQueue, pullThresholdForTopic / currentQueueCount);
+                log.info("The pullThresholdForQueue is changed from {} to {}, min PullThresholdForQueue is {}.",
+                    this.defaultMQPushConsumerImpl.getDefaultMQPushConsumer().getPullThresholdForQueue(), newVal,
+                        minPullThresholdForQueue);
                 this.defaultMQPushConsumerImpl.getDefaultMQPushConsumer().setPullThresholdForQueue(newVal);
             }
 

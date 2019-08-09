@@ -285,13 +285,19 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
     @Override
     public MessageExt viewMessage(String topic,
         String msgId) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        return viewMessage(topic, msgId, false);
+    }
+
+    public MessageExt viewMessage(String topic,
+        String msgId,
+        boolean isSlaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
         try {
             MessageDecoder.decodeMessageId(msgId);
-            return this.viewMessage(msgId);
+            return this.viewMessage(msgId, isSlaveFirst);
         } catch (Exception e) {
             log.warn("the msgId maybe created by new client. msgId={}", msgId, e);
         }
-        return this.mqClientInstance.getMQAdminImpl().queryMessageByUniqKey(topic, msgId);
+        return this.mqClientInstance.getMQAdminImpl().queryMessageByUniqKey(topic, msgId, isSlaveFirst);
     }
 
     @Override
@@ -381,12 +387,19 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
     public void deleteTopicInNameServer(Set<String> addrs,
         String topic) throws RemotingException, MQBrokerException, InterruptedException,
         MQClientException {
+        deleteTopicInNameServer(addrs, topic, null);
+    }
+
+    @Override
+    public void deleteTopicInNameServer(Set<String> addrs,
+        String topic, final Set<String> brokerAddrs) throws RemotingException, MQBrokerException, InterruptedException,
+        MQClientException {
         if (addrs == null) {
             String ns = this.mqClientInstance.getMQClientAPIImpl().fetchNameServerAddr();
             addrs = new HashSet(Arrays.asList(ns.split(";")));
         }
         for (String addr : addrs) {
-            this.mqClientInstance.getMQClientAPIImpl().deleteTopicInNameServer(addr, topic, timeoutMillis);
+            this.mqClientInstance.getMQClientAPIImpl().deleteTopicInNameServer(addr, topic, brokerAddrs, timeoutMillis);
         }
     }
 
@@ -962,9 +975,9 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
         return this.mqClientInstance.getMQAdminImpl().viewMessage(msgId);
     }
 
-    public MessageExt viewMessage(String topic,
-        String msgId, boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
-        return this.mqClientInstance.getMQAdminImpl().viewMessage(topic, msgId, slaveFirst);
+    public MessageExt viewMessage(String msgId,
+        boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        return this.mqClientInstance.getMQAdminImpl().viewMessage(msgId, slaveFirst);
     }
 
     @Override

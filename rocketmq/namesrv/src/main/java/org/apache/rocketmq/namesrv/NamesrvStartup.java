@@ -27,6 +27,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.common.MQVersion;
 import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.constant.LoggerName;
@@ -83,6 +84,10 @@ public class NamesrvStartup {
                 System.exit(0);
             }
 
+            String clusterName = null;
+            if (commandLine.hasOption('n')) {
+                clusterName = commandLine.getOptionValue('n');
+            }
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), namesrvConfig);
 
             if (null == namesrvConfig.getRocketmqHome()) {
@@ -104,6 +109,12 @@ public class NamesrvStartup {
 
             // remember all configs to prevent discard
             controller.getConfiguration().registerConfig(properties);
+            if (StringUtils.isEmpty(namesrvConfig.getClusterName()) && !StringUtils.isEmpty(clusterName)) {
+                Properties properties = new Properties();
+                properties.setProperty("clusterName", clusterName);
+                controller.getConfiguration().update(properties);
+                log.info("update cluster name:{}", namesrvConfig.getClusterName());
+            }
 
             boolean initResult = controller.initialize();
             if (!initResult) {

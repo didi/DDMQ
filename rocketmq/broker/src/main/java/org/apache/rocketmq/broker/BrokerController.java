@@ -845,9 +845,16 @@ public class BrokerController {
 
     public boolean onRoleChangePre(Properties properties) {
         BrokerRole newRole = BrokerRole.valueOf(properties.get(ConfigName.BROKER_ROLE).toString());
-        if (messageStoreConfig.getBrokerRole().equals(newRole)) {
+        if (messageStoreConfig.getBrokerRole().equals(newRole) && BrokerRole.SLAVE != newRole) {
             log.warn("new role is equal to current, role:{}", messageStoreConfig.getBrokerRole());
             return false;
+        }
+        if (messageStoreConfig.getBrokerRole().equals(newRole) && BrokerRole.SLAVE == newRole) {
+            long brokerId = Long.valueOf(properties.get(ConfigName.BROKER_ID).toString());
+            if (brokerId == brokerConfig.getBrokerId()) {
+                log.warn("broker id is equal, no need to change");
+                return false;
+            }
         }
 
         if (newRole.equals(BrokerRole.ASYNC_MASTER) || newRole.equals(BrokerRole.SYNC_MASTER)) {
@@ -865,6 +872,13 @@ public class BrokerController {
     public boolean onRoleChange(BrokerRole oldBrokerRole, long oldBrokerId) {
         log.info("broker role change, current role:{}, current id:{}, old role:{}, old id:{}",
             this.messageStoreConfig.getBrokerRole(), this.brokerConfig.getBrokerId(), oldBrokerRole, oldBrokerId);
+        if (BrokerRole.SLAVE == this.messageStoreConfig.getBrokerRole() && oldBrokerRole.equals(this.messageStoreConfig.getBrokerRole())) {
+            unregisterBrokerAll(oldBrokerId);
+            roleChangeState = RoleChangeState.SUCCESS;
+            registerBrokerAll(true, false);
+            log.info("change broker id {}", this.brokerConfig.getBrokerId());
+            return true;
+        }
 
         //1.commit log sync
         if (BrokerRole.SLAVE == this.messageStoreConfig.getBrokerRole()) {

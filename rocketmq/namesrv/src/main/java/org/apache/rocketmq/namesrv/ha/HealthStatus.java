@@ -16,11 +16,11 @@
  */
 package org.apache.rocketmq.namesrv.ha;
 
-import org.apache.rocketmq.namesrv.NamesrvController;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.rocketmq.namesrv.NamesrvController;
 
 
 public class HealthStatus {

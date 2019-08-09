@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.namesrv.ha;
 
+import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.impl.CommunicationMode;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -25,6 +26,7 @@ import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageDecoder;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.common.protocol.ResponseCode;
 import org.apache.rocketmq.common.protocol.header.SendMessageRequestHeader;
 import org.apache.rocketmq.common.protocol.route.BrokerData;
 import org.apache.rocketmq.namesrv.NamesrvController;
@@ -103,6 +105,13 @@ public class Detector {
                         null);
                     if (sendResult.getSendStatus() != SendStatus.SEND_OK) {
                         log.error("send message failed, status:{}", sendResult.getSendStatus());
+                        sendOk = false;
+                    }
+                } catch (MQBrokerException brokerException) {
+                    if (brokerException.getResponseCode() == ResponseCode.NO_PERMISSION || brokerException.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
+                        log.warn("brokerAddr {} is not writable, cause:{}", brokerAddr, brokerException.getErrorMessage());
+                    } else {
+                        log.error("send message failed", brokerException);
                         sendOk = false;
                     }
                 } catch (Exception ex) {

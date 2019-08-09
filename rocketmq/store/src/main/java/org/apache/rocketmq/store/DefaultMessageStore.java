@@ -31,7 +31,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -48,6 +50,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageExtBatch;
 import org.apache.rocketmq.common.running.RunningStats;
 import org.apache.rocketmq.common.sysflag.MessageSysFlag;
+import org.apache.rocketmq.common.utils.ThreadUtils;
 import org.apache.rocketmq.store.config.BrokerRole;
 import org.apache.rocketmq.store.config.MessageStoreConfig;
 import org.apache.rocketmq.store.config.StorePathConfigHelper;
@@ -1837,6 +1840,23 @@ public class DefaultMessageStore implements MessageStore {
     class ReputMessageService extends ServiceThread {
 
         private volatile long reputFromOffset = 0;
+        private LinkedList<Future> futures = new LinkedList<>();
+        private final boolean isReputConcurrentEnable;
+        private final int currentThreadCount;
+        private ExecutorService[] executors;
+        public ReputMessageService() {
+            if (messageStoreConfig.isReputConcurrentEnable() && messageStoreConfig.getReputConcurrentThreadCount() > 0) {
+                isReputConcurrentEnable = true;
+                currentThreadCount = messageStoreConfig.getReputConcurrentThreadCount();
+                executors = new ExecutorService[currentThreadCount];
+                for (int i = 0; i < currentThreadCount; i++) {
+                    executors[i] = ThreadUtils.newSingleThreadExecutor("ReputMessageConcurrent_" + i, false);
+                }
+            } else {
+                isReputConcurrentEnable = false;
+                currentThreadCount = 0;
+            }
+        }
 
         public long getReputFromOffset() {
             return reputFromOffset;
@@ -1885,20 +1905,27 @@ public class DefaultMessageStore implements MessageStore {
                         this.reputFromOffset = result.getStartOffset();
 
                         for (int readSize = 0; readSize < result.getSize() && doNext; ) {
-                            DispatchRequest dispatchRequest =
+                            final DispatchRequest dispatchRequest =
                                 DefaultMessageStore.this.commitLog.checkMessageAndReturnSize(result.getByteBuffer(), false, false);
                             int size = dispatchRequest.getMsgSize();
 
                             if (dispatchRequest.isSuccess()) {
                                 if (size > 0) {
-                                    DefaultMessageStore.this.doDispatch(dispatchRequest);
 
-                                    if (BrokerRole.SLAVE != DefaultMessageStore.this.getMessageStoreConfig().getBrokerRole()
-                                        && DefaultMessageStore.this.brokerConfig.isLongPollingEnable()) {
-                                        DefaultMessageStore.this.messageArrivingListener.arriving(dispatchRequest.getTopic(),
-                                            dispatchRequest.getQueueId(), dispatchRequest.getConsumeQueueOffset() + 1,
-                                            dispatchRequest.getTagsCode(), dispatchRequest.getStoreTimestamp(),
-                                            dispatchRequest.getBitMap(), dispatchRequest.getPropertiesMap());
+                                    if (isReputConcurrentEnable) {
+                                        int index = (int) Math.abs((long) (dispatchRequest.getTopic().hashCode() + dispatchRequest.getQueueId())) % currentThreadCount;
+                                        Future future = executors[index].submit(new Runnable() {
+                                            @Override public void run() {
+                                                try {
+                                                    dispatchAndNotify(dispatchRequest);
+                                                } catch (Exception ex) {
+                                                    log.error("do dispatch failed", ex);
+                                                }
+                                            }
+                                        });
+                                        futures.add(future);
+                                    } else {
+                                        dispatchAndNotify(dispatchRequest);
                                     }
 
                                     this.reputFromOffset += size;
@@ -1929,6 +1956,9 @@ public class DefaultMessageStore implements MessageStore {
                                 }
                             }
                         }
+                        if (isReputConcurrentEnable) {
+                            waitForDispatch();
+                        }
                     } finally {
                         result.release();
                     }
@@ -1936,6 +1966,26 @@ public class DefaultMessageStore implements MessageStore {
                     doNext = false;
                 }
             }
+        }
+        private void dispatchAndNotify(DispatchRequest dispatchRequest) {
+            DefaultMessageStore.this.doDispatch(dispatchRequest);
+            if (BrokerRole.SLAVE != DefaultMessageStore.this.getMessageStoreConfig().getBrokerRole()
+                && DefaultMessageStore.this.brokerConfig.isLongPollingEnable()) {
+                DefaultMessageStore.this.messageArrivingListener.arriving(dispatchRequest.getTopic(),
+                    dispatchRequest.getQueueId(), dispatchRequest.getConsumeQueueOffset() + 1,
+                    dispatchRequest.getTagsCode(), dispatchRequest.getStoreTimestamp(),
+                    dispatchRequest.getBitMap(), dispatchRequest.getPropertiesMap());
+            }
+        }
+        private void waitForDispatch() {
+            for (Future future : futures) {
+                try {
+                    future.get();
+                } catch (Exception ex) {
+                    log.error("future get failed", ex);
+                }
+            }
+            futures.clear();
         }
 
         @Override

@@ -125,6 +125,11 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         return defaultMQAdminExtImpl.viewMessage(offsetMsgId);
     }
 
+    public MessageExt viewMessage(String msgId,
+        boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        return this.defaultMQAdminExtImpl.viewMessage(msgId, slaveFirst);
+    }
+
     @Override
     public QueryResult queryMessage(String topic, String key, int maxNum, long begin,
         long end) throws MQClientException,
@@ -289,6 +294,13 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         String topic) throws RemotingException, MQBrokerException, InterruptedException,
         MQClientException {
         defaultMQAdminExtImpl.deleteTopicInNameServer(addrs, topic);
+    }
+
+    @Override
+    public void deleteTopicInNameServer(Set<String> addrs,
+        String topic, final Set<String> brokerAddrs) throws RemotingException, MQBrokerException, InterruptedException,
+        MQClientException {
+        defaultMQAdminExtImpl.deleteTopicInNameServer(addrs, topic, brokerAddrs);
     }
 
     @Override
@@ -474,9 +486,9 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         return this.defaultMQAdminExtImpl.viewMessage(topic, msgId);
     }
 
-    public MessageExt viewMessage(String topic, String msgId,
-        boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
-        return this.defaultMQAdminExtImpl.viewMessage(topic, msgId, slaveFirst);
+    public MessageExt viewMessage(String topic, String msgId, boolean isSlaveFirst)
+        throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        return this.defaultMQAdminExtImpl.viewMessage(topic, msgId, isSlaveFirst);
     }
 
     public String getAdminExtGroup() {

@@ -107,10 +107,11 @@ public class RoleManager {
                 continue;
             }
             for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
-                if (brokerName.equals(entry.getValue())) {
+                if (brokerAddr.equals(entry.getValue())) {
                     if (newId != entry.getKey()) {
                         log.info("brokerAddr:{} of brokerName:{} change to be:{}", brokerAddr, brokerName, entry.getKey());
                         isRoleUpdated = true;
+                        break;
                     } else {
                         continue;
                     }

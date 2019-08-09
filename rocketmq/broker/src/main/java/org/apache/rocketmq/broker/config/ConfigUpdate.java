@@ -17,6 +17,11 @@
 package org.apache.rocketmq.broker.config;
 
 import com.alibaba.fastjson.JSONObject;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -29,12 +34,6 @@ import org.apache.rocketmq.common.constant.ConfigName;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Properties;
 
 public class ConfigUpdate {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.BROKER_LOGGER_NAME);
@@ -97,6 +96,55 @@ public class ConfigUpdate {
         return path;
     }
 
+    private String getHostNameWithIpDefault() {
+        String host = "unknown_host";
+
+        String ip;
+        try {
+            ip = InetAddress.getLocalHost().getHostName();
+            if (StringUtils.isNotEmpty(ip)) {
+                host = ip;
+            }
+        } catch (Exception var3) {
+            log.error("get host name failed", var3);
+        }
+
+        if ("unknown_host".equals(host) || host.toLowerCase().equals("localhost")) {
+            try {
+                ip = getHostAddress();
+                if (StringUtils.isNotEmpty(ip)) {
+                    host = ip;
+                }
+            } catch (Exception var2) {
+                log.error("get ip failed");
+            }
+        }
+
+        return host;
+    }
+
+    private String getHostAddress() {
+        try {
+            Enumeration netInterfaces = NetworkInterface.getNetworkInterfaces();
+
+            while (netInterfaces.hasMoreElements()) {
+                NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
+                Enumeration ips = ni.getInetAddresses();
+
+                while (ips.hasMoreElements()) {
+                    InetAddress ip = (InetAddress) ips.nextElement();
+                    if (!ip.getHostAddress().equals("127.0.0.1") && !ip.isLoopbackAddress() && ip.getHostAddress().indexOf(":") == -1) {
+                        return ip.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception var4) {
+            log.error("get ip failed", var4);
+        }
+
+        return null;
+    }
+
     private void updateConfig(String config) {
         if (StringUtils.isEmpty(config)) {
             return;
@@ -109,10 +157,11 @@ public class ConfigUpdate {
 
         Properties properties = new Properties();
         for (Map.Entry<String, Object> entry : configMap.entrySet()) {
-            if ((ConfigName.BROKER_ROLE.equals(entry.getKey()) || ConfigName.BROKER_ID.equals(entry.getKey())) && controller.getBrokerConfig().isRoleConfigInit()) {
+            if (isConfigIgnore(entry.getKey())) {
                 log.info("not first start, ignore config:{}", entry.getKey());
                 continue;
             }
+
             properties.put(entry.getKey(), entry.getValue().toString());
         }
         if (!controller.getBrokerConfig().isRoleConfigInit()) {
@@ -121,6 +170,21 @@ public class ConfigUpdate {
         log.info("properties:{}", properties);
 
         controller.getConfiguration().update(properties);
+
+        if (properties.containsKey(ConfigName.NAME_SRV_ADDR) && controller.getBrokerOuterAPI() != null) {
+            controller.getBrokerOuterAPI().updateNameServerAddressList(controller.getBrokerConfig().getNamesrvAddr());
+            log.info("update name srv addr:{}", controller.getBrokerConfig().getNamesrvAddr());
+        }
+    }
+
+    private boolean isConfigIgnore(String key) {
+        boolean isIgnore = false;
+        if (ConfigName.BROKER_ROLE.equals(key) || ConfigName.BROKER_ID.equals(key)
+            || ConfigName.BROKER_CLUSTER_NAME.equals(key) || ConfigName.BROKER_NAME.equals(key)) {
+            isIgnore = true;
+        }
+
+        return isIgnore && controller.getBrokerConfig().isRoleConfigInit();
     }
 
     public void shutdown() {
@@ -135,53 +199,4 @@ public class ConfigUpdate {
             client.close();
         }
     }
-
-    public static String getHostNameWithIpDefault() {
-        //host
-        String host = "unknown_host";
-        try {
-            String hostGet = InetAddress.getLocalHost().getHostName();
-            if (org.apache.commons.lang3.StringUtils.isNotEmpty(hostGet)) {
-                host = hostGet;
-            }
-        } catch (Exception ex) {
-            log.error("get host name failed", ex);
-        }
-
-        if ("unknown_host".equals(host) || host.toLowerCase().equals("localhost")) {
-            try {
-                String ip = getHostAddress();
-                if (StringUtils.isNotEmpty(ip)) {
-                    host = ip;
-                }
-            } catch (Exception ex) {
-                log.error("get ip failed");
-            }
-        }
-        return host;
-    }
-
-    public static String getHostAddress() {
-        try {
-            Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (netInterfaces.hasMoreElements()) {
-                NetworkInterface ni = netInterfaces.nextElement();
-                Enumeration<InetAddress> ips = ni.getInetAddresses();
-                while (ips.hasMoreElements()) {
-                    InetAddress ip = ips.nextElement();
-                    if (ip.getHostAddress().equals("127.0.0.1")) {
-                        continue;
-                    }
-                    if (!ip.isLoopbackAddress() && ip.getHostAddress().indexOf(":") == -1) {
-                        return ip.getHostAddress();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("get ip failed", e);
-        }
-        return null;
-    }
-
-
 }

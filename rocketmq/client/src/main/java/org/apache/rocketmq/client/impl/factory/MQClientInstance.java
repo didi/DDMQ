@@ -18,6 +18,7 @@ package org.apache.rocketmq.client.impl.factory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramSocket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,13 +31,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.admin.MQAdminExtInner;
 import org.apache.rocketmq.client.exception.MQBrokerException;
@@ -52,6 +53,7 @@ import org.apache.rocketmq.client.impl.consumer.MQConsumerInner;
 import org.apache.rocketmq.client.impl.consumer.ProcessQueue;
 import org.apache.rocketmq.client.impl.consumer.PullMessageService;
 import org.apache.rocketmq.client.impl.consumer.RebalanceService;
+import org.apache.rocketmq.client.impl.consumer.SharedRebalanceService;
 import org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl;
 import org.apache.rocketmq.client.impl.producer.MQProducerInner;
 import org.apache.rocketmq.client.impl.producer.TopicPublishInfo;
@@ -103,15 +105,13 @@ public class MQClientInstance {
         new ConcurrentHashMap<String, HashMap<Long, String>>();
     private final ConcurrentMap<String/* Broker Name */, HashMap<String/* address */, Integer>> brokerVersionTable =
         new ConcurrentHashMap<String, HashMap<String, Integer>>();
-    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "MQClientFactoryScheduledThread");
-        }
-    });
+    private final ScheduledExecutorService scheduledExecutorService;
+
     private final ClientRemotingProcessor clientRemotingProcessor;
     private final PullMessageService pullMessageService;
     private final RebalanceService rebalanceService;
+    private final SharedRebalanceService sharedRebalanceService;
+
     private final DefaultMQProducer defaultMQProducer;
     private final ConsumerStatsManager consumerStatsManager;
     private final AtomicLong sendHeartbeatTimesTotal = new AtomicLong(0);
@@ -119,11 +119,15 @@ public class MQClientInstance {
     private DatagramSocket datagramSocket;
     private Random random = new Random();
 
+    private final boolean shareThread;
+    private List<Future> scheduleTaskFutures;
+
     public MQClientInstance(ClientConfig clientConfig, int instanceIndex, String clientId) {
         this(clientConfig, instanceIndex, clientId, null);
     }
 
     public MQClientInstance(ClientConfig clientConfig, int instanceIndex, String clientId, RPCHook rpcHook) {
+        this.shareThread = clientConfig.isShareThread();
         this.clientConfig = clientConfig;
         this.instanceIndex = instanceIndex;
         this.nettyClientConfig = new NettyClientConfig();
@@ -141,12 +145,33 @@ public class MQClientInstance {
 
         this.mQAdminImpl = new MQAdminImpl(this);
 
-        this.pullMessageService = new PullMessageService(this);
+        if (shareThread) {
+            pullMessageService = null; // ShareThread mode only used for pull consumer, do not need pull message service.
 
-        this.rebalanceService = new RebalanceService(this);
+            rebalanceService = null;
+            sharedRebalanceService = SharedResources.sharedRebalanceService;
+            sharedRebalanceService.add(this);
+
+            scheduledExecutorService = SharedResources.scheduledExecutorService;
+        } else {
+            pullMessageService = new PullMessageService(this);
+
+            sharedRebalanceService = null;
+            rebalanceService = new RebalanceService(this);
+
+            scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "MQClientFactoryScheduledThread");
+                }
+            });
+        }
 
         this.defaultMQProducer = new DefaultMQProducer(MixAll.CLIENT_INNER_PRODUCER_GROUP);
-        this.defaultMQProducer.resetClientConfig(clientConfig);
+
+        //inner producer. use same cid with mqinstance.
+        //bug fix. 2019.6.17. trigger thread leak.
+        this.defaultMQProducer.resetClientConfig(clientConfig, clientId);
 
         this.consumerStatsManager = new ConsumerStatsManager(this.scheduledExecutorService);
 
@@ -234,11 +259,15 @@ public class MQClientInstance {
                     // Start request-response channel
                     this.mQClientAPIImpl.start();
                     // Start various schedule tasks
-                    this.startScheduledTask();
+                    scheduleTaskFutures = this.startScheduledTask();
                     // Start pull service
-                    this.pullMessageService.start();
+                    if (!shareThread) {
+                        this.pullMessageService.start();
+                    }
                     // Start rebalance service
-                    this.rebalanceService.start();
+                    if (!shareThread) {
+                        this.rebalanceService.start();
+                    }
                     // Start push service
                     this.defaultMQProducer.getDefaultMQProducerImpl().start(false);
                     log.info("the client factory [{}] start OK", this.clientId);
@@ -256,9 +285,11 @@ public class MQClientInstance {
         }
     }
 
-    private void startScheduledTask() {
+    private List<Future> startScheduledTask() {
+        List<Future> futures = new ArrayList<Future>();
+
         if (null == this.clientConfig.getNamesrvAddr()) {
-            this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            futures.add(this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
                 @Override
                 public void run() {
@@ -268,10 +299,10 @@ public class MQClientInstance {
                         log.error("ScheduledTask fetchNameServerAddr exception", e);
                     }
                 }
-            }, 1000 * 10, 1000 * 60 * 2, TimeUnit.MILLISECONDS);
+            }, 1000 * 10, 1000 * 60 * 2, TimeUnit.MILLISECONDS));
         }
 
-        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+        futures.add(this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
             public void run() {
@@ -281,9 +312,9 @@ public class MQClientInstance {
                     log.error("ScheduledTask updateTopicRouteInfoFromNameServer exception", e);
                 }
             }
-        }, 10, this.clientConfig.getPollNameServerInterval(), TimeUnit.MILLISECONDS);
+        }, 10, this.clientConfig.getPollNameServerInterval(), TimeUnit.MILLISECONDS));
 
-        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+        futures.add(this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
             public void run() {
@@ -294,11 +325,11 @@ public class MQClientInstance {
                     log.error("ScheduledTask sendHeartbeatToAllBroker exception", e);
                 }
             }
-        }, 1000, this.clientConfig.getHeartbeatBrokerInterval(), TimeUnit.MILLISECONDS);
+        }, 1000, this.clientConfig.getHeartbeatBrokerInterval(), TimeUnit.MILLISECONDS));
 
         if (this.clientConfig.getPersistConsumerOffsetInterval() > 0) {
             log.info("start persistAllConsumerOffset, interval:{}", this.clientConfig.getPersistConsumerOffsetInterval());
-            this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            futures.add(this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
                 @Override
                 public void run() {
@@ -308,10 +339,10 @@ public class MQClientInstance {
                         log.error("ScheduledTask persistAllConsumerOffset exception", e);
                     }
                 }
-            }, 1000 * 10, this.clientConfig.getPersistConsumerOffsetInterval(), TimeUnit.MILLISECONDS);
+            }, 1000 * 10, this.clientConfig.getPersistConsumerOffsetInterval(), TimeUnit.MILLISECONDS));
         }
 
-        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+        futures.add(this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
             public void run() {
@@ -321,7 +352,8 @@ public class MQClientInstance {
                     log.error("ScheduledTask adjustThreadPool exception", e);
                 }
             }
-        }, 1, 1, TimeUnit.MINUTES);
+        }, 1, 1, TimeUnit.MINUTES));
+        return futures;
     }
 
     public String getClientId() {
@@ -830,10 +862,24 @@ public class MQClientInstance {
                     this.defaultMQProducer.getDefaultMQProducerImpl().shutdown(false);
 
                     this.serviceState = ServiceState.SHUTDOWN_ALREADY;
-                    this.pullMessageService.shutdown(true);
-                    this.scheduledExecutorService.shutdown();
+                    if (!shareThread) {
+                        this.pullMessageService.shutdown(true);
+                    }
+                    if (shareThread) {
+                        if (scheduleTaskFutures != null) {
+                            for (Future future : scheduleTaskFutures) {
+                                future.cancel(true);
+                            }
+                        }
+                    } else {
+                        this.scheduledExecutorService.shutdown();
+                    }
                     this.mQClientAPIImpl.shutdown();
-                    this.rebalanceService.shutdown();
+                    if (shareThread) {
+                        sharedRebalanceService.remove(this);
+                    } else {
+                        this.rebalanceService.shutdown();
+                    }
 
                     if (this.datagramSocket != null) {
                         this.datagramSocket.close();
@@ -952,7 +998,11 @@ public class MQClientInstance {
     }
 
     public void rebalanceImmediately() {
-        this.rebalanceService.wakeup();
+        if (shareThread) {
+            this.sharedRebalanceService.wakeup();
+        } else {
+            this.rebalanceService.wakeup();
+        }
     }
 
     public void doRebalance() {
@@ -1255,5 +1305,26 @@ public class MQClientInstance {
 
     public NettyClientConfig getNettyClientConfig() {
         return nettyClientConfig;
+    }
+
+    public static class SharedResources {
+        private static SharedRebalanceService sharedRebalanceService = new SharedRebalanceService();
+
+        //select read write.
+        private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors() / 4), new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "Shared_MQClientFactoryScheduledThread");
+            }
+        });
+
+        static {
+            sharedRebalanceService.start();
+        }
+
+        public static void shutdown() {
+            sharedRebalanceService.shutdown();
+            scheduledExecutorService.shutdownNow();
+        }
     }
 }

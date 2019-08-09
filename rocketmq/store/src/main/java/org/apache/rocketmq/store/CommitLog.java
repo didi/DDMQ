@@ -577,7 +577,11 @@ public class CommitLog {
                 return true;
             }
         } else {
-            if (storeTimestamp <= this.defaultMessageStore.getStoreCheckpoint().getMinTimestamp()) {
+            long minTimestamp = this.defaultMessageStore.getStoreCheckpoint().getMinTimestamp();
+            if (BrokerRole.SLAVE == this.defaultMessageStore.getMessageStoreConfig().getBrokerRole()) {
+                minTimestamp = this.defaultMessageStore.getStoreCheckpoint().getLogicsMsgTimestamp();
+            }
+            if (storeTimestamp <= minTimestamp) {
                 log.info("find check timestamp, {} {}",
                     storeTimestamp,
                     UtilAll.timeMillisToHumanString(storeTimestamp));
@@ -720,7 +724,8 @@ public class CommitLog {
         if (FlushDiskType.SYNC_FLUSH == this.defaultMessageStore.getMessageStoreConfig().getFlushDiskType()) {
             final GroupCommitService service = (GroupCommitService) this.flushCommitLogService;
             if (messageExt.isWaitStoreMsgOK()) {
-                GroupCommitRequest request = new GroupCommitRequest(result.getWroteOffset() + result.getWroteBytes());
+                GroupCommitRequest request = new GroupCommitRequest(result.getWroteOffset() + result.getWroteBytes(),
+                    this.defaultMessageStore.getSystemClock().now() + this.defaultMessageStore.getMessageStoreConfig().getSyncFlushTimeout());
                 service.putRequest(request);
                 boolean flushOK = request.waitForFlush(this.defaultMessageStore.getMessageStoreConfig().getSyncFlushTimeout());
                 if (!flushOK) {
@@ -748,7 +753,8 @@ public class CommitLog {
             if (messageExt.isWaitStoreMsgOK()) {
                 // Determine whether to wait
                 if (service.isSlaveOK(result.getWroteOffset() + result.getWroteBytes())) {
-                    GroupCommitRequest request = new GroupCommitRequest(result.getWroteOffset() + result.getWroteBytes());
+                    GroupCommitRequest request = new GroupCommitRequest(result.getWroteOffset() + result.getWroteBytes(),
+                        this.defaultMessageStore.getSystemClock().now() + this.defaultMessageStore.getMessageStoreConfig().getSyncFlushTimeout());
                     service.putRequest(request);
                     service.getWaitNotifyObject().wakeupAll();
                     boolean flushOK =
@@ -1043,9 +1049,13 @@ public class CommitLog {
             CommitLog.log.info(this.getServiceName() + " service started");
 
             while (!this.isStopped()) {
+                int interval = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushIntervalCommitLog();
+                if (!CommitLog.this.defaultMessageStore.getMessageStoreConfig().isFlushCommitLogEnable()) {
+                    flushByPageCache(interval);
+                    continue;
+                }
                 boolean flushCommitLogTimed = CommitLog.this.defaultMessageStore.getMessageStoreConfig().isFlushCommitLogTimed();
 
-                int interval = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushIntervalCommitLog();
                 int flushPhysicQueueLeastPages = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushCommitLogLeastPages();
 
                 int flushPhysicQueueThoroughInterval =
@@ -1114,15 +1124,38 @@ public class CommitLog {
         public long getJointime() {
             return 1000 * 60 * 5;
         }
+        private void flushByPageCache(long interval) {
+            try {
+                MappedFile lastFile = mappedFileQueue.getLastMappedFile();
+                if (lastFile != null) {
+                    long storeTimestamp = lastFile.getStoreTimestamp();
+                    long offset = getMaxOffset();
+                    Thread.sleep(interval);
+                    if (storeTimestamp > 0) {
+                        CommitLog.this.defaultMessageStore.getStoreCheckpoint().setPhysicMsgTimestamp(storeTimestamp);
+                    }
+                    CommitLog.this.mappedFileQueue.setFlushedWhere(offset);
+                } else {
+                    Thread.sleep(interval);
+                }
+            } catch (Exception ex) {
+                log.error("update flush info failed", ex);
+            }
+        }
     }
 
     public static class GroupCommitRequest {
         private final long nextOffset;
         private final CountDownLatch countDownLatch = new CountDownLatch(1);
         private volatile boolean flushOK = false;
+        private long expireTimestamp;
 
         public GroupCommitRequest(long nextOffset) {
             this.nextOffset = nextOffset;
+        }
+        public GroupCommitRequest(long nextOffset, long expireTimestamp) {
+            this.nextOffset = nextOffset;
+            this.expireTimestamp = expireTimestamp;
         }
 
         public long getNextOffset() {
@@ -1142,6 +1175,9 @@ public class CommitLog {
                 log.error("Interrupted", e);
                 return false;
             }
+        }
+        public long getExpireTimestamp() {
+            return expireTimestamp;
         }
     }
 

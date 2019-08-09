@@ -218,6 +218,24 @@ public class ConsumeMessageOrderlyService implements ConsumeMessageService {
         }
     }
 
+    @Override
+    public void submitConsumeRequestLater(
+            final List<MessageExt> msgs,
+            final ProcessQueue processQueue,
+            final MessageQueue messageQueue,
+            final boolean dispathToConsume,
+            final long timeMillis) {
+        if (dispathToConsume) {
+            this.scheduledExecutorService.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    ConsumeMessageOrderlyService.this
+                            .submitConsumeRequest(msgs, processQueue, messageQueue, dispathToConsume);
+                }
+            }, timeMillis, TimeUnit.MILLISECONDS);
+        }
+    }
+
     public synchronized void lockMQPeriodically() {
         if (!this.stopped) {
             this.defaultMQPushConsumerImpl.getRebalanceImpl().lockAll();
@@ -482,9 +500,25 @@ public class ConsumeMessageOrderlyService implements ConsumeMessageService {
 
                         final int consumeBatchSize =
                             ConsumeMessageOrderlyService.this.defaultMQPushConsumer.getConsumeMessageBatchMaxSize();
+                        // NOTICE: This assumes that consumeMessageBatchMaxSize equals 1
+                        if (consumeBatchSize != 1) {
+                            log.error("consumeMessageBatchMaxSize does not equal 1, {}", this.messageQueue);
+                            break;
+                        }
 
                         List<MessageExt> msgs = this.processQueue.takeMessags(consumeBatchSize);
+
+
                         if (!msgs.isEmpty()) {
+
+                            long delayMillis = ConsumeMessageOrderlyService.this.defaultMQPushConsumer.getDelayPushMessageTimeMillis();
+                            long timeMillis = System.currentTimeMillis() - msgs.get(0).getBornTimestamp();
+                            if (timeMillis < delayMillis) {
+                                this.getProcessQueue().makeMessageToCosumeAgain(msgs);
+                                ConsumeMessageOrderlyService.this.submitConsumeRequestLater(msgs, processQueue, messageQueue, true, delayMillis - timeMillis);
+                                break;
+                            }
+
                             ConsumeMessageOrderlyService.this.resetRetryTopic(msgs);
                             final ConsumeOrderlyContext context = new ConsumeOrderlyContext(this.messageQueue);
 

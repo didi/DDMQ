@@ -17,24 +17,29 @@
 
 package org.apache.rocketmq.tools.admin;
 
+import java.util.List;
+import java.util.Map;
 import org.apache.rocketmq.client.impl.MQClientManager;
 import org.apache.rocketmq.client.impl.factory.MQClientInstance;
+import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.admin.ConsumeStats;
+import org.apache.rocketmq.common.admin.OffsetWrapper;
 import org.apache.rocketmq.common.admin.RollbackStats;
 import org.apache.rocketmq.common.admin.TopicOffset;
 import org.apache.rocketmq.common.admin.TopicStatsTable;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.common.protocol.body.ConsumeStatsList;
 import org.apache.rocketmq.common.protocol.route.BrokerData;
 import org.apache.rocketmq.common.protocol.route.QueueData;
 import org.apache.rocketmq.common.protocol.route.TopicRouteData;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.Map;
-
-
+/**
+ * Created by JiangHaiting@didichuxing.com on 2017/11/30.
+ */
 public class DefaultMQAdminExtImplTest {
     private DefaultMQAdminExt mqAdmin;
 
@@ -45,7 +50,7 @@ public class DefaultMQAdminExtImplTest {
     @Before
     public void setUp() throws Exception {
         mqAdmin = new DefaultMQAdminExt();
-        mqAdmin.setNamesrvAddr("127.0.0.1:9876;127.0.0.2:9876");
+        mqAdmin.setNamesrvAddr("10.94.112.8:9876;10.94.112.80:9876");
         mqAdmin.start();
     }
 

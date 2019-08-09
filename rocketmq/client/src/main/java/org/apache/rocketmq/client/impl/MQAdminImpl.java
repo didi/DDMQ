@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.QueryResult;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -245,11 +244,10 @@ public class MQAdminImpl {
     public MessageExt viewMessage(
         String msgId) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
 
-        return viewMessage(null, msgId, false);
+        return viewMessage(msgId, false);
     }
 
-    public MessageExt viewMessage(
-        String topic, String msgId,
+    public MessageExt viewMessage(String msgId,
         boolean slaveFirst) throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
 
         MessageId messageId = null;
@@ -259,11 +257,11 @@ public class MQAdminImpl {
             throw new MQClientException(ResponseCode.NO_MESSAGE, "query message by id finished, but no message.");
         }
         String brokerAddr = RemotingUtil.socketAddress2String(messageId.getAddress());
-        if (slaveFirst && StringUtils.isNotEmpty(topic)) {
-            TopicRouteData topicRouteData = this.mQClientFactory.getAnExistTopicRouteData(topic);
+        if (slaveFirst) {
+            TopicRouteData topicRouteData = this.mQClientFactory.getAnExistTopicRouteData(MixAll.DEFAULT_TOPIC);
             if (null == topicRouteData) {
-                this.mQClientFactory.updateTopicRouteInfoFromNameServer(topic);
-                topicRouteData = this.mQClientFactory.getAnExistTopicRouteData(topic);
+                this.mQClientFactory.updateTopicRouteInfoFromNameServer(MixAll.DEFAULT_TOPIC);
+                topicRouteData = this.mQClientFactory.getAnExistTopicRouteData(MixAll.DEFAULT_TOPIC);
             }
             if (topicRouteData != null && topicRouteData.getBrokerDatas() != null) {
                 for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
@@ -272,7 +270,7 @@ public class MQAdminImpl {
                         ids.remove(MixAll.MASTER_ID);
                         if (ids.size() > 0) {
                             brokerAddr = brokerData.getBrokerAddrs().get(ids.iterator().next());
-                            log.info("get msg from slave:{}, topic:{}", brokerAddr, topic);
+                            log.info("get msg from slave:{}", brokerAddr);
                         }
                     }
                 }
@@ -291,9 +289,14 @@ public class MQAdminImpl {
 
     public MessageExt queryMessageByUniqKey(String topic,
         String uniqKey) throws InterruptedException, MQClientException {
+        return queryMessageByUniqKey(topic, uniqKey, false);
+    }
+
+    public MessageExt queryMessageByUniqKey(String topic,
+        String uniqKey, boolean isSlaveFirst) throws InterruptedException, MQClientException {
 
         QueryResult qr = this.queryMessage(topic, uniqKey, 32,
-            MessageClientIDSetter.getNearlyTimeFromID(uniqKey).getTime() - 1000, Long.MAX_VALUE, true);
+            MessageClientIDSetter.getNearlyTimeFromID(uniqKey).getTime() - 1000, Long.MAX_VALUE, true, isSlaveFirst);
         if (qr != null && qr.getMessageList() != null && qr.getMessageList().size() > 0) {
             return qr.getMessageList().get(0);
         } else {

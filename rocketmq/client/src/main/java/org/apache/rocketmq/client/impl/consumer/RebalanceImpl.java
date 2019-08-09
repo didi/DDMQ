@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.rocketmq.client.consumer.AllocateMessageQueueStrategy;
+import org.apache.rocketmq.client.impl.CidFilter;
 import org.apache.rocketmq.client.impl.FindBrokerResult;
 import org.apache.rocketmq.client.impl.factory.MQClientInstance;
 import org.apache.rocketmq.client.log.ClientLogger;
@@ -54,6 +55,8 @@ public abstract class RebalanceImpl {
     protected MessageModel messageModel;
     protected AllocateMessageQueueStrategy allocateMessageQueueStrategy;
     protected MQClientInstance mQClientFactory;
+
+    protected volatile CidFilter cidFilter;
 
     public RebalanceImpl(String consumerGroup, MessageModel messageModel,
         AllocateMessageQueueStrategy allocateMessageQueueStrategy,
@@ -266,10 +269,16 @@ public abstract class RebalanceImpl {
                     break;
                 }
 
-                List<String> cidAll = this.mQClientFactory.findConsumerIdList(topic, consumerGroup);
-                if (null == cidAll) {
+                List<String> cidAllBeforeFiltering = this.mQClientFactory.findConsumerIdList(topic, consumerGroup);
+                if (null == cidAllBeforeFiltering) {
                     log.warn("doRebalance, {} {}, get consumer id list failed, cid={}", consumerGroup, topic, mQClientFactory.getClientId());
                     break;
+                }
+
+                List<String> cidAll = cidFilter == null ? cidAllBeforeFiltering : cidFilter.filtering(cidAllBeforeFiltering, topic);
+
+                if ((cidAll == null || cidAll.isEmpty()) && MixAll.getRetryTopic(consumerGroup).equals(topic)) {
+                    return;
                 }
 
                 if (mqSet != null && cidAll != null) {
@@ -475,5 +484,13 @@ public abstract class RebalanceImpl {
         }
 
         this.processQueueTable.clear();
+    }
+
+    public CidFilter getCidFilter() {
+        return cidFilter;
+    }
+
+    public void setCidFilter(CidFilter cidFilter) {
+        this.cidFilter = cidFilter;
     }
 }

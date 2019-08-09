@@ -370,7 +370,7 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
         final DeleteTopicInNamesrvRequestHeader requestHeader =
             (DeleteTopicInNamesrvRequestHeader) request.decodeCommandCustomHeader(DeleteTopicInNamesrvRequestHeader.class);
 
-        this.namesrvController.getRouteInfoManager().deleteTopic(requestHeader.getTopic());
+        this.namesrvController.getRouteInfoManager().deleteTopic(requestHeader.getTopic(), requestHeader.getBrokerAddrs());
 
         response.setCode(ResponseCode.SUCCESS);
         response.setRemark(null);

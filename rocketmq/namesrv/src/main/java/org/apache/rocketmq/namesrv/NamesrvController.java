@@ -69,13 +69,13 @@ public class NamesrvController {
             this.namesrvConfig, this.nettyServerConfig
         );
         this.configuration.setStorePathFromConfig(this.namesrvConfig, "configStorePath");
+    }
+
+    public boolean initialize() {
         if (namesrvConfig.isRoleSwitchEnable()) {
             haManager = new HAManager(this);
         }
         routeInfoManager.setHaManager(haManager);
-    }
-
-    public boolean initialize() {
 
         this.kvConfigManager.load();
 

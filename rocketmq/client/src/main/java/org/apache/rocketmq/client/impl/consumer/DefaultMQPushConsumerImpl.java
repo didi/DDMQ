@@ -45,6 +45,7 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.hook.ConsumeMessageContext;
 import org.apache.rocketmq.client.hook.ConsumeMessageHook;
 import org.apache.rocketmq.client.hook.FilterMessageHook;
+import org.apache.rocketmq.client.impl.CidFilter;
 import org.apache.rocketmq.client.impl.CommunicationMode;
 import org.apache.rocketmq.client.impl.MQClientManager;
 import org.apache.rocketmq.client.impl.factory.MQClientInstance;
@@ -311,11 +312,30 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                                     pullRequest.getMessageQueue().getTopic(), pullResult.getMsgFoundList().size());
 
                                 boolean dispathToConsume = processQueue.putMessage(pullResult.getMsgFoundList());
-                                DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
-                                    pullResult.getMsgFoundList(),
-                                    processQueue,
-                                    pullRequest.getMessageQueue(),
-                                    dispathToConsume);
+
+                                boolean isSubmitConsumeRequest = false;
+                                long delayMills = DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getDelayPushMessageTimeMillis();
+                                if (delayMills > 0L) {
+                                    long timeMillis = System.currentTimeMillis() - pullResult.getMsgFoundList().get(0).getBornTimestamp();
+                                    if (timeMillis < delayMills) {
+                                        DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequestLater(
+                                                pullResult.getMsgFoundList(),
+                                                processQueue,
+                                                pullRequest.getMessageQueue(),
+                                                dispathToConsume,
+                                                delayMills - timeMillis);
+
+                                        isSubmitConsumeRequest = true;
+                                    }
+                                }
+
+                                if (!isSubmitConsumeRequest) {
+                                    DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
+                                            pullResult.getMsgFoundList(),
+                                            processQueue,
+                                            pullRequest.getMessageQueue(),
+                                            dispathToConsume);
+                                }
 
                                 if (DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getPullInterval() > 0) {
                                     DefaultMQPushConsumerImpl.this.executePullRequestLater(pullRequest,
@@ -576,6 +596,8 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                     this.defaultMQPushConsumer.changeInstanceNameToPID();
                 }
 
+                //cproxy custom cid,do not use the default policy.
+                this.defaultMQPushConsumer.setClientId(this.defaultMQPushConsumer.getInstanceName());
                 this.mQClientFactory = MQClientManager.getInstance().getAndCreateMQClientInstance(this.defaultMQPushConsumer, this.rpcHook);
 
                 this.rebalanceImpl.setConsumerGroup(this.defaultMQPushConsumer.getConsumerGroup());
@@ -1154,5 +1176,9 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
     public void setConsumeMessageService(ConsumeMessageService consumeMessageService) {
         this.consumeMessageService = consumeMessageService;
 
+    }
+
+    public void setCidFilter(CidFilter cidFilter) {
+        this.rebalanceImpl.setCidFilter(cidFilter);
     }
 }

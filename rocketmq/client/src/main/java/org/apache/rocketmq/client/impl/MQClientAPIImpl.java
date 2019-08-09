@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.PullCallback;
 import org.apache.rocketmq.client.consumer.PullResult;
@@ -176,7 +177,7 @@ public class MQClientAPIImpl {
         RPCHook rpcHook, final ClientConfig clientConfig) {
         this.clientConfig = clientConfig;
         topAddressing = new TopAddressing(MixAll.getWSAddr(), clientConfig.getUnitName());
-        this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
+        this.remotingClient = new NettyRemotingClient(nettyClientConfig, null, clientConfig.isShareThread());
         this.clientRemotingProcessor = clientRemotingProcessor;
 
         this.remotingClient.registerRPCHook(rpcHook);
@@ -1300,8 +1301,19 @@ public class MQClientAPIImpl {
 
     public void deleteTopicInNameServer(final String addr, final String topic, final long timeoutMillis)
         throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
+        deleteTopicInNameServer(addr, topic, null, timeoutMillis);
+    }
+
+    public void deleteTopicInNameServer(final String addr, final String topic, Set<String> brokerAddrs,
+        final long timeoutMillis)
+        throws RemotingException, MQBrokerException, InterruptedException, MQClientException {
         DeleteTopicRequestHeader requestHeader = new DeleteTopicRequestHeader();
         requestHeader.setTopic(topic);
+        if (brokerAddrs != null && !brokerAddrs.isEmpty()) {
+            requestHeader.setBrokerAddrs(StringUtils.join(brokerAddrs, ";"));
+        } else {
+            requestHeader.setBrokerAddrs(null);
+        }
         RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.DELETE_TOPIC_IN_NAMESRV, requestHeader);
 
         RemotingCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);

@@ -34,25 +34,8 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.security.cert.CertificateException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import org.apache.rocketmq.remoting.ChannelEventListener;
 import org.apache.rocketmq.remoting.InvokeCallback;
 import org.apache.rocketmq.remoting.RPCHook;
@@ -68,6 +51,26 @@ import org.apache.rocketmq.remoting.protocol.RemotingCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.SocketAddress;
+import java.security.cert.CertificateException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class NettyRemotingClient extends NettyRemotingAbstract implements RemotingClient {
     private static final Logger log = LoggerFactory.getLogger(RemotingHelper.ROCKETMQ_REMOTING);
 
@@ -79,7 +82,7 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
     private final Lock lockChannelTables = new ReentrantLock();
     private final ConcurrentMap<String /* addr */, ChannelWrapper> channelTables = new ConcurrentHashMap<String, ChannelWrapper>();
 
-    private final Timer timer = new Timer("ClientHouseKeepingService", true);
+    private final ScheduledExecutorService timer;
 
     private final AtomicReference<List<String>> namesrvAddrList = new AtomicReference<List<String>>();
     private final AtomicReference<String> namesrvAddrChoosed = new AtomicReference<String>();
@@ -96,13 +99,25 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
     private DefaultEventExecutorGroup defaultEventExecutorGroup;
     private RPCHook rpcHook;
 
+    private final boolean shareThread;
+
+    private Future timerFuture;
+
+    public NettyRemotingClient(final NettyClientConfig nettyClientConfig,
+                               final ChannelEventListener channelEventListener) {
+        this(nettyClientConfig, channelEventListener, false);
+    }
+
     public NettyRemotingClient(final NettyClientConfig nettyClientConfig) {
         this(nettyClientConfig, null);
     }
 
     public NettyRemotingClient(final NettyClientConfig nettyClientConfig,
-        final ChannelEventListener channelEventListener) {
+        final ChannelEventListener channelEventListener, boolean shareThread) {
         super(nettyClientConfig.getClientOnewaySemaphoreValue(), nettyClientConfig.getClientAsyncSemaphoreValue());
+
+        this.shareThread = shareThread;
+
         this.nettyClientConfig = nettyClientConfig;
         this.channelEventListener = channelEventListener;
 
@@ -111,23 +126,41 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
             publicThreadNums = 4;
         }
 
-        this.publicExecutor = Executors.newFixedThreadPool(publicThreadNums, new ThreadFactory() {
-            private AtomicInteger threadIndex = new AtomicInteger(0);
+        if (shareThread) {
+            this.publicExecutor = SharedResources.publicExecutor;
 
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, "NettyClientPublicExecutor_" + this.threadIndex.incrementAndGet());
-            }
-        });
+            this.eventLoopGroupWorker = SharedResources.eventLoopGroup;
 
-        this.eventLoopGroupWorker = new NioEventLoopGroup(1, new ThreadFactory() {
-            private AtomicInteger threadIndex = new AtomicInteger(0);
+            timer = SharedResources.timer;
+        } else {
 
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, String.format("NettyClientSelector_%d", this.threadIndex.incrementAndGet()));
-            }
-        });
+            this.publicExecutor = Executors.newFixedThreadPool(publicThreadNums, new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "NettyClientPublicExecutor_" + this.threadIndex.incrementAndGet());
+                }
+            });
+
+            this.eventLoopGroupWorker = new NioEventLoopGroup(1, new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyClientSelector_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
+
+            timer = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread t = new Thread(r, "ClientHouseKeepingService");
+                    t.setDaemon(true);
+                    return t;
+                }
+            });
+        }
 
         if (nettyClientConfig.isUseTLS()) {
             try {
@@ -150,17 +183,17 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
 
     @Override
     public void start() {
-        this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(
-            nettyClientConfig.getClientWorkerThreads(),
-            new ThreadFactory() {
-
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "NettyClientWorkerThread_" + this.threadIndex.incrementAndGet());
-                }
-            });
+        if (!shareThread) {
+            this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(
+                    nettyClientConfig.getClientWorkerThreads(),
+                    new ThreadFactory() {
+                        private AtomicInteger threadIndex = new AtomicInteger(0);
+                        @Override
+                        public Thread newThread(Runnable r) {
+                            return new Thread(r, "NettyClientWorkerThread_" + this.threadIndex.incrementAndGet());
+                        }
+                    });
+        }
 
         Bootstrap handler = this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)
             .option(ChannelOption.TCP_NODELAY, true)
@@ -180,17 +213,26 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
                             log.warn("Connections are insecure as SSLContext is null!");
                         }
                     }
-                    pipeline.addLast(
-                        defaultEventExecutorGroup,
-                        new NettyEncoder(),
-                        new NettyDecoder(),
-                        new IdleStateHandler(0, 0, nettyClientConfig.getClientChannelMaxIdleTimeSeconds()),
-                        new NettyConnectManageHandler(),
-                        new NettyClientHandler());
+                    if (shareThread) {
+                        pipeline.addLast(
+                            new NettyEncoder(),
+                            new NettyDecoder(),
+                            new IdleStateHandler(0, 0, nettyClientConfig.getClientChannelMaxIdleTimeSeconds()),
+                            new NettyConnectManageHandler(),
+                            new NettyClientHandler());
+                    } else {
+                        pipeline.addLast(
+                            defaultEventExecutorGroup,
+                            new NettyEncoder(),
+                            new NettyDecoder(),
+                            new IdleStateHandler(0, 0, nettyClientConfig.getClientChannelMaxIdleTimeSeconds()),
+                            new NettyConnectManageHandler(),
+                            new NettyClientHandler());
+                    }
                 }
             });
 
-        this.timer.scheduleAtFixedRate(new TimerTask() {
+        timerFuture = this.timer.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -199,7 +241,7 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
                     log.error("scanResponseTable exception", e);
                 }
             }
-        }, 1000 * 3, 1000);
+        }, 1000 * 3, 1000, TimeUnit.MILLISECONDS);
 
         if (this.channelEventListener != null) {
             this.nettyEventExecutor.start();
@@ -209,7 +251,24 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
     @Override
     public void shutdown() {
         try {
-            this.timer.cancel();
+            if (shareThread) {
+                timerFuture.cancel(true);
+            } else {
+                this.timer.shutdownNow();
+                this.eventLoopGroupWorker.shutdownGracefully();
+
+                if (this.defaultEventExecutorGroup != null) {
+                    this.defaultEventExecutorGroup.shutdownGracefully();
+                }
+
+                if (this.publicExecutor != null) {
+                    try {
+                        this.publicExecutor.shutdown();
+                    } catch (Exception e) {
+                        log.error("NettyRemotingServer shutdown exception, ", e);
+                    }
+                }
+            }
 
             for (ChannelWrapper cw : this.channelTables.values()) {
                 this.closeChannel(null, cw.getChannel());
@@ -217,25 +276,12 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
 
             this.channelTables.clear();
 
-            this.eventLoopGroupWorker.shutdownGracefully();
 
             if (this.nettyEventExecutor != null) {
                 this.nettyEventExecutor.shutdown();
             }
-
-            if (this.defaultEventExecutorGroup != null) {
-                this.defaultEventExecutorGroup.shutdownGracefully();
-            }
         } catch (Exception e) {
             log.error("NettyRemotingClient shutdown exception, ", e);
-        }
-
-        if (this.publicExecutor != null) {
-            try {
-                this.publicExecutor.shutdown();
-            } catch (Exception e) {
-                log.error("NettyRemotingServer shutdown exception, ", e);
-            }
         }
     }
 
@@ -693,6 +739,44 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
             if (NettyRemotingClient.this.channelEventListener != null) {
                 NettyRemotingClient.this.putNettyEvent(new NettyEvent(NettyEventType.EXCEPTION, remoteAddress, ctx.channel()));
             }
+        }
+    }
+
+    public static class SharedResources {
+
+        //select read write.
+        private static EventLoopGroup eventLoopGroup = new NioEventLoopGroup(Math.max(1, Math.max(1, Runtime.getRuntime().availableProcessors() / 3)), new ThreadFactory() {
+            private AtomicInteger threadIndex = new AtomicInteger(0);
+
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, String.format("Shared_NettyClientSelector_%d", this.threadIndex.incrementAndGet()));
+            }
+        });
+
+        private static ScheduledExecutorService timer = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r, "Shared_ClientHouseKeepingService");
+                t.setDaemon(true);
+                return t;
+            }
+        });
+
+        private static ExecutorService publicExecutor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors() / 3), new ThreadFactory() {
+            private AtomicInteger threadIndex = new AtomicInteger(0);
+
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "Shared_NettyClientPublicExecutor_" + this.threadIndex.incrementAndGet());
+            }
+        });
+
+        public static void shutdown() {
+            eventLoopGroup.shutdownGracefully();
+            timer.shutdownNow();
+            publicExecutor.shutdownNow();
         }
     }
 }

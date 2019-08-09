@@ -369,13 +369,13 @@ public class HAService {
                 if (!this.requestsRead.isEmpty()) {
                     for (CommitLog.GroupCommitRequest req : this.requestsRead) {
                         boolean transferOK = HAService.this.push2SlaveMaxOffset.get() >= req.getNextOffset();
-                        for (int i = 0; !transferOK && i < 5; i++) {
+                        while (!transferOK && defaultMessageStore.getSystemClock().now() < req.getExpireTimestamp()) {
                             this.notifyTransferObject.waitForRunning(1000);
                             transferOK = HAService.this.push2SlaveMaxOffset.get() >= req.getNextOffset();
                         }
 
                         if (!transferOK) {
-                            log.warn("transfer messsage to slave timeout, " + req.getNextOffset());
+                            log.warn("transfer message to slave timeout, " + req.getNextOffset());
                         }
 
                         req.wakeupCustomer(transferOK);
