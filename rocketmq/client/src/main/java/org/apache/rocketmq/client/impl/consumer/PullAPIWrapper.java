@@ -172,7 +172,7 @@ public class PullAPIWrapper {
         if (isSlaveFirst) {
             findBrokerResult = this.mQClientFactory.findBrokerAddressInSubscribeSlaveFirst(mq.getBrokerName());
         } else {
-            this.mQClientFactory.findBrokerAddressInSubscribe(mq.getBrokerName(),
+            findBrokerResult = this.mQClientFactory.findBrokerAddressInSubscribe(mq.getBrokerName(),
                 this.recalculatePullFromWhichNode(mq), false);
         }
         if (null == findBrokerResult) {
