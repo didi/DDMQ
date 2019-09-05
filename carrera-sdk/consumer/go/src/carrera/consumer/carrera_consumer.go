@@ -1,16 +1,16 @@
 package consumer
 
 import (
+	log "carrera/common/dlog"
+	"carrera/common/qlog"
 	carrera "carrera/consumer/CarreraConsumer"
-	log "go.intra.xiaojukeji.com/golang/dlog"
+	"fmt"
 	"math"
 	"math/rand"
 	"sync"
 	"sync/atomic"
 	"time"
 	"unsafe"
-	"carrera/common/qlog"
-	"fmt"
 )
 
 type CarreraConsumer interface {

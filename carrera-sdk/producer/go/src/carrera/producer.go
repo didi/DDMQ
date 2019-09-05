@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"carrera/CarreraProducer"
+	log "carrera/common/dlog"
 	"carrera/common/util"
-	log "go.intra.xiaojukeji.com/golang/commons/dlog"
 	"strings"
 
-	"errors"
+	"carrera/common"
+	"carrera/common/qlog"
 	"carrera/pool"
+	"errors"
 	"go.intra.xiaojukeji.com/golang/go.uuid"
 	"go.intra.xiaojukeji.com/golang/thrift-lib/0.9.2"
 	"math"
-	"carrera/common/qlog"
-	"carrera/common"
 )
 
 const (

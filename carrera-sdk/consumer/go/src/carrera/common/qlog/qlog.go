@@ -1,7 +1,7 @@
 package qlog
 
 import (
-	log "go.intra.xiaojukeji.com/golang/commons/dlog"
+	log "carrera/common/dlog"
 	"path/filepath"
 )
 
@@ -51,8 +51,8 @@ func initDropLogger(recoveryFileSizeGB int, level string, logPath string) {
 	maxRecoverFileSize := 50 // MB
 	maxRecoverFileBackups := 1024 * recoveryFileSizeGB / maxRecoverFileSize
 	DROP_LOGGER = log.CreateLocalLog(filepath.Join(logPath, "drop/", DROP_LOG_FILE_NAME), level, maxRecoverFileSize, maxRecoverFileBackups, "text")
-	DROP_LOGGER.SetDisableQuoting(true)
-	DROP_LOGGER.SetDisableAutoAddKey(true)
+	//DROP_LOGGER.SetDisableQuoting(true)
+	//DROP_LOGGER.SetDisableAutoAddKey(true)
 }
 
 /**
@@ -64,9 +64,9 @@ func initLocalLog(logFileSizeGB int, level string, logPath string, fileName stri
 	// create the default log at last
 	maxLogFileSize := 1024 // MB
 	maxLogFileBackups := 1024 * logFileSizeGB / maxLogFileSize
-	l := log.CreateLocalLog(filepath.Join(logPath, fileName), level, maxLogFileSize, maxLogFileBackups, "text")
-	l.SetDisableQuoting(true)
-	l.SetDisableAutoAddKey(true)
+	log.CreateLocalLog(filepath.Join(logPath, fileName), level, maxLogFileSize, maxLogFileBackups, "text")
+	//l.SetDisableQuoting(true)
+	//l.SetDisableAutoAddKey(true)
 }
 
 func InitLog(logFileSizeGB, recoveryFileSizeGB int) {

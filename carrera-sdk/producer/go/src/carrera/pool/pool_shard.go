@@ -1,11 +1,11 @@
 package pool
 
 import (
+	log "carrera/common/dlog"
+	"carrera/common/errinfo"
 	"errors"
-	log "go.intra.xiaojukeji.com/golang/commons/dlog"
 	"sync/atomic"
 	"time"
-	"carrera/common/errinfo"
 )
 
 type PoolShard struct {

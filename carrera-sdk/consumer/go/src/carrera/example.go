@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"carrera/consumer"
 	"carrera/consumer/CarreraConsumer"
+	"fmt"
 	"time"
 )
 
 func main() {
 	//指定日志输出路径
-	//consumer.InitLogger("./mq/log")
+	consumer.InitLogger("./mq/log")
 
 	/*
 			ProxyList 中的svr会并发拉取，拉取后投递到GoroutineNum数量的goroutine中，进行处理

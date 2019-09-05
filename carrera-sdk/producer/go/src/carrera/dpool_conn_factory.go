@@ -1,15 +1,15 @@
 package carrera
 
 import (
-	"net"
-	"time"
 	"crypto/md5"
 	"hash"
+	"net"
+	"time"
 
-	"go.intra.xiaojukeji.com/golang/thrift-lib/0.9.2"
-	log "go.intra.xiaojukeji.com/golang/commons/dlog"
-	"carrera/pool"
 	"carrera/CarreraProducer"
+	log "carrera/common/dlog"
+	"carrera/pool"
+	"go.intra.xiaojukeji.com/golang/thrift-lib/0.9.2"
 )
 
 type PooledConnection struct {

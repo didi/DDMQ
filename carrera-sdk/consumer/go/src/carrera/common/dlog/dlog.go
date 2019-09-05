@@ -1,5 +1,6 @@
 package dlog
 
+
 import (
 	"fmt"
 	"io"
@@ -9,9 +10,9 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"go.intra.xiaojukeji.com/golang/logrus"
-	logrus_syslog "go.intra.xiaojukeji.com/golang/logrus/hooks/syslog"
-	"go.intra.xiaojukeji.com/golang/lumberjack"
+	"github.com/natefinch/lumberjack"
+	"github.com/sirupsen/logrus"
+	logrus_syslog "github.com/sirupsen/logrus/hooks/syslog"
 )
 
 const (
@@ -26,7 +27,7 @@ const (
 var Logger *DLogger
 
 func init() {
-	lumberjack.BackupTimeFormat = "20060102150405"
+	//lumberjack.BackupTimeFormat = "20060102150405"
 	CreateLocalLog("./all.log", "debug", 100, 10, "text")
 }
 
@@ -66,29 +67,29 @@ func (lw *DLogger) Close() {
 	}
 }
 
-func (lw *DLogger) SetKeySeparator(separator string) {
-	switch f := lw.Formatter.(type) {
-	case *logrus.TextFormatter:
-		f.KeySeparator = separator
-	default:
-	}
-}
-
-func (lw *DLogger) SetDisableAutoAddKey(disable bool) {
-	switch f := lw.Formatter.(type) {
-	case *logrus.TextFormatter:
-		f.DisableAutoAddedKey = disable
-	default:
-	}
-}
-
-func (lw *DLogger) SetDisableQuoting(disable bool) {
-	switch f := lw.Formatter.(type) {
-	case *logrus.TextFormatter:
-		f.DisableQuoting = disable
-	default:
-	}
-}
+//func (lw *DLogger) SetKeySeparator(separator string) {
+//	switch f := lw.Formatter.(type) {
+//	case *logrus.TextFormatter:
+//		f.KeySeparator = separator
+//	default:
+//	}
+//}
+//
+//func (lw *DLogger) SetDisableAutoAddKey(disable bool) {
+//	switch f := lw.Formatter.(type) {
+//	case *logrus.TextFormatter:
+//		f.DisableAutoAddedKey = disable
+//	default:
+//	}
+//}
+//
+//func (lw *DLogger) SetDisableQuoting(disable bool) {
+//	switch f := lw.Formatter.(type) {
+//	case *logrus.TextFormatter:
+//		f.DisableQuoting = disable
+//	default:
+//	}
+//}
 
 func (lw *DLogger) ShowFileLine(enable bool) {
 	if enable {

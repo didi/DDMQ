@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"carrera/CarreraProducer"
+	log "carrera/common/dlog"
 	"carrera/common/qlog"
-	log "go.intra.xiaojukeji.com/golang/commons/dlog"
 )
 
 var dropLogFileRegexp = regexp.MustCompile("(drop)\\.log\\.[0-9]+")
