@@ -2,6 +2,7 @@ package com.xiaojukeji.carrera.cproxy.actions.http;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.xiaojukeji.carrera.chronos.enums.MsgTypes;
 import com.xiaojukeji.carrera.chronos.model.InternalKey;
 import com.xiaojukeji.carrera.config.v4.cproxy.UpstreamTopic;
@@ -29,6 +30,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class CarreraAsyncRequest extends AsyncCompletionHandler<Response> {
+
+    private static final String HTTP_CALLBACK_URL_KEY = "carrera_http_callback_url";
+    private static final String HTTP_CALLBACK_URL_KEY_SPLITER = "<>"; //分割多个url
+
     enum HttpErrNo {
         OK(0),
         SLOW(1000000),
@@ -332,7 +337,14 @@ public class CarreraAsyncRequest extends AsyncCompletionHandler<Response> {
     }
 
     public String getUrl() {
-        List<String> urls = job.getUrls();
+        List<String> urls;
+        String customUrl = job.getContext().getProperties().get(HTTP_CALLBACK_URL_KEY);
+        //if producer specify the exact url
+        if (customUrl != null) {
+            urls = Lists.newArrayList(customUrl.split(HTTP_CALLBACK_URL_KEY_SPLITER));
+        } else {
+            urls = job.getUrls();
+        }
         return urls.get((startIdx + job.getErrorRetryCnt()) % urls.size());
     }
 
