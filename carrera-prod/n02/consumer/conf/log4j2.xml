@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" name="carrera" monitorInterval="60" shutdownHook="disable">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ABSOLUTE} %5p %c{1}:%L - %m%n"/>
+        </Console>
+        <RollingRandomAccessFile name="CarreraAppender" fileName="logs/carrera.log"
+                     filePattern="logs/old/carrera.log-%d{yyyy-MM-dd-HH}.%i.gz">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy compressionLevel="1">
+                <Delete basePath="logs" maxDepth="2">
+                    <IfAny>
+                        <IfAccumulatedFileSize exceeds="${env:LOG_SAVE_SIZE}"/>
+                        <IfLastModified age="${env:LOG_SAVE_TIME}"/>
+                    </IfAny>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="DropAppender" fileName="logs/drop.log"
+                     filePattern="logs/old/drop.log-%d{yyyy-MM-dd}.%i.gz">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy compressionLevel="9"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="WarnAppender" fileName="logs/error.log"
+                     filePattern="logs/old/error.log-%d{yyyy-MM-dd}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="MetricAppender" fileName="logs/metric.log"
+                     filePattern="logs/old/metric.log-%d{yyyy-MM-dd-HH}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="MainAppender" fileName="logs/main.log"
+                     filePattern="logs/old/main.log-%d{yyyy-MM-dd}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy/>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <Loggers>
+        <Root level="WARN">
+            <AppenderRef ref="CarreraAppender"/>
+            <AppenderRef ref="WarnAppender"/>
+        </Root>
+        <Logger name="com.xiaojukeji.carrera.cproxy" additivity="false" level="INFO">
+            <AppenderRef ref="CarreraAppender"/>
+            <AppenderRef ref="WarnAppender" level="error"/>
+        </Logger>
+        <Logger name="com.xiaojukeji.carrera.cproxy.consumer.BaseCarreraConsumer" additivity="false" level="${env:LOG_BASE_CONSUMER_LEVEL}">
+            <AppenderRef ref="CarreraAppender"/>
+        </Logger>
+        <Logger name="org.apache.thrift.server.AbstractNonblockingServer$AsyncFrameBuffer" additivity="false"
+                     level="ERROR">
+            <AppenderRef ref="WarnAppender" level="warn"/>
+        </Logger>
+        <Logger name="DropLogger" level="INFO" additivity="false">
+            <AppenderRef ref="DropAppender"/>
+        </Logger>
+        <Logger name="OffsetLogger" level="INFO" additivity="false">
+            <AppenderRef ref="MetricAppender"/>
+        </Logger>
+        <Logger name="MetricLogger" level="INFO" additivity="false">
+            <AppenderRef ref="MetricAppender"/>
+        </Logger>
+        <Logger name="MainLogger" level="INFO" additivity="false">
+            <AppenderRef ref="MainAppender"/>
+            <AppenderRef ref="WarnAppender" level="error"/>
+        </Logger>
+        <AsyncLogger name="com.xiaojukeji.carrera" level="INFO" additivity="false">
+            <AppenderRef ref="CarreraAppender"/>
+            <AppenderRef ref="WarnAppender" level="WARN"/>
+        </AsyncLogger>
+    </Loggers>
+</Configuration>
