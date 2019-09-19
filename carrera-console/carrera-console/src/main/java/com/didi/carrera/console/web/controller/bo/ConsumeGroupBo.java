@@ -42,6 +42,8 @@ public class ConsumeGroupBo extends BaseBo {
     @NotBlank(message = "负责RD不能为空")
     private String contacters;
 
+    private String remark;
+
     private List<String> alarmGroup;
 
     @NotNull(message = "报警级别不能为空")
@@ -115,6 +117,14 @@ public class ConsumeGroupBo extends BaseBo {
 
     public void setContacters(String contacters) {
         this.contacters = contacters;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public List<String> getAlarmGroup() {
@@ -254,6 +264,7 @@ public class ConsumeGroupBo extends BaseBo {
                 ", service='" + service + '\'' +
                 ", department='" + department + '\'' +
                 ", contacters='" + contacters + '\'' +
+                ", remark='" + remark + '\'' +
                 ", alarmGroup=" + alarmGroup +
                 ", alarmLevel=" + alarmLevel +
                 ", alarmIsEnable=" + alarmIsEnable +

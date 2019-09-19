@@ -94,6 +94,22 @@ export default {
       }
     },
 
+    formatUrlObject (keys) {
+      let arrays = [];
+      if (keys && keys.length) {
+        keys.forEach((item) => {
+          arrays.push({
+            key: item
+          });
+        });
+      } else {
+        arrays = [{
+          key: ''
+        }];
+      }
+      return arrays;
+    },
+
     // 根据value获取label
     getNameById (id, array) {
       let label = '';

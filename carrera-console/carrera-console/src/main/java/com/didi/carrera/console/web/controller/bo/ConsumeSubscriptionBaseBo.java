@@ -53,6 +53,8 @@ public class ConsumeSubscriptionBaseBo extends BaseOrderBo {
     private Long topicId;
     private String topicName;
 
+    private String remark;
+
     @NotNull(message = "消费限流不能为空")
     @Min(value = 1, message = "消费限流必须大于0")
     private Double maxTps;
@@ -160,6 +162,14 @@ public class ConsumeSubscriptionBaseBo extends BaseOrderBo {
 
     public void setMaxTps(Double maxTps) {
         this.maxTps = maxTps;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public Byte getAlarmType() {
@@ -611,6 +621,7 @@ public class ConsumeSubscriptionBaseBo extends BaseOrderBo {
                 ", topicId=" + topicId +
                 ", topicName='" + topicName + '\'' +
                 ", maxTps=" + maxTps +
+                ", remark='" + remark + '\'' +
                 ", pressureTraffic=" + pressureTraffic +
                 ", alarmType=" + alarmType +
                 ", alarmIsEnable=" + alarmIsEnable +

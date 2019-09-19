@@ -63,6 +63,7 @@ public class SubscriptionOrderListVo extends ConsumeSubscriptionOrderBo {
         vo.setClusters(Maps.newHashMap());
         vo.getClusters().put(sub.getClusterName(), sub.getClusterId());
         vo.setClusterDesc(clusterDesc);
+        vo.setRemark(sub.getRemark());
 
         return vo;
     }

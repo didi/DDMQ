@@ -18,7 +18,7 @@
                        @click="getSubscribeList"></bc-button>
             <bc-button icon="plus"
                        type="primary"
-                       @click="handleCreateSubscribe">Subscription
+                       @click="handleCreateSubscribe">Add
             </bc-button>
             <bc-button-group>
               <bc-button type="gray"
@@ -71,6 +71,13 @@
               <span :class="coloringText('topic', 'states', parseInt(scope.record.state,10))">{{dictTranslate('topic','states', parseInt(scope.record.state, 10))}}</span>
             </template>
           </bc-table-column>
+
+          <bc-table-column field="remark" index="remark" label="Remark">
+            <template slot-scope="scope">
+              {{scope.record.remark}}
+            </template>
+          </bc-table-column>
+
           <bc-table-column field="operate" index="operate" label="Operation" width="350px">
             <template slot-scope="scope">
               <a class="text-link"  @click="handleDetail(scope.record)">Detail</a>
@@ -85,7 +92,7 @@
                           query: {
                             topicId: scope.record.topicId,
                             topicName: scope.record.topicName,
-                          },}">Consume Progress
+                          },}">Progress
               </router-link>
             </template>
           </bc-table-column>

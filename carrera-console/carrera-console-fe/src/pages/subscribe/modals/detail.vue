@@ -73,6 +73,21 @@
               <div class="detail-item-key">API Level</div>
               <div class="detail-item-value">{{this.dictTranslate('topic', 'apiTypes', basicInfo.apiType) }}</div>
             </div>
+            <div class="detail-item">
+              <div class="detail-item-key">Remark</div>
+              <div class="detail-item-value">{{basicInfo.remark}}</div>
+            </div>
+          </div>
+          <div class="detail-info-title">Alarm information</div>
+          <div class="detail-info-block">
+            <div class="detail-item">
+              <div class="detail-item-key">Alarm Msg Lag</div>
+              <div class="detail-item-value">{{basicInfo.alarmMsgLag}}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-item-key">Alarm Delay Time</div>
+              <div class="detail-item-value">{{basicInfo.alarmDelayTime}}</div>
+            </div>
           </div>
           <div class="detail-info-title">Advanced config</div>
           <template v-if="basicInfo.apiType === CONSATNT.SUBSCRIBE_API_HIGHT_LEVEL">
