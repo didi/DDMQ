@@ -129,7 +129,11 @@
                 <div class="detail-item-key">Message Push Type</div>
                 <div class="detail-item-value">{{basicInfo.msgPushTypeDesc}}</div>
               </div>
-              
+
+              <div class="detail-item">
+                <div class="detail-item-key">Urls</div>
+                <div class="detail-item-value">{{basicInfo.urls && basicInfo.urls.join(';')}}</div>
+              </div>
             </div>
           </template>
           <template v-else>
