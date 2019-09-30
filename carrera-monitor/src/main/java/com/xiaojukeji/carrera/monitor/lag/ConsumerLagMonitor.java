@@ -12,6 +12,7 @@ import com.xiaojukeji.carrera.config.v4.GroupConfig;
 import com.xiaojukeji.carrera.config.v4.cproxy.UpstreamTopic;
 import com.xiaojukeji.carrera.dynamic.ParameterDynamicZookeeper;
 import com.xiaojukeji.carrera.utils.TimeUtils;
+import com.xiaojukeji.tools.NoticeTools;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.client.consumer.PullStatus;
@@ -31,8 +32,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-
 
 public class ConsumerLagMonitor extends BaseConfigMonitor {
 
@@ -148,7 +147,6 @@ public class ConsumerLagMonitor extends BaseConfigMonitor {
                 getRmqConsumeStats(group, topic, brokerConfig, produceOffsetMap, consumeOffsetMap, qid2mq);
                 RocketMQProduceOffsetFetcher rmqFetcher = getRmqFetcher(brokerConfig);
 
-
                 consumeOffsetMap.forEach((qid, consumeOffset) -> {
                     long produceOffset = produceOffsetMap.containsKey(qid) ? produceOffsetMap.remove(qid) : -1;
                     long lag = produceOffset > consumeOffset ? produceOffset - consumeOffset : 0;
@@ -219,6 +217,8 @@ public class ConsumerLagMonitor extends BaseConfigMonitor {
             String alarmJson = JSON.toJSONString(alarmTable);
             // 可以通过配置日志采集收集报警信息并配置报警策略.
             LOGGER.info("[CONSUME_LAG_ALARM_MSG] alarm msg={}", alarmJson);
+
+            NoticeTools.sendEmail("consumer.lag.monitor", alarmJson);
         }
 
         LOGGER.debug("monitor end, group:{}, costtime:{}ms", groupConfig.getGroup(), TimeUtils.getElapseTime(startTs));

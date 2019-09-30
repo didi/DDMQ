@@ -80,138 +80,113 @@
       color: #666666;
     }
   }
-
 </style>
 
 <template>
-<bc-modal v-model="show"
-          v-if="show"
-          :title="title"
-          :offsetTop="40"
-          :width="1000"
-          class="create-group-modal"
-          @on-cancel="cancel">
+<bc-modal v-model="show" v-if="show" :title="title" :offsetTop="40" :width="1000" class="create-group-modal" @on-cancel="cancel">
   <div class="subscribe-create config-form-item">
     <div class="config-form">
-    <bc-form  class="clearfix"
-              v-if="show"
-               ref="form"
-               :width="540"
-               :model="form"
-               :rules="formRule"
-               labelAlign="top">
+    <bc-form  class="clearfix" v-if="show" ref="form" :width="540" :model="form" :rules="formRule" labelAlign="top">
       <div class="title-default">Basic Config</div>
       <div class="config-form-item">
-        <bc-form-item label="Consumer Group："
-                      prop="groupId">
+        <bc-form-item label="Consumer Group：" prop="groupId">
           <bc-input v-if="isEditing" disabled :width="265" v-model="form.groupName"></bc-input>
-          <bc-select  v-if="!isEditing"
-                      remote
-                      filterable
-                      :width="265"
-                      :remote-method="filterGroups"
-                      :label="form.groupName"
-                      v-model="form.groupId"
-                      :loading="groupQueryLoading"
-                      placeholder="Please input keywords to select">
+          <bc-select v-if="!isEditing" remote filterable :width="265" :remote-method="filterGroups" :label="form.groupName"
+                     v-model="form.groupId" :loading="groupQueryLoading" placeholder="Please input keywords to select" @on-change="changeGroupId">
             <template v-if="!groupQueryLoading">
-              <bc-option v-for="item in filterableGroups"
-                        :value="item.value"
-                        :key="item.value">{{ item.label }}</bc-option>
+              <bc-option v-for="item in filterableGroups" :value="item.value" :key="item.value">{{ item.label }}</bc-option>
             </template>
           </bc-select>
         </bc-form-item>
-        <bc-form-item label="Topic："
-                      prop="topicId">
+        <bc-form-item label="Topic：" prop="topicId">
           <bc-input v-if="isEditing" disabled :width="265" v-model="form.topicName"></bc-input>
-          <bc-select  v-if="!isEditing"
-                      remote
-                      filterable
-                      :width="265"
-                      :remote-method="filterTopics"
-                      :label="form.topicName"
-                      v-model="form.topicId"
-                      :loading="loading"
-                      placeholder="Please input keywords to select">
+          <bc-select v-if="!isEditing" remote filterable :width="265" :remote-method="filterTopics" :label="form.topicName"
+                     v-model="form.topicId" :loading="loading" placeholder="Please input keywords to select">
             <template v-if="!loading">
-              <bc-option v-for="item in filterableTopics"
-                        :value="item.value"
-                        :key="item.value">{{ item.label }}</bc-option>
+              <bc-option v-for="item in filterableTopics" :value="item.value" :key="item.value">{{ item.label }}</bc-option>
             </template>
           </bc-select>
         </bc-form-item>
       </div>
 
       <div class="config-form-item">
-        <bc-form-item label="Consume maxTps"
-                      prop="maxTps">
+        <bc-form-item label="Consume maxTps" prop="maxTps">
           <bc-input v-model="form.maxTps" type="number" :width="265"></bc-input>
         </bc-form-item>
 
-        <bc-form-item label="Receive Pressure Traffic"
-                      prop="pressureTraffic">
+        <bc-form-item label="Receive Pressure Traffic" prop="pressureTraffic">
           <bc-select placehold="Please select" :width="265" v-model.number="form.pressureTraffic">
-            <bc-option v-for="item in dict.topic.pressureTrafficStates"
-                      :value=item.value
-                      :label=item.label
-                      :key="item.label"></bc-option>
+            <bc-option v-for="item in dict.topic.pressureTrafficStates" :value=item.value :label=item.label :key="item.label"></bc-option>
           </bc-select>
-
         </bc-form-item>
       </div>
 
+      <div class="config-form-item">
+        <bc-form-item label="Remark" prop="Remark">
+          <bc-input v-model="form.remark" type="text" :width="265"></bc-input>
+        </bc-form-item>
+      </div>
+
+      <div class="title-default" style="margin-bottom: 15px;">Alarm Config
+        <span @click="toggleAlarmConfig" class="icon-for-advanced-config">
+          <bc-icon :type="iconForAlarmConfig"></bc-icon>
+        </span>
+      </div>
+
+      <div v-show="isShowAlarmConfig">
+        <div class="config-form-item">
+          <bc-form-item label="Alarm Type" prop="alarmType">
+            <bc-input v-model="form.alarmType" type="number" :width="265"></bc-input>
+          </bc-form-item>
+          <bc-form-item label="Alarm Level" prop="alarmLevel">
+            <bc-input v-model="form.alarmLevel" type="number" :width="265"></bc-input>
+          </bc-form-item>
+        </div>
+
+        <div class="config-form-item">
+          <bc-form-item label="Alarm Msg Lag" prop="alarmMsgLag">
+              <bc-input v-model="form.alarmMsgLag" type="text" :width="265"></bc-input>
+          </bc-form-item>
+          <bc-form-item label="Alarm Delay Time" prop="alarmDelayTime">
+              <bc-input v-model="form.alarmDelayTime" type="number" :width="265"></bc-input>
+          </bc-form-item>
+        </div>
+      </div>
+
       <div class="title-default" style="margin-bottom: 15px;">Advanced Config
-        <span @click="toggleAdvancedConfig"
-              class="icon-for-advanced-config">
-              <bc-icon :type="iconForAdvancedConfig"></bc-icon>
+        <span @click="toggleAdvancedConfig" class="icon-for-advanced-config">
+          <bc-icon :type="iconForAdvancedConfig"></bc-icon>
         </span>
       </div>
 
       <div v-show="isShowAdvancedConfig">
-
-        <bc-form-item label="API Level"
-                      prop="apiType">
+        <bc-form-item label="API Level" prop="apiType">
           <bc-select placehold="Please select" v-model.number="form.apiType">
-            <bc-option v-for="item in dict.topic.apiTypes"
-                      :value=item.value
-                      :label=item.label
-                      :key="item.label"></bc-option>
+            <bc-option v-for="item in dict.topic.apiTypes" :value=item.value :label=item.label :key="item.label"></bc-option>
           </bc-select>
         </bc-form-item>
 
         <template v-if="(parseInt(form.apiType,10)===1)">
           <div class="config-form-item">
-            <bc-form-item label="Consume Timeout"
-                          prop="consumeTimeout">
-              <bc-input v-model="form.consumeTimeout"
-                        :width="265"
-                        type="number"
-                        placeholder="default 1000ms">
+            <bc-form-item label="Consume Timeout" prop="consumeTimeout">
+              <bc-input v-model="form.consumeTimeout" :width="265" type="number" placeholder="default 1000ms">
                 <span slot="append">ms</span>
               </bc-input>
             </bc-form-item>
 
-            <bc-form-item label="Error Retry Times"
-                          prop="errorRetryTimes">
-              <bc-input v-model="form.errorRetryTimes"
-                        :width="265"
-                        type="number"
-                        placeholder="default 3"></bc-input>
+            <bc-form-item label="Error Retry Times" prop="errorRetryTimes">
+              <bc-input v-model="form.errorRetryTimes" :width="265" type="number" placeholder="default 3"></bc-input>
             </bc-form-item>
           </div>
 
           <div class="config-form-item">
-          <bc-form-item label="Retry Intervals"
-                        prop="retryIntervals">
-            <bc-input v-model="form.retryIntervals"
-                      :width="265"
-                      placeholder="integer,separate by ;">
+          <bc-form-item label="Retry Intervals" prop="retryIntervals">
+            <bc-input v-model="form.retryIntervals" :width="265" placeholder="integer,separate by ;">
               <span slot="append">ms</span>
             </bc-input>
           </bc-form-item>
 
-          <bc-form-item label="Message Type"
-                        prop="msgType">
+          <bc-form-item label="Message Type" prop="msgType">
             <bc-select placehold="Please select" :width="265" v-model.number="form.msgType">
               <bc-option v-for="item in dict.topic.msgTypes"
                     :value=item.value
@@ -223,8 +198,7 @@
 
           <template v-if="(parseInt(form.msgType,10)===1)">
             <div class="config-form-item">
-              <bc-form-item label="Enable groovyScript"
-                            prop="enableGroovy">
+              <bc-form-item label="Enable groovyScript" prop="enableGroovy">
                 <bc-select placehold="Please select" :width="265" v-model.number="form.enableGroovy">
                   <bc-option v-for="item in dict.topic.groovyStates"
                     :value=item.value
@@ -233,8 +207,7 @@
                 </bc-select>
               </bc-form-item>
 
-              <bc-form-item label="Enable Transit"
-                            prop="enableTransit">
+              <bc-form-item label="Enable Transit" prop="enableTransit">
                 <bc-select placehold="Please select" :width="265" v-model.number="form.enableTransit">
                   <bc-option v-for="item in dict.topic.transitStates"
                     :value=item.value
@@ -246,24 +219,15 @@
 
             <template v-if="(form.enableGroovy===0)">
               <bc-form-item label="GroovyScript">
-                <bc-input v-model="form.groovy"
-                          type="textarea"
-                          :rows="4"
-                          placeholder=""></bc-input>
+                <bc-input v-model="form.groovy" type="textarea" :rows="4" placeholder=""></bc-input>
               </bc-form-item>
             </template>
 
             <template v-if="(form.enableTransit===0)">
               <bc-form-item label="Transit">
-                <div class="conf-margin"
-                      v-for="(item,i) in transits"
-                      :key="i">
-                  <bc-input v-model="item.key"
-                            placeholder="key"
-                            style="width:227px;margin-right: 10px;"></bc-input>
-                  <bc-input v-model="item.value"
-                            placeholder="value"
-                            :width="227"></bc-input>
+                <div class="conf-margin" v-for="(item,i) in transits" :key="i">
+                  <bc-input v-model="item.key" placeholder="key" style="width:227px;margin-right: 10px;"></bc-input>
+                  <bc-input v-model="item.value" placeholder="value" :width="227"></bc-input>
                   <span class="form-icon-operate" @click="addConf(transits)">
                     <bc-icon type="jia"></bc-icon>
                   </span>
@@ -276,8 +240,7 @@
           </template>
 
           <div class="config-form-item">
-            <bc-form-item label="Enable Sequential Consume"
-                          prop="enableOrder">
+            <bc-form-item label="Enable Sequential Consume" prop="enableOrder">
               <bc-select placehold="Please select" :width="265" v-model.number="form.enableOrder">
                 <bc-option v-for="item in dict.topic.orderStates"
                     :value=item.value
@@ -287,8 +250,7 @@
 
             </bc-form-item>
 
-            <bc-form-item label="Consume type"
-                          prop="consumeType">
+            <bc-form-item label="Consume type" prop="consumeType">
                 <bc-select placehold="Please select" :width="265" v-model.number="form.consumeType">
                   <bc-option v-for="item in dict.topic.consumeTypes"
                     :value=item.value
@@ -300,8 +262,7 @@
           </div>
 
           <template v-if="(form.enableOrder===0)">
-            <bc-form-item label="Basis ordering rules"
-                          prop="orderKey">
+            <bc-form-item label="Basis ordering rules" prop="orderKey">
               <bc-select placehold="Please select" v-model="form.orderKey">
                 <bc-option v-for="item in dict.topic.orderKeyTypes"
                           :value=item.value
@@ -312,18 +273,15 @@
             </bc-form-item>
 
             <template v-if="form.orderKey=='JsonPath'">
-              <bc-form-item label="JsonPath"
-                            prop="jsonPath">
-                <bc-input v-model="form.jsonPath"
-                          placeholder="Please input JsonPath"></bc-input>
+              <bc-form-item label="JsonPath" prop="jsonPath">
+                <bc-input v-model="form.jsonPath" placeholder="Please input JsonPath"></bc-input>
               </bc-form-item>
             </template>
           </template>
 
           <template v-if="(parseInt(form.consumeType,10)===2)">
             <div class="config-form-item">
-              <bc-form-item label="HttpMethod"
-                            prop="httpMethod">
+              <bc-form-item label="HttpMethod" prop="httpMethod">
                 <bc-select placehold="Please select" :width='265' v-model.number="form.httpMethod">
                   <bc-option v-for="item in dict.topic.httpMethodTypes"
                       :value=item.value
@@ -332,11 +290,8 @@
                 </bc-select>
 
               </bc-form-item>
-              <bc-form-item label="Message push type"
-                            prop="msgPushType">
-                <bc-select v-model="form.msgPushType"
-                            placeholder="Please select"
-                            :width='265'>
+              <bc-form-item label="Message push type" prop="msgPushType">
+                <bc-select v-model="form.msgPushType" placeholder="Please select" :width='265'>
                   <bc-option v-for="(item,index) in msgPushTypes"
                               :value="item.value"
                               :label="item.label"
@@ -345,21 +300,16 @@
               </bc-form-item>
             </div>
             <div class="config-form-item">
-              <bc-form-item label="Http token"
-                            prop="httpToken">
+              <bc-form-item label="Http token" prop="httpToken">
                 <bc-input v-model="form.httpToken" :width='265'></bc-input>
               </bc-form-item>
 
-              <bc-form-item label="Push max concurrency"
-                            prop="pushMaxConcurrency">
+              <bc-form-item label="Push max concurrency" prop="pushMaxConcurrency">
                 <bc-input v-model="form.pushMaxConcurrency" :width='265'></bc-input>
               </bc-form-item>
             </div>
-            <bc-form-item label="Urls："
-                          prop="urls">
-              <div class="conf-margin"
-                    v-for="(item,index) in urls"
-                    :key="index">
+            <bc-form-item label="Urls：" prop="urls">
+              <div class="conf-margin" v-for="(item,index) in urls" :key="index">
                 <bc-form-item>
                   <bc-input v-model="item.key" width="87%" placeholder="Please input url"></bc-input>
                   <span class="form-icon-operate" @click="addUrl(urls)">
@@ -368,21 +318,13 @@
                   <span class="form-icon-operate" @click="removeUrl(item,urls)">
                     <bc-icon type="jian" v-if="urls.length>1"></bc-icon>
                   </span>
-
                 </bc-form-item>
-
               </div>
             </bc-form-item>
             <bc-form-item label="QueryParams">
-              <div class="conf-margin"
-                    v-for="(item,i) in queryParams"
-                    :key="i">
-                <bc-input v-model="item.key"
-                          placeholder="key"
-                          style="width:227px;margin-right: 10px;"></bc-input>
-                <bc-input v-model="item.value"
-                          placeholder="value"
-                          :width="227"></bc-input>
+              <div class="conf-margin" v-for="(item,i) in queryParams" :key="i">
+                <bc-input v-model="item.key" placeholder="key" style="width:227px;margin-right: 10px;"></bc-input>
+                <bc-input v-model="item.value" placeholder="value" :width="227"></bc-input>
                 <span class="form-icon-operate" @click="addConf(queryParams)">
                   <bc-icon type="jia"></bc-icon>
                 </span>
@@ -395,25 +337,16 @@
           </template>
 
           <template v-if="(parseInt(form.consumeType,10)===3)">
-            <bc-form-item label="Write type"
-                          prop="bigDataType">
+            <bc-form-item label="Write type" prop="bigDataType">
               <bc-select placehold="Please select" v-model.number="form.bigDataType">
-                <bc-option v-for="item in dict.topic.writeTypes"
-                          :value=item.value
-                          :label=item.label
-                          :key="item.label"></bc-option>
+                <bc-option v-for="item in dict.topic.writeTypes" :value=item.value :label=item.label :key="item.label"></bc-option>
               </bc-select>
-
             </bc-form-item>
 
-            <bc-form-item label="Write config"
-                          prop="bigDataConfig">
+            <bc-form-item label="Write config" prop="bigDataConfig">
               <div class="bc-codemirror">
-                <codemirror v-model="form.bigDataConfig"
-                            :options="editorOptions"></codemirror>
-                <bc-tooltip v-if="bigDataConfigError"
-                            :content="bigDataConfigError"
-                            placement="top">
+                <codemirror v-model="form.bigDataConfig" :options="editorOptions"></codemirror>
+                <bc-tooltip v-if="bigDataConfigError" :content="bigDataConfigError" placement="top">
                   <span class="bcui-icon-icon config-warnning"></span>
                 </bc-tooltip>
               </div>
@@ -440,23 +373,22 @@
       <div class="config-details">
       <div class="title-default">Config Detail</div>
 
-      <div v-for="(item,index) in configResultArr"
-            :key="item.key + index"
-            class="detail-item">
+      <div v-for="(item,index) in configResultArr" :key="item.key + index" class="detail-item">
         <div class="detail-item-key">{{item.key}}</div>
         <div class="detail-item-value">{{item.value}}</div>
       </div>
 
-      <div v-for="(item,index) in advanceConfig" v-if="form.apiType === 1"
-            :key="item.key + index"
-            class="detail-item">
+      <div v-for="(item,index) in alarmConfig" :key="item.key + index" class="detail-item">
         <div class="detail-item-key">{{item.key}}</div>
         <div class="detail-item-value">{{item.value}}</div>
       </div>
 
-      <div v-for="(item,index) in writeConfig" v-if="form.consumeType === 3"
-            :key="item.key + index"
-            class="detail-item">
+      <div v-for="(item,index) in advanceConfig" v-if="form.apiType === 1" :key="item.key + index" class="detail-item">
+        <div class="detail-item-key">{{item.key}}</div>
+        <div class="detail-item-value">{{item.value}}</div>
+      </div>
+
+      <div v-for="(item,index) in writeConfig" v-if="form.consumeType === 3" :key="item.key + index" class="detail-item">
         <div class="detail-item-key">{{item.key}}</div>
         <div class="detail-item-value">{{item.value}}</div>
       </div>
@@ -513,8 +445,9 @@
           clusterId: '',
           clusterIds: [],
           maxTps: 128,
-          alarmType: 0,
           alarmIsEnable: '',
+          alarmType: 0,
+          alarmLevel: 1,
           alarmMsgLag: '',
           alarmDelayTime: '',
           apiType: 1,
@@ -539,11 +472,13 @@
           jsonPath: '',
           pressureTraffic: 0,
           bigDataType: 0,
-          bigDataConfig: ''
+          bigDataConfig: '',
+          remark: ''
         },
         isSubmitting: false,
         filterableGroups: [],
         filterableTopics: [],
+        groupAlarmList: [],
         others: [{ key: '', value: '' }],
         transits: [{ key: '', value: '' }],
         queryParams: [{ key: '', value: '' }],
@@ -553,7 +488,8 @@
         isShowAdvancedConfig: false,
         urls: [{ key: '' }],
         iconForAdvancedConfig: '',
-
+        isShowAlarmConfig: true,
+        iconForAlarmConfig: 'chevron-top',
         isEditing: false,
         bigDataConfigError: ''
       };
@@ -578,31 +514,52 @@
       },
       configResultArr: {
         get () {
-          return [ {
-                     key: 'Consumer group',
-                     value: this.form.groupId ? this.getGroupNameById(this.form.groupId, this.groupList) : '',
-                   },
-                   {
-                     key: 'Topic',
-                     value: this.form.topicId ? this.getTopicNameById(this.form.topicId, this.topicList) : '',
-                   },
-                   {
-                     key: 'Consume maxTps',
-                     value: this.form.maxTps
-                   },
-                   {
-                     key: 'Receive Pressure Traffic',
-                     value: this.form.pressureTraffic === 1 ? 'Enable' : 'Disable',
-                   },
-                   {
-                     key: 'Api Level',
-                     value: this.form.apiType === 1 ? 'High level' : 'Low level',
+          return [{
+             key: 'Consumer group',
+             value: this.form.groupId ? this.getGroupNameById(this.form.groupId, this.groupList) : '',
+           },
+           {
+             key: 'Topic',
+             value: this.form.topicId ? this.getTopicNameById(this.form.topicId, this.topicList) : '',
+           },
+           {
+             key: 'Consume maxTps',
+             value: this.form.maxTps
+           },
+           {
+             key: 'Receive Pressure Traffic',
+             value: this.form.pressureTraffic === 1 ? 'Enable' : 'Disable',
+           },
+           {
+             key: 'Api Level',
+             value: this.form.apiType === 1 ? 'High level' : 'Low level',
           }];
         },
         set () {
         }
       },
-
+      alarmConfig: {
+        get () {
+          return [{
+            key: 'Alarm Type',
+            value: this.form.alarmType,
+          },
+          {
+            key: 'Alarm Level',
+            value: this.form.alarmLevel,
+          },
+          {
+            key: 'Alarm Msg Lag',
+            value: this.form.alarmMsgLag
+          },
+          {
+            key: 'Alarm Delay Time',
+            value: this.form.alarmDelayTime,
+          }];
+        },
+        set () {
+        }
+      },
       advanceConfig: {
         get () {
           return [
@@ -700,6 +657,16 @@
         }
       },
 
+      toggleAlarmConfig () {
+        if (this.isShowAlarmConfig) {
+          this.isShowAlarmConfig = false;
+          this.iconForAlarmConfig = 'chevron-bottom';
+        } else {
+          this.isShowAlarmConfig = true;
+          this.iconForAlarmConfig = 'chevron-top';
+        }
+      },
+
       // 针对线下环境初始化默认值
       initData () {
         if (window.ENV === 'daily' || window.ENV === 'development') {
@@ -782,10 +749,11 @@
           topicName: form.topicName || this.getTopicNameById(form.topicId),
           clusters: { 'ddmq': 1 },
           maxTps: Number(form.maxTps),
-          alarmType: 0,
           alarmIsEnable: 1,
-          alarmMsgLag: 10000,
-          alarmDelayTime: 300000,
+          alarmType: form.alarmType,
+          alarmLevel: form.alarmLevel,
+          alarmMsgLag: form.alarmMsgLag,
+          alarmDelayTime: form.alarmDelayTime,
           apiType: form.apiType,
           extraParams: this.formatMap(this.others),
           queryParams: {},
@@ -793,7 +761,8 @@
           httpQueryParams: {},
           urls: [],
           orderRemark: form.orderRemark,
-          pressureTraffic: form.pressureTraffic
+          pressureTraffic: form.pressureTraffic,
+          remark: form.remark
         };
 
         // 接口类型选择决定读取以下字段
@@ -924,6 +893,15 @@
               value: item.groupId
             };
           });
+          this.groupAlarmList = groupList.map((item) => {
+            return {
+              groupId: item.groupId,
+              alarmLevel: item.alarmLevel,
+              alarmMsgLag: item.alarmMsgLag,
+              alarmDelayTime: item.alarmDelayTime,
+              alarmGroup: item.alarmGroup
+            };
+          });
         });
       },
 
@@ -974,6 +952,16 @@
         this.urls = [{ key: '' }];
         this.$refs['form'].resetFields();
         this.$emit('input', false);
+      },
+
+      changeGroupId () {
+        this.groupAlarmList.forEach((item) => {
+          if (item.groupId === this.form.groupId) {
+            this.form.alarmLevel = item.alarmLevel;
+            this.form.alarmMsgLag = item.alarmMsgLag;
+            this.form.alarmDelayTime = item.alarmDelayTime;
+          }
+        });
       },
 
       init () {

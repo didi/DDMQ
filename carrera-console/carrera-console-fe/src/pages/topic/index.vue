@@ -12,12 +12,8 @@
       <div class="block-body">
         <div class="bcui-table-toolbar">
           <div class="bcui-table-toolbar__item pull-left">
-            <bc-button icon="refresh"
-                       type="gray"
-                       @click="getUserTopicList"></bc-button>
-            <bc-button icon="plus"
-                       type="primary"
-                       @click="handleCreateTopic">Topic
+            <bc-button icon="refresh" type="gray" @click="getUserTopicList"></bc-button>
+            <bc-button icon="plus" type="primary" @click="handleCreateTopic">Add
             </bc-button>
           </div>
 
@@ -34,10 +30,7 @@
                   class=""
                   empty-text="No data"
                   ref="table">
-          <bc-table-column field="topicName"
-                           index="topicName"
-                           label="Topic"
-                           width="400px">
+          <bc-table-column field="topicName" index="topicName" label="Topic" width="400px">
             <template slot-scope="scope">
               <router-link :class="['text-link']"
                            :to="{
@@ -49,27 +42,27 @@
             </template>
           </bc-table-column>
 
-           <bc-table-column field="clusterName"
-                           index="clusterName"
-                           label="Cluster">
+          <bc-table-column field="clusterName" index="clusterName" label="Cluster">
             <template slot-scope="scope">
               {{scope.record.conf[0].clusterName}}
             </template>
           </bc-table-column>
 
-          <bc-table-column field="produceTps"
-                           index="produceTps"
-                           label="Rate Limit TPS">
+          <bc-table-column field="produceTps" index="produceTps" label="Rate Limit TPS">
             <template slot-scope="scope">
               {{scope.record.conf[0].produceTps}}
             </template>
           </bc-table-column>
-          <bc-table-column field="operate"
-                           index="operate"
-                           label="Operation"
-                           width="200px">
+
+          <bc-table-column field="description" index="description" label="Description">
             <template slot-scope="scope">
-              <a :class="['text-link']" @click="handleEditTopic(scope.record)">Edit Topic</a>
+              {{scope.record.description}}
+            </template>
+          </bc-table-column>
+
+          <bc-table-column field="operate" index="operate" label="Operation" width="200px">
+            <template slot-scope="scope">
+              <a :class="['text-link']" @click="handleEditTopic(scope.record)">Edit</a>
               <a :class="['text-link']" @click="handleGetMessage(scope.record)">Sampling</a>
             </template>
           </bc-table-column>

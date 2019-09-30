@@ -1,7 +1,7 @@
 #!/bin/bash
 
-WEBAPPS="/home/xiaoju/tomcat/webapps"
-TOMCATBIN="/home/xiaoju/tomcat/bin"
+WEBAPPS="/root/tomcat/webapps"
+TOMCATBIN="/root/tomcat/bin"
 
 function start() {
 	OLD_PID="`pgrep -f org.apache.catalina.startup.Bootstrap`"
@@ -11,8 +11,8 @@ function start() {
     fi
 
     rm -rf $WEBAPPS/carrera
-    rm $WEBAPPS/carrera-console.war
-    cp carrera-console.war $WEBAPPS
+    rm $WEBAPPS/carrera.war
+    cp carrera.war $WEBAPPS
     $TOMCATBIN/startup.sh
     echo "tomcat started" >> control.log
 }

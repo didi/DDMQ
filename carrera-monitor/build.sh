@@ -23,4 +23,5 @@ mkdir -p ${OUTPATH}/target
 cp control.sh ${OUTPATH}/
 cp src/main/resources/monitor.yaml ${OUTPATH}/conf/
 cp src/main/resources/logback.xml ${OUTPATH}/conf/
+cp src/main/resources/notice.properties ${OUTPATH}/conf/
 cp target/carrera-monitor-1.0.0-SNAPSHOT-jar-with-dependencies.jar ${OUTPATH}/target

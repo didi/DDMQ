@@ -52,6 +52,7 @@ public class ConsumeGroupVo extends ConsumeGroupBo {
         vo.setConsumeModeMapper(getConsumeModeStringMapper(consumeGroup.getGroupConsumeModeMapper()));
         vo.setSubscriptionNum(0);
         vo.setSubscriptionEnableNum(0);
+        vo.setRemark(consumeGroup.getRemark());
         return vo;
     }
 

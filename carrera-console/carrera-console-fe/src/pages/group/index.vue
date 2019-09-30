@@ -16,7 +16,7 @@
                         @click="getGroupList"></bc-button>
             <bc-button icon="plus"
                         type="primary"
-                        @click="handleCreateGroup">Consumer Group
+                        @click="handleCreateGroup">Add
             </bc-button>
             <bc-button-group>
               <bc-button type="gray"
@@ -50,18 +50,24 @@
                   @on-check-all="handleCheckTableAll"
                   empty-text="No data"
                   ref="table">
-            <bc-table-column field="groupName" index="groupName" label="Consumer Group">
+            <bc-table-column field="groupName" index="groupName" label="Group Name">
             </bc-table-column>
             <bc-table-column field="subscriptionNum" index="subscriptionNum" label="Subscription Number">
             </bc-table-column>
             <bc-table-column field="subscriptionEnableNum" index="subscriptionEnableNum" label="Enabled Subscription Number">
             </bc-table-column>
 
+            <bc-table-column field="remark" index="remark" label="Remark">
+              <template slot-scope="scope">
+                {{scope.record.remark}}
+              </template>
+            </bc-table-column>
+
             <bc-table-column field="operate" index="operate" label="Operation" width="430px">
               <template slot-scope="scope">
                 <router-link class="text-link" :to="{ name: 'subscribes', query: { groupId: scope.record.groupId} }">Subscriptions</router-link>
-                <a :class="['text-link', scope.record.subscriptionNum ? '':'disable-text-link']" href="" @click.prevent="handleConsume(scope.record)">Consume Progress</a>
-                <a :class="['text-link']" @click="handleEditGroup(scope.record)">Edit Consumer Group</a>
+                <a :class="['text-link', scope.record.subscriptionNum ? '':'disable-text-link']" href="" @click.prevent="handleConsume(scope.record)">Progress</a>
+                <a :class="['text-link']" @click="handleEditGroup(scope.record)">Edit</a>
               </template>
             </bc-table-column>
         </bc-table>
