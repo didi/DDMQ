@@ -26,7 +26,7 @@ class Carrera
     // 一次拉取能获取到的最大消息条数，服务端根据此值和服务端的配置，取最小值
     const MAX_BATCH_SIZE = 1;
     // 拉取消息时，在服务端等待消息的最长时间
-    const MAX_LINGER_TIME = 50;
+    const MAX_LINGER_TIME = 500;
     // 日志格式2016-10-31 12:02:01 || {msg}
     const LOG_FORMAT = "%s || %s";
     /*  ...  */
@@ -76,6 +76,8 @@ class Carrera
 
     private $log_path;
 
+    public $proxyLocked = false;
+
     public function __construct()
     {
         $ci = get_instance();
@@ -121,6 +123,7 @@ class Carrera
 
         $startTime = microtime(true);
         try {
+            $this->proxyLocked = true;
             $ret = $this->pullWithThrift('pull', $request);
             switch ($ret['code']) {
                 case self::OK:
@@ -134,6 +137,7 @@ class Carrera
                     break;
             }
         } catch (\Exception $e) {
+            $this->proxyLocked = false;
             $ret = array(
                 'code' => self::CLIENT_EXCEPTION,
                 'msg' => $e->getMessage(),
@@ -202,6 +206,7 @@ class Carrera
 
         $startTime = microtime(true);
         try {
+            $this->proxyLocked = true;
             $ret = $this->pullWithThrift('fetch', $request);
             switch ($ret['code']) {
                 case self::OK:
@@ -215,6 +220,7 @@ class Carrera
                     break;
             }
         } catch (\Exception $e) {
+            $this->proxyLocked = false;
             $ret = array(
                 'code' => self::CLIENT_EXCEPTION,
                 'msg' => $e->getMessage(),
@@ -294,6 +300,7 @@ class Carrera
             );
             $status = 'failure';
         }
+        $this->proxyLocked = false;
         $used = (microtime(true) - $startTime) * 1000;
         $addr = $ret['ip'];
 
@@ -362,6 +369,7 @@ class Carrera
             );
             $status = 'failure';
         }
+        $this->proxyLocked = false;
         $used = (microtime(true) - $startTime) * 1000;
         $addr = $ret['ip'];
 
@@ -386,21 +394,29 @@ class Carrera
 
     private function pullWithThrift($cmd, $request)
     {
-        $proxyAddr = null;
+        static $proxyAddr;
+
         $tmpProxyList = $this->proxyList;
+        if (!$proxyAddr) {
+            $proxyIndex = array_rand($tmpProxyList, 1);
+            $proxyAddr = $tmpProxyList[$proxyIndex];
+        }
+
         $retryCount = 0;
         do {
             try {
-                if ($proxyAddr != null) {
-                    if (count($tmpProxyList) <= 1) {
-                        $tmpProxyList = $this->proxyList;
-                    } else {
-                        $rmProxyIndex = array_search($proxyAddr, $tmpProxyList);
-                        unset($tmpProxyList[$rmProxyIndex]);
+                if ($retryCount > 1) {
+                    if (!$this->proxyLocked) {
+                        if (count($tmpProxyList) <= 1) {
+                            $tmpProxyList = $this->proxyList;
+                        } else {
+                            $rmProxyIndex = array_search($proxyAddr, $tmpProxyList);
+                            unset($tmpProxyList[$rmProxyIndex]);
+                        }
+                        $proxyIndex = array_rand($tmpProxyList, 1);
+                        $proxyAddr = $tmpProxyList[$proxyIndex];
                     }
                 }
-                $proxyIndex = array_rand($tmpProxyList, 1);
-                $proxyAddr = $tmpProxyList[$proxyIndex];
 
                 list($hostname, $port) = explode(':', $proxyAddr);
                 $socket = new TSocket($hostname, $port);
@@ -450,15 +466,6 @@ class Carrera
                     'ip' => $proxyAddr
                 );
             } catch (PullException $e) {
-                if (isset($transport)) {
-                    $transport->close();
-                }
-                $result = array(
-                    'code' => self::CLIENT_EXCEPTION,
-                    'msg' => $e->getMessage(),
-                    'ip' => $proxyAddr
-                );
-            } catch (\Exception $e) {
                 if (isset($transport)) {
                     $transport->close();
                 }
