@@ -4,7 +4,7 @@ require_once __DIR__ . '/thriftconf.php';
 use didi\carrera\consumer\proxy\ConsumerServiceClient;
 use didi\carrera\consumer\proxy\PullRequest;
 use didi\carrera\consumer\proxy\AckResult;
-use didi\carrera\consumer\proxy\ConsumeStatsRequest;
+use didi\carrera\consumer\proxy\PullResponse;
 use didi\carrera\consumer\proxy\FetchRequest;
 use didi\carrera\consumer\proxy\ConsumeResult;
 use didi\carrera\consumer\proxy\PullException;
@@ -34,6 +34,7 @@ class Carrera
     // 错误码
     const OK = 0;
     const CACHE_OK = 1;
+    const EMPTY_RET = 2;
     const DOWNGRADE = 100;
     const CLIENT_EXCEPTION = 101;
     const MISSING_PARAMETERS = 102;
@@ -145,7 +146,7 @@ class Carrera
             $status = 'failure';
         }
         $used = (microtime(true) - $startTime) * 1000;
-        $addr = $ret['ip'];
+        $addr = isset($ret['ip']) ? $ret['ip'] : '';
 
         $logInfo = array(
             'opera_stat_key' => 'carrera_trace',
