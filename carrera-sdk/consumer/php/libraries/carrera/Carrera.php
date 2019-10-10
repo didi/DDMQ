@@ -123,28 +123,34 @@ class Carrera
         ));
 
         $startTime = microtime(true);
-        try {
-            $this->proxyLocked = true;
-            $ret = $this->pullWithThrift('pull', $request);
-            switch ($ret['code']) {
-                case self::OK:
-                    $status = 'success';
-                    break;
-                case self::CACHE_OK:
-                    $status = 'cache_ok';
-                    break;
-                default:
-                    $status = 'failure';
-                    break;
+
+        $retryCount = 0;
+        do {
+            try {
+                $this->proxyLocked = true;
+                $ret = $this->pullWithThrift('pull', $request);
+                switch ($ret['code']) {
+                    case self::OK:
+                        $status = 'success';
+                        break;
+                    case self::CACHE_OK:
+                        $status = 'cache_ok';
+                        break;
+                    default:
+                        $status = 'failure';
+                        break;
+                }
+            } catch (\Exception $e) {
+                $this->proxyLocked = false;
+                $ret = array(
+                    'code' => self::CLIENT_EXCEPTION,
+                    'msg' => $e->getMessage(),
+                );
+                $status = 'failure';
+                sleep(self::RETRY_INTERVAL);
             }
-        } catch (\Exception $e) {
-            $this->proxyLocked = false;
-            $ret = array(
-                'code' => self::CLIENT_EXCEPTION,
-                'msg' => $e->getMessage(),
-            );
-            $status = 'failure';
-        }
+        } while ($retryCount++ < $this->clientRetry);
+
         $used = (microtime(true) - $startTime) * 1000;
         $addr = isset($ret['ip']) ? $ret['ip'] : '';
 
@@ -433,20 +439,28 @@ class Carrera
 
                 switch ($cmd) {
                     case 'pull':
-                        if ($response && $response->context->qid) {
-                            $ret = [
-                                'context' => $response->context,
-                                'messages' => $response->messages
-                            ];
-                            $result = array(
-                                'ret' => $ret,
-                                'code' => self::OK,
-                                'msg' => 'success',
-                                'ip' => $proxyAddr
-                            );
-                            return $result;
-                        } else {
-                            sleep(self::RETRY_INTERVAL);
+                        if ($response instanceof PullResponse) {
+                            if ($response->context->qid) {
+                                $ret = [
+                                    'context' => $response->context,
+                                    'messages' => $response->messages
+                                ];
+                                $result = array(
+                                    'ret' => $ret,
+                                    'code' => self::OK,
+                                    'msg' => 'success',
+                                    'ip' => $proxyAddr
+                                );
+                                return $result;
+                            } elseif ($retryCount > 1) {
+                                $result = array(
+                                    'ret' => null,
+                                    'code' => self::EMPTY_RET,
+                                    'msg' => 'empty',
+                                    'ip' => $proxyAddr
+                                );
+                                return $result;
+                            }
                         }
                         break;
                     default:
@@ -466,6 +480,7 @@ class Carrera
                     'msg' => 'failure',
                     'ip' => $proxyAddr
                 );
+                sleep(self::RETRY_INTERVAL);
             } catch (PullException $e) {
                 if (isset($transport)) {
                     $transport->close();
