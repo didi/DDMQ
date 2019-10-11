@@ -40,6 +40,11 @@ public class InternalController extends AbstractBaseController {
     @Autowired
     private ZKV4ConfigService zkv4ConfigService;
 
+    public static boolean validate(final String ip) {
+        String PATTERN = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
+        return ip.matches(PATTERN);
+    }
+
     @ResponseBody
     @RequestMapping(value = {"/createTopic"}, method = {RequestMethod.POST})
     public ConsoleBaseResponse<?> createTopic(@Valid @RequestBody TopicOrderBo<AcceptTopicConfBo> topicinfo, BindingResult bindingResult) throws Exception {
@@ -91,12 +96,18 @@ public class InternalController extends AbstractBaseController {
     @ResponseBody
     @RequestMapping(value = {"/v4/addPProxy"}, method = {RequestMethod.GET})
     public ConsoleBaseResponse<?> addPProxy(@RequestParam String cluster, @RequestParam String host) throws Exception {
+        if (!validate(host)) {
+            return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "invalid host");
+        }
         return topicService.addPProxy(cluster, host);
     }
 
     @ResponseBody
     @RequestMapping(value = {"/v4/addCProxy"}, method = {RequestMethod.GET})
     public ConsoleBaseResponse<?> addCProxy(@RequestParam String cluster, @RequestParam String host) throws Exception {
+        if (!validate(host)) {
+            return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "invalid host");
+        }
         return consumeSubscriptionService.addCProxy(cluster, host);
     }
 
