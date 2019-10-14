@@ -7,16 +7,16 @@
     name: 'bc-icon',
     props: {
       type: {
-        type: String,
-      },
+        type: String
+      }
     },
     computed: {
-      iconClasses() {
+      iconClasses () {
         return [
           `${iconClassPrefix}`,
-          `${iconClassPrefix}-${this.type}`,
+          `${iconClassPrefix}-${this.type}`
         ];
-      },
-    },
+      }
+    }
   };
 </script>
