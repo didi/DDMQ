@@ -5,7 +5,8 @@ import message from '../ui-core/components/message'
 const http = axios.create({
   headers: {
     'X-Requested-With': 'XMLHttpRequest'
-  }
+  },
+  withCredentials: true
 });
 
 http.interceptors.response.use(function (response) {
