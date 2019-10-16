@@ -1,6 +1,7 @@
 package com.didi.carrera.console.web.controller.odin;
 
 
+import com.didi.carrera.console.config.ConsoleConfig;
 import com.didi.carrera.console.service.ClusterService;
 import com.didi.carrera.console.service.ConsumeGroupService;
 import com.didi.carrera.console.service.ConsumeSubscriptionService;
@@ -11,9 +12,11 @@ import com.didi.carrera.console.web.ConsoleBaseResponse;
 import com.didi.carrera.console.web.controller.bo.AcceptTopicConfBo;
 import com.didi.carrera.console.web.controller.bo.ConsumeSubscriptionOrderBo;
 import com.didi.carrera.console.web.controller.bo.TopicOrderBo;
+import com.didi.carrera.console.web.util.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
@@ -43,6 +49,37 @@ public class InternalController extends AbstractBaseController {
     public static boolean validate(final String ip) {
         String PATTERN = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
         return ip.matches(PATTERN);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = {"/login"}, method = {RequestMethod.GET})
+    public ConsoleBaseResponse<?> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+        try {
+            if (ConsoleConfig.instance().getCarreraAdminUser().contains(username)
+                    && ConsoleConfig.instance().getCarreraAdminPassword().contains(password)) {
+
+                response.addCookie(CookieUtil.newCookie());
+                return ConsoleBaseResponse.success("success");
+            } else {
+                return ConsoleBaseResponse.success("fail");
+            }
+        } catch (Exception e) {
+            return ConsoleBaseResponse.success("fail");
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = {"/logout"}, method = {RequestMethod.GET})
+    public ConsoleBaseResponse<?> logout(@RequestParam String username, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return ConsoleBaseResponse.success();
+        }
+        for (Cookie cookie : cookies) {
+            CookieUtil.cookies.remove(cookie.getValue());
+        }
+
+        return ConsoleBaseResponse.success();
     }
 
     @ResponseBody

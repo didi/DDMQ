@@ -16,6 +16,14 @@
     </context:component-scan>
     <mvc:default-servlet-handler/>
 
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.didi.carrera.console.web.controller.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <mvc:annotation-driven>

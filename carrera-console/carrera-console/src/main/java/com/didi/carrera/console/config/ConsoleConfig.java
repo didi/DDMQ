@@ -13,6 +13,8 @@ public class ConsoleConfig {
 
     private List<String> carreraAdminUser;
 
+    private List<String> carreraAdminPassword;
+
     public String getZookeeper() {
         return zookeeper;
     }
@@ -41,6 +43,14 @@ public class ConsoleConfig {
         this.carreraAdminUser = carreraAdminUser;
     }
 
+    public List<String> getCarreraAdminPassword() {
+        return carreraAdminPassword;
+    }
+
+    public void setCarreraAdminPassword(List<String> carreraAdminPassword) {
+        this.carreraAdminPassword = carreraAdminPassword;
+    }
+
     static {
         Yaml yaml = new Yaml();
         try (InputStream inputStream = ConsoleConfig.class.getResourceAsStream("/console.yaml")) {
@@ -56,6 +66,7 @@ public class ConsoleConfig {
                 "zookeeper='" + zookeeper + '\'' +
                 ", env='" + env + '\'' +
                 ", carreraAdminUser=" + carreraAdminUser +
+                ", carreraAdminPassword=" + carreraAdminPassword +
                 '}';
     }
 }
