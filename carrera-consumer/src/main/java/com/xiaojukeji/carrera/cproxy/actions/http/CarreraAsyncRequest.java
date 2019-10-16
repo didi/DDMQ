@@ -10,6 +10,7 @@ import com.xiaojukeji.carrera.cproxy.actions.FormParamsExtractAction;
 import com.xiaojukeji.carrera.cproxy.consumer.UpstreamJob;
 import com.xiaojukeji.carrera.cproxy.consumer.limiter.LimiterMgr;
 import com.xiaojukeji.carrera.cproxy.utils.*;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.http.HttpStatus;
 import org.asynchttpclient.AsyncCompletionHandler;
@@ -125,7 +126,7 @@ public class CarreraAsyncRequest extends AsyncCompletionHandler<Response> {
             long elapse = TimeUtils.getElapseTime(startTime);
             MetricUtils.httpRequestSuccessMetric(job, result == ProcessResult.OK, lastRequestErrno);
             if (result == ProcessResult.OK) {
-                LOGGER.info("Action Result: HttpAccess[result:success,request:{},used:{}ms]", this, elapse);
+                LOGGER.info("Action Result: HttpAccess[result:success,request:{},used:{}ms,url:{}]", this, elapse, getUrl());
                 job.onFinished(true);
             } else if (result == ProcessResult.FAIL) {
                 LOGGER.info("Action Result: HttpAccess[result:failure,request:{},used:{}ms,response:{}]",
@@ -338,13 +339,13 @@ public class CarreraAsyncRequest extends AsyncCompletionHandler<Response> {
 
     public String getUrl() {
         List<String> urls;
-        String customUrl = job.getContext().getProperties().get(HTTP_CALLBACK_URL_KEY);
-        //if producer specify the exact url
-        if (customUrl != null) {
+        if (MapUtils.isNotEmpty(job.getContext().getProperties()) && job.getContext().getProperties().get(HTTP_CALLBACK_URL_KEY) != null) {
+            String customUrl = job.getContext().getProperties().get(HTTP_CALLBACK_URL_KEY);
             urls = Lists.newArrayList(customUrl.split(HTTP_CALLBACK_URL_KEY_SPLITER));
         } else {
             urls = job.getUrls();
         }
+
         return urls.get((startIdx + job.getErrorRetryCnt()) % urls.size());
     }
 
