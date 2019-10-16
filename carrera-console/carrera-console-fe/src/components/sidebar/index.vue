@@ -197,14 +197,25 @@
                            <i class="icon bcui-icon-shoucang prefix-icon"></i>
                           <span>Subscription</span>
                           </bc-menu-item>
+            <bc-menu-item name="/logout"
+                          @click.native="gotoLogin">
+                           <i class="icon bcui-icon-power-off prefix-icon"></i>
+                          <span>Logout</span>
+                          </bc-menu-item>
         </bc-menu>
       </div>
     </div>
   </div>
 </template>
 <script>
+  import loginMixins from '../../mixins/apis/login.js';
+  import { login } from '../../utils'
+
+  const { getToken, removeToken } = login;
+
   export default {
     name: 'sidebar',
+    mixins: [loginMixins],
     components: {},
     props: {},
     data () {
@@ -229,6 +240,18 @@
         this.$router.push({
           name: 'topics'
         });
+      },
+      gotoLogin () {
+        this.requestPostLogout({
+          params: {
+            username: getToken()
+          }
+        }).then(() => {
+          removeToken();
+          this.$router.push({
+            name: 'login'
+          });
+        })
       }
     },
 

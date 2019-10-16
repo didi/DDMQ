@@ -29,9 +29,10 @@ module.exports = merge(baseConfig, {
     },
     proxy: {
       '/carrera/api': {
-        target: 'http://xxxxx ',
+        target: 'http://10.96.83.87:8080/',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        cookieDomainRewrite: 'localhost'
       }
     }
   },
