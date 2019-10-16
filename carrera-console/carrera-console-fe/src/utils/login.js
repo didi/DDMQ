@@ -11,3 +11,7 @@ export const getToken = () => {
   if (token) return token
   else return false
 }
+
+export const removeToken = () => {
+  Cookies.remove(COOKIE_KEY)
+}

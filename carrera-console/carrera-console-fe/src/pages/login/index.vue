@@ -61,7 +61,7 @@
           :label-width="0"
           prop="password"
         >
-          <bc-input v-model="form.password" type="password" placeholder="Password"></bc-input>
+          <bc-input v-model="form.password" type="password" placeholder="Password" @keyup.enter.native="handleSubmit"></bc-input>
           <check-mark :valid="valid.password"></check-mark>
         </bc-form-item>
         <bc-form-item
@@ -86,6 +86,10 @@
 </template>
 
 <script>
+  import loginMixins from '../../mixins/apis/login';
+  import { login } from '../../utils';
+
+  const { setToken } = login;
   const prefix = 'login';
 
   const checkMark = {
@@ -106,6 +110,7 @@
 
   export default {
     name: prefix,
+    mixins: [loginMixins],
     components: {
       checkMark
     },
@@ -168,17 +173,26 @@
         this.$refs.loginForm.validate((valid) => {
           if (valid) {
             const { username, password } = this.form;
-            const mockRequest = new Promise((resolve) => {
-              return setTimeout(() => { resolve() }, 1000);
-            })
             this.loading = true;
-            mockRequest.then(() => {
-              console.log('username', username);
-              console.log('password', password);
+            this.requestPostLogin({
+              params: {
+                username,
+                password
+              }
+            }).then(({ data }) => {
+              if (data === 'success') {
+                console.log('data', data);
+                setToken(username);
+                this.$router.push({
+                  name: 'intro'
+                });
+              } else {
+                this.$message.error('Username or Password incorrect');
+                this.$refs.loginForm.resetFields();
+              }
             }).finally(() => {
               this.loading = false;
             })
-            // login(this)(userName, password);
           }
         });
       }
