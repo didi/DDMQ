@@ -2,6 +2,8 @@ import axios from 'axios';
 import router from '../router';
 import message from '../ui-core/components/message'
 
+let notified = false;
+
 const http = axios.create({
   headers: {
     'X-Requested-With': 'XMLHttpRequest'
@@ -10,6 +12,7 @@ const http = axios.create({
 });
 
 http.interceptors.response.use(function (response) {
+  notified = false;
   return response;
 }, function (error) {
   authorizeHandle(error);
@@ -18,11 +21,12 @@ http.interceptors.response.use(function (response) {
 
 function authorizeHandle ({ response }) {
   const { status } = response;
-  if (status === 401) {
+  if (status === 401 && !notified) {
     message.info('Not logging');
-    return router.push({
+    router.push({
       name: 'login'
     })
+    notified = true;
   }
 }
 

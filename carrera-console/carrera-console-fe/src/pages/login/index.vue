@@ -5,6 +5,11 @@
   height: 100%;
   background: @backgroundColor;
   position: relative;
+  .header h1{
+    span ~ span {
+      padding-left: 15px;
+    }
+  }
   .container {
     min-width: 800px;
     padding: 60px 150px 72px;
@@ -47,7 +52,7 @@
   <div class="login">
     <div class="container">
       <div class="header">
-        <h1>DDMQ Login</h1>
+        <h1><span>DDMQ</span><span>Login</span></h1>
       </div>
       <bc-form ref="loginForm" :rules="rules" :model="form">
         <bc-form-item
