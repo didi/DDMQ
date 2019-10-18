@@ -21,8 +21,8 @@ http.interceptors.response.use(function (response) {
 
 function authorizeHandle ({ response }) {
   const { status } = response;
-  if (status === 401 && !notified) {
-    message.info('Not logging');
+  if (status === 401) {
+    if (!notified) message.info('Not logging');
     router.push({
       name: 'login'
     })

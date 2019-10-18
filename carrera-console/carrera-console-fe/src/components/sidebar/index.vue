@@ -214,11 +214,6 @@
                            <i class="icon bcui-icon-shoucang prefix-icon"></i>
                           <span>Subscription</span>
                           </bc-menu-item>
-            <bc-menu-item name="/logout"
-                          @click.native="gotoLogin">
-                           <i class="icon bcui-icon-power-off prefix-icon"></i>
-                          <span>Logout</span>
-                          </bc-menu-item>
         </bc-menu>
       </div>
       <div class="bcui-menu-item logout-button" @click="confirmLogout">
