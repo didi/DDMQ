@@ -110,10 +110,10 @@ public class KafkaClusterProducer implements ClusterProducer {
             props.put(ProducerConfig.METADATA_MAX_AGE_CONFIG, config.getMetadataMaxAge());
         }
 
-        props.put(ProducerConfig.TIMEOUT_CONFIG, config.getAckTimeout());
+//        props.put(ProducerConfig.TIMEOUT_CONFIG, config.getAckTimeout());
         props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, config.getBufferMemory());
-        props.put(ProducerConfig.BLOCK_ON_BUFFER_FULL_CONFIG, false);
-        props.put(ProducerConfig.METADATA_FETCH_TIMEOUT_CONFIG, config.getMetadataFetchTimeout());
+//        props.put(ProducerConfig.BLOCK_ON_BUFFER_FULL_CONFIG, false);
+//        props.put(ProducerConfig.METADATA_FETCH_TIMEOUT_CONFIG, config.getMetadataFetchTimeout());
 
         String hostname = "UNKNOWN_HOST";
         try {

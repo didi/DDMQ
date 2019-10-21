@@ -22,6 +22,7 @@ public class CarreraConfiguration implements ConfigurationValidator {
     private boolean useAutoBatch = false;
     private BatchMQProducerConfiguration autoBatch;
     private boolean warmUpConnection;
+    private List<String> kafkaAdapterVip;
 
     private int maxTps = 100000;
     private double tpsWarningRatio = 0.9;
@@ -176,6 +177,14 @@ public class CarreraConfiguration implements ConfigurationValidator {
         this.limiterFailureRetryQueueSize = limiterFailureRetryQueueSize;
     }
 
+    public List<String> getKafkaAdapterVip() {
+        return kafkaAdapterVip;
+    }
+
+    public void setKafkaAdapterVip(List<String> kafkaAdapterVip) {
+        this.kafkaAdapterVip = kafkaAdapterVip;
+    }
+
     @Override
     public boolean validate() throws ConfigException {
         if (CollectionUtils.isEmpty(retryDelays)) {
@@ -215,6 +224,7 @@ public class CarreraConfiguration implements ConfigurationValidator {
                 ", useAutoBatch=" + useAutoBatch +
                 ", autoBatch=" + autoBatch +
                 ", warmUpConnection=" + warmUpConnection +
+                ", kafkaAdapterVip=" + kafkaAdapterVip +
                 ", maxTps=" + maxTps +
                 ", tpsWarningRatio=" + tpsWarningRatio +
                 ", defaultTopicInfoConf=" + defaultTopicInfoConf +

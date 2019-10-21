@@ -220,6 +220,8 @@ public class CarreraRequest extends CarreraMessage implements SendCallback {
         }
         finished = true;
 
+        sendResult(result);
+
         if (resultHandler != null) {
             resultHandler.onComplete(result.getResult());
         }
@@ -246,6 +248,12 @@ public class CarreraRequest extends CarreraMessage implements SendCallback {
 
         LOGGER.info("sendResult:{},{},{},message:{},timeout:{},time:{}ms, limiterRetry:{}",
                 result, brokerCluster, sync ? "SYNC" : "ASYNC", this, timeout, TimeUtils.getElapseTime(startTime), limiterFailureRetryCount);
+    }
+
+    protected void sendResult(ProxySendResult result) {
+        if (resultHandler != null) {
+            resultHandler.onComplete(result.getResult());
+        }
     }
 
     public void onKafkaCompletion(RecordMetadata metadata, Exception exception) {

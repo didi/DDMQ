@@ -1,0 +1,122 @@
+{
+  "brokerClusters": ["R_auto-test"],
+  "carreraConfiguration": {
+    "autoBatch": {
+      "batchWaitMills": 5,
+      "doBatchThresholdBytes": 1024,
+      "encodeWorkerThreads": 4,
+      "maxBatchMessagesNumber": 32,
+      "maxBathBytes": 4096,
+      "maxContinuouslyRunningMills": 50,
+      "maxEncodeWorkerForEachBroker": 1
+    },
+    "cache": {
+      "cacheServer": {
+        "addrs": ["127.0.0.1:6379", "127.0.0.1:6379"],
+        "jedisPool": {
+          "blockWhenExhausted": false,
+          "evictionPolicyClassName": "org.apache.commons.pool2.impl.DefaultEvictionPolicy",
+          "fairness": false,
+          "jmxEnabled": true,
+          "jmxNamePrefix": "pool",
+          "lifo": true,
+          "maxIdle": 50,
+          "maxTotal": 100,
+          "maxWaitMillis": 10,
+          "minEvictableIdleTimeMillis": 60000,
+          "minIdle": 10,
+          "numTestsPerEvictionRun": -1,
+          "softMinEvictableIdleTimeMillis": 1800000,
+          "testOnBorrow": false,
+          "testOnCreate": false,
+          "testOnReturn": false,
+          "testWhileIdle": true,
+          "timeBetweenEvictionRunsMillis": 30000
+        },
+        "keys": ["pproxy_test_cache_0", "pproxy_test_cache_1", "pproxy_test_cache_2"],
+        "timeout": 5000
+      },
+      "delayStart": 300000,
+      "logQueueSizePeriod": 10000,
+      "maxFetchSize": 100,
+      "maxQueueSize": 1000000,
+      "rateLimit": 3000,
+      "retryInterval": 100,
+      "updateQueueSizePeriod": 500,
+      "workerThreadPerServerAndKey": 2
+    },
+    "defaultTopicInfoConf": {
+      "topics": [{
+        "autoBatch": true,
+        "delayTopic": false,
+        "produceMode": "SAME_IDC",
+        "strongOrder": false,
+        "topic": "publiclog",
+        "topicUnits": [{
+          "brokerCluster": "R_auto-test",
+          "idc": "gz01",
+          "maxTps": 1000,
+          "proxies": {"P_kafka_test":["127.0.0.1:9092"]},
+          "totalMaxTps": 1000
+        }],
+        "useCache": false
+      }]
+    },
+    "delay": {
+      "chronosInnerTopicPrefix": "R_auto-test_chronos_inner_",
+      "innerTopicNum": 1
+    },
+    "kafkaConfigurationMap": {},
+    "kafkaProducers": 3,
+    "maxTps": 3000,
+    "paramLength": {
+      "failWhenIllegal": true,
+      "keyLenMax": 255,
+      "tagLenMax": 255
+    },
+    "rateLimit": {
+      "staticMode": false
+    },
+    "kafkaAdapterVip": ["127.0.0.1:9092", "127.0.0.1:9092"],
+    "retryDelays": [200, 500, 1000, 5000, 10000],
+    "rocketmqConfigurationMap": {
+      "R_auto-test": {
+        "clientCallbackExecutorThreads": 4,
+        "compressMsgBodyOverHowmuch": 4096,
+        "groupPrefix": "carrera_rocketmq_producer_",
+        "heartbeatBrokerInterval": 10000,
+        "maxMessageSize": 2097152,
+        "namesrvAddrs": ["127.0.0.1:9876"],
+        "persistConsumerOffsetInterval": 5000,
+        "pollNameServerInterval": 2000,
+        "retryAnotherBrokerWhenNotStoreOK": false,
+        "retryTimesWhenSendFailed": 1,
+        "sendMsgTimeout": 3000
+      }
+    },
+    "rocketmqProducers": 3,
+    "thriftServer": {
+      "acceptQueueSizePerThread": 100,
+      "backlog": 50,
+      "clientTimeout": 0,
+      "maxReadBufferBytes": 5000000,
+      "port": 9614,
+      "selectorThreads": 8,
+      "timeoutCheckerThreads": 3,
+      "workerQueueSize": 20000,
+      "workerThreads": 0
+    },
+    "tpsWarningRatio": 0.8,
+    "useAutoBatch": false,
+    "useCache": false,
+    "useKafka": false,
+    "useRequestLimiter": true,
+    "useRocketmq": true,
+    "warmUpConnection": true,
+    "warmUpFetchTopicRouteInfo": true
+  },
+  "idc": "gz01",
+  "instance": "127.0.0.1:9614",
+  "proxyCluster": "P_kafka_test",
+  "topics": ["publiclog"]
+}

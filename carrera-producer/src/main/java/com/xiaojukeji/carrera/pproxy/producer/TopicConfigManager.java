@@ -4,6 +4,7 @@ import com.xiaojukeji.carrera.config.v4.TopicConfig;
 import com.xiaojukeji.carrera.config.v4.pproxy.RocketmqConfiguration;
 import com.xiaojukeji.carrera.config.v4.pproxy.TopicConfiguration;
 import com.xiaojukeji.carrera.config.v4.pproxy.TopicInfoConfiguration;
+import com.xiaojukeji.carrera.pproxy.kafka.network.Address;
 import com.xiaojukeji.carrera.thrift.Message;
 import com.xiaojukeji.carrera.pproxy.config.TopicInMgmtConfig;
 import org.apache.commons.collections4.CollectionUtils;
@@ -60,6 +61,11 @@ public class TopicConfigManager {
 
     public ConcurrentHashMap<String, TopicInMgmtConfig> getTopicConfigs() {
         return topicConfigs;
+    }
+
+    public List<Address> getProxyIpList(String topic) {
+        TopicInMgmtConfig topicInMgmtConfig = topicConfigs.get(topic);
+        return topicInMgmtConfig.getAllProxyIpList();
     }
 
     public void deleteTopic(String topic) {

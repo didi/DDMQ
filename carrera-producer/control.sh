@@ -1,10 +1,11 @@
 #!/bin/bash
 MAINCLASS=com.xiaojukeji.carrera.pproxy.proxy.ProducerProxyMain
-PROXY_VERSION=1.0.0-SNAPSHOT
+PROXY_VERSION=1.1.0-KFK-SNAPSHOT
+JAR_FILE="carrera-producer-${PROXY_VERSION}-jar-with-dependencies.jar"
 CONTROL_LOG="logs/control.log"
-
+IS_LOCAL_FILE_MODE=true
 function start() {
-    OLD_PID="`pgrep -f ${MAINCLASS}`"
+    OLD_PID="`pgrep -f ${JAR_FILE}`"
     if [ "$OLD_PID" ]; then
         echo "Proxy is already running, pid=$OLD_PID. Stop it first!"
         exit 1
@@ -52,7 +53,12 @@ function start() {
     JAVA_OPTS="${JAVA_OPTS} -Drocketmq.client.log.loadconfig=false"
     JAVA_OPTS="${JAVA_OPTS} -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
 
-    CLASSPATH="${PROXY_HOME}/carrera-producer-${PROXY_VERSION}-jar-with-dependencies.jar":${CLASSPATH}
+    if [ $IS_LOCAL_FILE_MODE == true ]; then
+       JAVA_OPTS="${JAVA_OPTS} -Dcom.xiaojukeji.carrera.config.isConfigLocalMode=true"
+       CARRERA_CONFIG="${PROXY_HOME}/conf/pproxy_config.json"
+    fi
+
+    CLASSPATH="${PROXY_HOME}/${JAR_FILE}":${CLASSPATH}
 
     CONSOLE_LOG=${PROXY_HOME}/logs/console.`date +%Y-%m-%d`.log
     date >> ${CONSOLE_LOG}
@@ -60,7 +66,7 @@ function start() {
     java ${JVM_OPTS} ${JAVA_OPTS} -cp ${CLASSPATH} ${MAINCLASS} ${CARRERA_CONFIG} >> ${CONSOLE_LOG} 2>&1 &
     sleep 2
     date >> ${CONTROL_LOG}
-    PID="`pgrep -f ${MAINCLASS}`"
+    PID="`pgrep -f ${JAR_FILE}`"
     if [ "$PID" ]; then
         echo "New Proxy is running, pid=$PID" >> ${CONTROL_LOG}
     else
@@ -72,15 +78,15 @@ function start() {
 function stop() {
     mkdir -p logs
     date >> logs/control.log
-    echo "Killing Proxy =`pgrep -f ${MAINCLASS}`" >> ${CONTROL_LOG}
-    pkill -15 -f ${MAINCLASS}
+    echo "Killing Proxy =`pgrep -f ${JAR_FILE}`" >> ${CONTROL_LOG}
+    pkill -15 -f ${JAR_FILE}
     t=0
-    while [[ `pgrep -f ${MAINCLASS}` && "$t" -lt 60 ]]; do
-        echo "time=$t,killing `pgrep -f ${MAINCLASS}`"
+    while [[ `pgrep -f ${JAR_FILE}` && "$t" -lt 60 ]]; do
+        echo "time=$t,killing `pgrep -f ${JAR_FILE}`"
         t=$(($t+1))
         sleep 1
     done
-    if [ `pgrep -f ${MAINCLASS}` ]; then
+    if [ `pgrep -f ${JAR_FILE}` ]; then
         echo "Stop Proxy Failed" >> ${CONTROL_LOG}
         exit 1
     fi

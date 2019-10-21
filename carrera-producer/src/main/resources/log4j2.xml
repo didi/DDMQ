@@ -60,6 +60,14 @@
             </Policies>
             <DefaultRolloverStrategy/>
         </RollingFile>
+        <RollingFile name="KafkaAdapterAppender" fileName="logs/kafka.log"
+                     filePattern="logs/old/kafka.log-%d{yyyy-MM-dd}.%i">
+            <PatternLayout pattern="%d{DEFAULT} [ %p ] %c{1} - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy/>
+        </RollingFile>
     </Appenders>
     <Loggers>
         <Root level="WARN">
@@ -96,6 +104,10 @@
         <AsyncLogger name="com.xiaojukeji.carrera" level="INFO" additivity="false">
             <AppenderRef ref="CarreraAppender"/>
             <AppenderRef ref="WarnAppender" level="WARN"/>
+        </AsyncLogger>
+        <AsyncLogger name="KafkaAdapterLog" level="INFO" additivity="false">
+            <AppenderRef ref="KafkaAdapterAppender" level="info"/>
+            <AppenderRef ref="stdout" level="INFO"/>
         </AsyncLogger>
     </Loggers>
 </Configuration>

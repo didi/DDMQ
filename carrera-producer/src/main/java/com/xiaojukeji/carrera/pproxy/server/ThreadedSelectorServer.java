@@ -26,6 +26,7 @@ public class ThreadedSelectorServer implements Server {
     private ProducerPool producerPool;
     private TServer server;
     private CarreraConfiguration config;
+    private ProducerAsyncServerImpl producerAsyncServer;
 
     public ThreadedSelectorServer(CarreraConfiguration config, ProducerPool producerPool) {
         this.config = config;
@@ -41,8 +42,9 @@ public class ThreadedSelectorServer implements Server {
                     .clientTimeout(config.getThriftServer().getClientTimeout())
             );
             TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(transport);
-            TProcessor asyncProcessor = new ProducerService.AsyncProcessor<>(new ProducerAsyncServerImpl(producerPool,
-                config.getThriftServer().getTimeoutCheckerThreads()));
+            producerAsyncServer = new ProducerAsyncServerImpl(producerPool,
+                    config.getThriftServer().getTimeoutCheckerThreads());
+            TProcessor asyncProcessor = new ProducerService.AsyncProcessor<>(producerAsyncServer);
             args.processor(asyncProcessor);
             args.protocolFactory(new TCompactProtocol.Factory());
             args.transportFactory(new TFramedTransport.Factory());
@@ -97,5 +99,9 @@ public class ThreadedSelectorServer implements Server {
             server.stop();
             server = null;
         }
+    }
+
+    public ProducerAsyncServerImpl getProducerAsyncServer() {
+        return producerAsyncServer;
     }
 }

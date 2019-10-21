@@ -2,7 +2,11 @@ package com.xiaojukeji.carrera.pproxy.config;
 
 import com.xiaojukeji.carrera.config.v4.TopicConfig;
 import com.xiaojukeji.carrera.config.v4.pproxy.TopicConfiguration;
+import com.xiaojukeji.carrera.pproxy.kafka.network.Address;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +45,7 @@ public class TopicInMgmtConfig {
     }
 
     public void updateCommonConfig(TopicConfig topicConfig){
+        topic = topicConfig.getTopic();
         delayTopic = topicConfig.isDelayTopic();
         autoBatch = topicConfig.isAutoBatch();
         strongOrder = topicConfig.isStrongOrder();
@@ -85,6 +90,20 @@ public class TopicInMgmtConfig {
 
     public Set<String> getBrokerClusters(){
         return clusterConfig.keySet();
+    }
+
+    public List<Address> getAllProxyIpList() {
+        List<Address> allProxyIpList = new ArrayList<>();
+        for(TopicConfiguration topicConfiguration : clusterConfig.values()) {
+            Map<String, Set<String>> proxies = topicConfiguration.getProxies();
+            for (Set<String> proxy : proxies.values()) {
+                for (String ipPort : proxy) {
+                    String[] addressArray = ipPort.trim().split(":");
+                    allProxyIpList.add(new Address(addressArray[0], new Integer(addressArray[1])));
+                }
+            }
+        }
+        return allProxyIpList;
     }
 
     public boolean hasCluster(){

@@ -2,6 +2,7 @@ package com.xiaojukeji.carrera.pproxy.proxy;
 
 import com.xiaojukeji.carrera.pproxy.producer.ConfigManager;
 import com.xiaojukeji.carrera.pproxy.producer.ProducerPool;
+import com.xiaojukeji.carrera.pproxy.server.KafkaServer;
 import com.xiaojukeji.carrera.pproxy.server.Server;
 import com.xiaojukeji.carrera.pproxy.server.ThreadedSelectorServer;
 import com.xiaojukeji.carrera.pproxy.utils.LogUtils;
@@ -14,6 +15,7 @@ public class ProxyApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyApp.class);
 
     private Server server;
+    private Server kafkaServer;
 
     private ProducerPool producerPool;
 
@@ -42,6 +44,13 @@ public class ProxyApp {
         producerPool.warmUp();
 
         server = new ThreadedSelectorServer(configManager.getProxyConfig().getCarreraConfiguration(), producerPool);
+
+        boolean useKafkaServer = true; //todo config
+        if (useKafkaServer) {
+            kafkaServer = new KafkaServer(producerPool, configManager);
+            kafkaServer.startServer();
+            LOGGER.info("kafka server start");
+        }
 
         LOGGER.info("Thrift server starts serving...");
         server.startServer();

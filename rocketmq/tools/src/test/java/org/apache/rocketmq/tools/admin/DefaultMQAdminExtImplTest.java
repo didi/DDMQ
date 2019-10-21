@@ -37,9 +37,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created by JiangHaiting@didichuxing.com on 2017/11/30.
- */
 public class DefaultMQAdminExtImplTest {
     private DefaultMQAdminExt mqAdmin;
 
@@ -50,7 +47,7 @@ public class DefaultMQAdminExtImplTest {
     @Before
     public void setUp() throws Exception {
         mqAdmin = new DefaultMQAdminExt();
-        mqAdmin.setNamesrvAddr("10.94.112.8:9876;10.94.112.80:9876");
+        mqAdmin.setNamesrvAddr("127.0.0.1:9876;127.0.0.1:9876");
         mqAdmin.start();
     }
 
