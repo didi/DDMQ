@@ -42,7 +42,7 @@ public class ProducerProxyMain {
                     proxyApp.stop();
                 }
                 System.out.println("carrera producer stopped!");
-                LOGGER.info("carrera consumer stopped!");
+                LOGGER.info("carrera producer stopped!");
             } catch (Exception e) {
                 LogUtils.logError("ProxyApp.start", "register shutdownHook error", e);
             } finally {

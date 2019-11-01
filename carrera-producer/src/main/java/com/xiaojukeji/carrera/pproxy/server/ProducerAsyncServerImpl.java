@@ -31,6 +31,8 @@ public class ProducerAsyncServerImpl implements ProducerService.AsyncIface {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProducerAsyncServerImpl.class);
 
+    public static final String HEARTBEAT_TOPIC = "carrera_heartbeat";
+
     private final ProducerPool producerPool;
 
     public ProducerAsyncServerImpl(ProducerPool producerPool, int timeoutCheckerThreads) {
@@ -41,6 +43,12 @@ public class ProducerAsyncServerImpl implements ProducerService.AsyncIface {
 
     @Override
     public void sendSync(Message message, long timeout, @SuppressWarnings("rawtypes") AsyncMethodCallback resultHandler) throws TException {
+        if (HEARTBEAT_TOPIC.equals(message.topic)) {
+            MetricUtils.incRequestCounter(message.topic, MetricUtils.REQUEST_SYNC);
+            resultHandler.onComplete(ProxySendResult.OK.getResult());
+            return;
+        }
+
         MetricUtils.incRequestCounter(message.topic, MetricUtils.REQUEST_SYNC);
         CarreraRequest request = new CarreraRequest(producerPool, message, timeout, resultHandler);
 
