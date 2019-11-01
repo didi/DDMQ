@@ -1,16 +1,30 @@
 package com.xiaojukeji.carrera.metric;
 
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.xiaojukeji.carrera.utils.CommonUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class Metric {
+
+    @JSONField(name = "metric")
     private String name;
+
+    private String endpoint;
+
     private long timestamp;
+
     private long value;
+
+    @JSONField(name = "tagsMap")
     private Map<String, String> tags = new HashMap<>();
+
     private long step;
+
+    private String counterType = "GAUGE";
 
     public Metric(String name, String host, long value, long step) {
         long current = System.currentTimeMillis() / 1000;
@@ -18,6 +32,7 @@ public class Metric {
         this.name = name;
         this.value = value;
         this.step = step;
+        this.endpoint = CommonUtils.getHostAddress();
         setTag("host", host);
     }
 
@@ -27,6 +42,14 @@ public class Metric {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 
     public long getTimestamp() {
@@ -65,14 +88,24 @@ public class Metric {
         tags.put(tag, value);
     }
 
+    public String getCounterType() {
+        return counterType;
+    }
+
+    public void setCounterType(String counterType) {
+        this.counterType = counterType;
+    }
+
     @Override
     public String toString() {
         return "Metric{" +
                 "name='" + name + '\'' +
+                ", endpoint='" + endpoint + '\'' +
                 ", timestamp=" + timestamp +
                 ", value=" + value +
                 ", tags=" + tags +
                 ", step=" + step +
+                ", counterType='" + counterType + '\'' +
                 '}';
     }
 }

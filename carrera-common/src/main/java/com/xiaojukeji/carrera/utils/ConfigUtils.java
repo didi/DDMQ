@@ -29,6 +29,10 @@ public class ConfigUtils {
         return defaultValue;
     }
 
+    public static String getDefaultConfig(String configKey, String defaultValue) {
+        return getDefaultConfig(configKey, defaultValue, String::valueOf);
+    }
+
     public static boolean getDefaultConfig(String configKey, boolean defaultValue) {
         return getDefaultConfig(configKey, defaultValue, Boolean::valueOf);
     }

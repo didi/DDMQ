@@ -2,6 +2,7 @@ package com.xiaojukeji.carrera.metric;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.xiaojukeji.carrera.utils.CommonFastJsonUtils;
+import com.xiaojukeji.carrera.utils.CommonUtils;
 import com.xiaojukeji.carrera.utils.ConfigUtils;
 import com.xiaojukeji.carrera.utils.HttpUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -31,10 +33,11 @@ public class MetricClient implements Runnable {
     private static final int SEND_THREAD_POOL_SIZE = 5;
     private static final int BLOCK_QUEUE_SIZE = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.queue.size", 50 * 1024);
     private static final boolean DISABLE_SEND_METRIC = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.disable", true);
+    private static final String pushUrl = ConfigUtils.getDefaultConfig("com.xiaojukeji.carrera.metric.url", StringUtils.EMPTY);
 
     private static final double RATE = 2000;
     private RateLimiter rateLimiter = RateLimiter.create(RATE);
-    private String pushUrl;
+
     private String hostName;
     private volatile boolean isRunning = true;
 
@@ -63,6 +66,12 @@ public class MetricClient implements Runnable {
 
     public void init() throws Exception {
         // init url and host etc.
+        this.hostName = getHostNameByInet();
+    }
+
+
+    private String getHostNameByInet() throws Exception {
+        return CommonUtils.getHostNameWithIpDefault();
     }
 
     public void shutDown() {
