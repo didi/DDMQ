@@ -35,6 +35,10 @@ import java.util.stream.Collectors;
 
 abstract class AbstractCarreraRocketMqConsumer extends BaseCarreraConsumer {
 
+    private static int HIGHLEVEL_CONSUMER_INSTANCE_NUM = Integer.valueOf(System.getProperty("carrera.highlevel.instance", "9"));
+
+    private static final String HIGHLEVEL = "high";
+
     private static volatile AtomicInteger instanceNum = new AtomicInteger(0);
 
     private volatile ScheduledFuture<?> rmqCommitFuture;
@@ -80,7 +84,8 @@ abstract class AbstractCarreraRocketMqConsumer extends BaseCarreraConsumer {
     }
 
     private void setup(DefaultMQPushConsumer rmqConsumer, RocketMQBaseConfig config, GroupConfig groupConfig) {
-        rmqConsumer.setInstanceName(rmqConsumer.getInstanceName() + (instanceNum.addAndGet(1) / 3000));
+        rmqConsumer.setInstanceName(RmqCidMaker.makeCid(HIGHLEVEL_CONSUMER_INSTANCE_NUM, group, brokerCluster, cProxyConfig.getProxyCluster(), this.cProxyConfig.getInstance(), HIGHLEVEL));
+
 
         if (config == null || config.getSubscription() == null) {
             Map<String, String> subscription = new HashMap<>();

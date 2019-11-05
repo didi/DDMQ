@@ -2,6 +2,7 @@ package com.xiaojukeji.carrera.cproxy.consumer.lowlevel;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.xiaojukeji.carrera.config.v4.cproxy.RocketmqConfiguration;
+import com.xiaojukeji.carrera.cproxy.consumer.RmqCidMaker;
 import com.xiaojukeji.carrera.thrift.consumer.AckResult;
 import com.xiaojukeji.carrera.thrift.consumer.FetchRequest;
 import com.xiaojukeji.carrera.thrift.consumer.FetchResponse;
@@ -41,6 +42,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class RmqFetcher extends AbstractTpsLimitedFetcher implements MessageQueueListener {
+
+    private static final String LOW_LEVEL_V2 = "low2";
+    private static int SECOND_LOWLEVEL_CONSUMER_INSTANCE_NUM = Integer.valueOf(System.getProperty("carrera.lowlevel.second.instance", "10"));
+
     public static final Logger LOGGER = getLogger(RmqFetcher.class);
 
     private volatile DefaultMQPullConsumer consumer;
@@ -256,7 +261,8 @@ public class RmqFetcher extends AbstractTpsLimitedFetcher implements MessageQueu
         String nameServers = StringUtils.join(rmqConfig.getNamesrvAddrs().iterator(), ";");
         consumer.setNamesrvAddr(nameServers);
         //必须这样设置。一个instance只能有一个group
-        consumer.setInstanceName(cid + System.currentTimeMillis());
+        consumer.setInstanceName(RmqCidMaker.makeCid(SECOND_LOWLEVEL_CONSUMER_INSTANCE_NUM, config.getGroup(), config.getBrokerCluster(), config.getcProxyConfig().getProxyCluster(), config.getInstance(), LOW_LEVEL_V2));//根据instancename 隔离highlevel和lowlevel的netty资源
+
         //fix 2018.6.14 lowlevel实例过多，netty线程未共享
         consumer.setClientCallbackExecutorThreads(1);
         consumer.setMessageQueueListener(this);
