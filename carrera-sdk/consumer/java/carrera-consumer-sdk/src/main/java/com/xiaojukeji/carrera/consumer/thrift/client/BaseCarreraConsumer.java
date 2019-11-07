@@ -6,6 +6,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -33,6 +34,10 @@ public abstract class BaseCarreraConsumer<REQ, RES> {
     private int ERROR_IGNORE_COUNT;//跟重试间隔和ERROR_IGNORE_INTERVAL_MS相关
 
     protected String type; // 用于区分上层消费实例的类型，如carrera/storm/jstorm/flink等。
+
+    private static final boolean OPEN_SSL = Boolean.valueOf(System.getProperty("carrera.ssl.open", "false"));
+    private static final String TRUST_STORE = System.getProperty("carrera.ssl.trustStore", "");
+    private static final String TRUST_PASS = System.getProperty("carrera.ssl.trustPass", "");
 
     /**
      * 单线程消费一个consumer proxy的客户端。config.servers只能指定一个server。
@@ -89,11 +94,20 @@ public abstract class BaseCarreraConsumer<REQ, RES> {
         return config;
     }
 
-    private synchronized void init() {
+    private synchronized void init() throws TTransportException {
         if (client != null) {
             return;
         }
-        TSocket socket = new TSocket(host, port, config.getTimeout());
+        TSocket socket;
+        if (OPEN_SSL) {
+            TSSLTransportFactory.TSSLTransportParameters parameters = new TSSLTransportFactory.TSSLTransportParameters();
+            parameters.setTrustStore(TRUST_STORE, TRUST_PASS);
+            socket = TSSLTransportFactory.getClientSocket(host, port, config.getTimeout(), parameters);
+        } else {
+            socket = new TSocket(host, port, config.getTimeout());
+            socket.open();
+        }
+
         transport = new TFramedTransport(socket);
         TProtocol protocol = new TCompactProtocol(transport);
         client = new ConsumerService.Client(protocol);
@@ -114,7 +128,7 @@ public abstract class BaseCarreraConsumer<REQ, RES> {
      * @throws InterruptedException
      */
     public void startConsume(BaseMessageProcessor processor) throws InterruptedException {
-        init();
+//        init();
         isRunning = true;
         LOGGER.info("start consume group:{},server:{},topic:{}", config.getGroupId(), config.getServers(), topic);
         try {

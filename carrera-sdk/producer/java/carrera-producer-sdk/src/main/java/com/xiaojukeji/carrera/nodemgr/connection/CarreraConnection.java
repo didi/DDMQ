@@ -7,6 +7,7 @@ import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolException;
 import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -21,14 +22,27 @@ public class CarreraConnection {
     private int clientTimeout;
     private TSocket socket;
 
+    private static final boolean OPEN_SSL = Boolean.valueOf(System.getProperty("carrera.ssl.open", "false"));
+    private static final String TRUST_STORE = System.getProperty("carrera.ssl.trustStore", "");
+    private static final String TRUST_PASS = System.getProperty("carrera.ssl.trustPass", "");
+
+
     public CarreraConnection(Node node, int clientTimeout) {
         this.node = node;
         this.clientTimeout = clientTimeout;
     }
 
     private ProducerService.Client createThriftClient() throws TTransportException {
-        socket = new TSocket(node.getIp(), node.getPort(), this.clientTimeout);
-        socket.open();
+        TSocket socket;
+        if (OPEN_SSL) {
+            TSSLTransportFactory.TSSLTransportParameters parameters = new TSSLTransportFactory.TSSLTransportParameters();
+            parameters.setTrustStore(TRUST_STORE, TRUST_PASS);
+            socket = TSSLTransportFactory.getClientSocket(node.getIp(), node.getPort(), clientTimeout, parameters);
+        } else {
+            socket = new TSocket(node.getIp(), node.getPort(), clientTimeout);
+            socket.open();
+        }
+
         TTransport transport = new TFramedTransport(socket);
         TProtocol protocol = new TCompactProtocol(transport);
         return new ProducerService.Client(protocol);
