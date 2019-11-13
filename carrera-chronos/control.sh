@@ -52,6 +52,8 @@ function start() {
     JVM_OPTS="${JVM_OPTS} -XX:+PreserveFramePointer -XX:-UseBiasedLocking -XX:-OmitStackTraceInFastThrow"
     JVM_OPTS="${JVM_OPTS} -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCApplicationConcurrentTime -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:${CHRONOS_LOG}/gc.log"
     JVM_OPTS="${JVM_OPTS} -XX:+PrintSafepointStatistics"
+    JVM_OPTS="${JVM_OPTS} -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m"
+
     CLASSPATH="${CHRONOS_HOME}/chronos-${CHRONOS_VERSION}-jar-with-dependencies.jar":${CLASSPATH}
 
     JAVA_OPTS="${JAVA_OPTS} -Dlog4j.configurationFile=file://${CHRONOS_HOME}/conf/log4j2.xml"

@@ -47,6 +47,7 @@ function start() {
     JVM_OPTS="${JVM_OPTS} -XX:+PreserveFramePointer -XX:-UseBiasedLocking -XX:-OmitStackTraceInFastThrow"
     JVM_OPTS="${JVM_OPTS} -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCApplicationConcurrentTime -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:${PROXY_HOME}/logs/gc.log"
     JVM_OPTS="${JVM_OPTS} -XX:+PrintSafepointStatistics"
+    JVM_OPTS="${JVM_OPTS} -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m"
 
     JAVA_OPTS="${JAVA_OPTS} -Dlog4j.configurationFile=file://${PROXY_HOME}/conf/log4j2.xml"
     JAVA_OPTS="${JAVA_OPTS} -Drocketmq.client.log.loadconfig=false"
