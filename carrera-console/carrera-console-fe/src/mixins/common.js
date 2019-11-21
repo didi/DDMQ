@@ -103,6 +103,18 @@ export default {
         }
       });
       return label;
+    },
+
+    formatUrlObject (arr, arrays) {
+      if (arr.length) {
+        arrays = [];
+        Object.keys(arr).forEach((item) => {
+          arrays.push({
+            key: arr[item]
+          });
+        });
+        return arrays;
+      }
     }
 
   }
