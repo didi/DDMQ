@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,24 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         Map<Long, Cluster> clusterMap = Maps.newHashMap();
         clusterService.findAll().forEach(cluster -> clusterMap.put(cluster.getId(), cluster));
         return clusterMap;
+    }
+
+    @PostConstruct
+    public void initZkData() {
+        LOGGER.info("start initZkData");
+
+        List<String> children = zkService.getChildren("/");
+        if (CollectionUtils.isNotEmpty(children) && children.contains("carrera")) {
+            LOGGER.info("already inited, skip.");
+            return;
+        }
+
+        try {
+            initAllZk();
+            initZkPath();
+        } catch (Exception e) {
+            LOGGER.error("failed to init zk on cluster init, possible zk not startup.", e);
+        }
     }
 
     @Override
