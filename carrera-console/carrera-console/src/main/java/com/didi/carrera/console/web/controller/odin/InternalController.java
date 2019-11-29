@@ -132,7 +132,7 @@ public class InternalController extends AbstractBaseController {
 
     @ResponseBody
     @RequestMapping(value = {"/v4/addPProxy"}, method = {RequestMethod.GET})
-    public ConsoleBaseResponse<?> addPProxy(@RequestParam String cluster, @RequestParam String host) throws Exception {
+    public ConsoleBaseResponse<?> addPProxy(@RequestParam(defaultValue = "ddmq") String cluster, @RequestParam String host) throws Exception {
         if (!validate(host)) {
             return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "invalid host");
         }
@@ -141,7 +141,7 @@ public class InternalController extends AbstractBaseController {
 
     @ResponseBody
     @RequestMapping(value = {"/v4/addCProxy"}, method = {RequestMethod.GET})
-    public ConsoleBaseResponse<?> addCProxy(@RequestParam String cluster, @RequestParam String host) throws Exception {
+    public ConsoleBaseResponse<?> addCProxy(@RequestParam(defaultValue = "ddmq") String cluster, @RequestParam String host) throws Exception {
         if (!validate(host)) {
             return ConsoleBaseResponse.error(ConsoleBaseResponse.Status.INVALID_PARAM, "invalid host");
         }
