@@ -50,7 +50,7 @@ public class DefaultMQAdminExtImplTest {
     @Before
     public void setUp() throws Exception {
         mqAdmin = new DefaultMQAdminExt();
-        mqAdmin.setNamesrvAddr("10.94.112.8:9876;10.94.112.80:9876");
+        mqAdmin.setNamesrvAddr("127.0.0.1:9876");
         mqAdmin.start();
     }
 
