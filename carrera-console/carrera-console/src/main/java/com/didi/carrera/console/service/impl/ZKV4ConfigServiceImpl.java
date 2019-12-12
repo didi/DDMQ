@@ -101,7 +101,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
         return clusterMap;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void initZkData() {
         LOGGER.info("start initZkData");
 
