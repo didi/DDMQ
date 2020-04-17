@@ -120,9 +120,8 @@
 Welcome to contribute by creating issues or sending pull requests. See [Contributing Guide](CONTRIBUTING.md) for guidelines.
 
 
-### Community
-<img src="image/dingGroup.jpg" alt="Mand Mobile Community" width="200"/>
-
+### Contact
+Feel free to contact DDMQ developers via <ddmq_open_source@didiglobal.com>
 
 ### License
 
