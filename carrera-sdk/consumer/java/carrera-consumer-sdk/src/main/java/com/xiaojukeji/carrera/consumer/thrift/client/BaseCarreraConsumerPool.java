@@ -82,47 +82,38 @@ public abstract class BaseCarreraConsumerPool {
     }
 
     private void startConsume(BaseMessageProcessor processor, int concurrency, Map<String, Integer> extraConcurrency, List<Node> servers) {
-        int totalThreads = concurrency > 0 ? Math.max(concurrency, servers.size()) : 0;
+        int serverCnt = servers.size();
+        int totalThreads = concurrency > 0 ? Math.max(concurrency, serverCnt) : 0;
         for (Integer topicConcurrency : extraConcurrency.values()) {
-            totalThreads += topicConcurrency > 0 ? Math.max(topicConcurrency, servers.size()) : 0;
+            totalThreads += topicConcurrency > 0 ? Math.max(topicConcurrency, serverCnt) : 0;
         }
         if (totalThreads == 0) {
             throw new RuntimeException("concurrency is too small, at least one for each server.");
         }
         executorService = Executors.newFixedThreadPool(totalThreads, new ThreadFactoryBuilder().setNameFormat("MessageProcess-%d").build());
-
-        Collections.shuffle(servers);
-
-        int serverCnt = servers.size();
-        if (concurrency > 0) {
-            if (concurrency < serverCnt) {
-                LOGGER.warn("concurrency({})<server number({}), use {} as concurrency", concurrency, serverCnt, serverCnt);
-                concurrency = serverCnt;
-            }
-            for (int i = 0; i < serverCnt; i++) {
-                int threadNumber = concurrency / serverCnt;
-                threadNumber += i < concurrency % serverCnt ? 1 : 0;
-                if (threadNumber == 0) {
-                    LOGGER.warn("no thread for server:{}", servers.get(i));
-                } else {
-                    createConsumer(processor, threadNumber, servers.get(i), null);
-                }
-            }
-        }
-
+        createConsumers(processor, concurrency, servers, null);
         for (Map.Entry<String, Integer> entry : extraConcurrency.entrySet()) {
             int c = entry.getValue();
-            if (c == 0) continue;
-            if (c < serverCnt) {
-                LOGGER.warn("concurrency({})<server number({}), use {} as concurrency", c, serverCnt, serverCnt);
-                c = serverCnt;
-            }
-            Collections.shuffle(servers);
-            for (int i = 0; i < serverCnt; i++) {
-                int threadNumber = c / serverCnt;
-                threadNumber += i < c % serverCnt ? 1 : 0;
-                createConsumer(processor, threadNumber, servers.get(i), entry.getKey());
-            }
+            String topic = entry.getKey();
+            createConsumers(processor, c, servers, topic);
+        }
+    }
+
+    protected void createConsumers(BaseMessageProcessor processor, int concurrency, List<Node> servers, String topic) {
+        if (concurrency <= 0) {
+            return;
+        }
+        int serverCnt = servers.size();
+        if (concurrency < serverCnt) {
+            LOGGER.warn("concurrency({})<server number({}), use {} as concurrency", concurrency, serverCnt, serverCnt);
+            concurrency = serverCnt;
+        }
+        Collections.shuffle(servers);
+        int threadNumber = concurrency / serverCnt;
+        int threadExtraNumber = concurrency % serverCnt;
+        for (int i = 0; i < serverCnt; i++) {
+            int extra = i < threadExtraNumber ? 1 : 0;
+            createConsumer(processor, threadNumber + extra, servers.get(i), topic);
         }
     }
 
