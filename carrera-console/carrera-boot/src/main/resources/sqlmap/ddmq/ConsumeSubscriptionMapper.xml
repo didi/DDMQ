@@ -1,0 +1,926 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.didi.carrera.console.dao.mapper.ConsumeSubscriptionMapper">
+  <resultMap id="BaseResultMap" type="com.didi.carrera.console.dao.model.ConsumeSubscription">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="group_id" jdbcType="BIGINT" property="groupId" />
+    <result column="group_name" jdbcType="VARCHAR" property="groupName" />
+    <result column="topic_id" jdbcType="BIGINT" property="topicId" />
+    <result column="topic_name" jdbcType="VARCHAR" property="topicName" />
+    <result column="cluster_id" jdbcType="BIGINT" property="clusterId" />
+    <result column="cluster_name" jdbcType="VARCHAR" property="clusterName" />
+    <result column="pressure_traffic" jdbcType="TINYINT" property="pressureTraffic" />
+    <result column="max_tps" jdbcType="DOUBLE" property="maxTps" />
+    <result column="alarm_type" jdbcType="TINYINT" property="alarmType" />
+    <result column="alarm_is_enable" jdbcType="TINYINT" property="alarmIsEnable" />
+    <result column="alarm_level" jdbcType="TINYINT" property="alarmLevel" />
+    <result column="alarm_msg_lag" jdbcType="INTEGER" property="alarmMsgLag" />
+    <result column="alarm_delay_time" jdbcType="INTEGER" property="alarmDelayTime" />
+    <result column="api_type" jdbcType="TINYINT" property="apiType" />
+    <result column="consume_timeout" jdbcType="INTEGER" property="consumeTimeout" />
+    <result column="error_retry_times" jdbcType="INTEGER" property="errorRetryTimes" />
+    <result column="retry_intervals" jdbcType="VARCHAR" property="retryIntervals" />
+    <result column="msg_type" jdbcType="TINYINT" property="msgType" />
+    <result column="enable_groovy" jdbcType="TINYINT" property="enableGroovy" />
+    <result column="enable_transit" jdbcType="TINYINT" property="enableTransit" />
+    <result column="enable_order" jdbcType="TINYINT" property="enableOrder" />
+    <result column="order_key" jdbcType="VARCHAR" property="orderKey" />
+    <result column="consume_type" jdbcType="TINYINT" property="consumeType" />
+    <result column="big_data_type" jdbcType="TINYINT" property="bigDataType" />
+    <result column="big_data_config" jdbcType="VARCHAR" property="bigDataConfig" />
+    <result column="urls" jdbcType="VARCHAR" property="urls" />
+    <result column="http_method" jdbcType="TINYINT" property="httpMethod" />
+    <result column="http_headers" jdbcType="VARCHAR" property="httpHeaders" />
+    <result column="http_query_params" jdbcType="VARCHAR" property="httpQueryParams" />
+    <result column="msg_push_type" jdbcType="TINYINT" property="msgPushType" />
+    <result column="http_token" jdbcType="VARCHAR" property="httpToken" />
+    <result column="push_max_concurrency" jdbcType="INTEGER" property="pushMaxConcurrency" />
+    <result column="actions" jdbcType="VARCHAR" property="actions" />
+    <result column="config" jdbcType="VARCHAR" property="config" />
+    <result column="state" jdbcType="TINYINT" property="state" />
+    <result column="extra_params" jdbcType="VARCHAR" property="extraParams" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.didi.carrera.console.dao.model.ConsumeSubscription">
+    <result column="groovy" jdbcType="LONGVARCHAR" property="groovy" />
+    <result column="transit" jdbcType="LONGVARCHAR" property="transit" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, group_id, group_name, topic_id, topic_name, cluster_id, cluster_name, pressure_traffic, 
+    max_tps, alarm_type, alarm_is_enable, alarm_level, alarm_msg_lag, alarm_delay_time, 
+    api_type, consume_timeout, error_retry_times, retry_intervals, msg_type, enable_groovy, 
+    enable_transit, enable_order, order_key, consume_type, big_data_type, big_data_config, 
+    urls, http_method, http_headers, http_query_params, msg_push_type, http_token, push_max_concurrency, 
+    actions, config, state, extra_params, remark, is_delete, create_time, modify_time
+  </sql>
+  <sql id="Blob_Column_List">
+    groovy, transit
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscriptionCriteria" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from consume_subscription
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscriptionCriteria" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from consume_subscription
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <if test="start != null and start >= 0 ">
+      limit #{start}
+    </if>
+    <if test="start != null and start >= 0 and end != null and end >= 0">
+      , #{end}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from consume_subscription
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from consume_subscription
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscriptionCriteria">
+    delete from consume_subscription
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscription" useGeneratedKeys="true">
+    insert into consume_subscription (group_id, group_name, topic_id, 
+      topic_name, cluster_id, cluster_name, 
+      pressure_traffic, max_tps, alarm_type, 
+      alarm_is_enable, alarm_level, alarm_msg_lag, 
+      alarm_delay_time, api_type, consume_timeout, 
+      error_retry_times, retry_intervals, msg_type, 
+      enable_groovy, enable_transit, enable_order, 
+      order_key, consume_type, big_data_type, 
+      big_data_config, urls, http_method, 
+      http_headers, http_query_params, msg_push_type, 
+      http_token, push_max_concurrency, actions, 
+      config, state, extra_params, 
+      remark, is_delete, create_time, 
+      modify_time, groovy, transit
+      )
+    values (#{groupId,jdbcType=BIGINT}, #{groupName,jdbcType=VARCHAR}, #{topicId,jdbcType=BIGINT}, 
+      #{topicName,jdbcType=VARCHAR}, #{clusterId,jdbcType=BIGINT}, #{clusterName,jdbcType=VARCHAR}, 
+      #{pressureTraffic,jdbcType=TINYINT}, #{maxTps,jdbcType=DOUBLE}, #{alarmType,jdbcType=TINYINT}, 
+      #{alarmIsEnable,jdbcType=TINYINT}, #{alarmLevel,jdbcType=TINYINT}, #{alarmMsgLag,jdbcType=INTEGER}, 
+      #{alarmDelayTime,jdbcType=INTEGER}, #{apiType,jdbcType=TINYINT}, #{consumeTimeout,jdbcType=INTEGER}, 
+      #{errorRetryTimes,jdbcType=INTEGER}, #{retryIntervals,jdbcType=VARCHAR}, #{msgType,jdbcType=TINYINT}, 
+      #{enableGroovy,jdbcType=TINYINT}, #{enableTransit,jdbcType=TINYINT}, #{enableOrder,jdbcType=TINYINT}, 
+      #{orderKey,jdbcType=VARCHAR}, #{consumeType,jdbcType=TINYINT}, #{bigDataType,jdbcType=TINYINT}, 
+      #{bigDataConfig,jdbcType=VARCHAR}, #{urls,jdbcType=VARCHAR}, #{httpMethod,jdbcType=TINYINT}, 
+      #{httpHeaders,jdbcType=VARCHAR}, #{httpQueryParams,jdbcType=VARCHAR}, #{msgPushType,jdbcType=TINYINT}, 
+      #{httpToken,jdbcType=VARCHAR}, #{pushMaxConcurrency,jdbcType=INTEGER}, #{actions,jdbcType=VARCHAR}, 
+      #{config,jdbcType=VARCHAR}, #{state,jdbcType=TINYINT}, #{extraParams,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{groovy,jdbcType=LONGVARCHAR}, #{transit,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscription" useGeneratedKeys="true">
+    insert into consume_subscription
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="groupId != null">
+        group_id,
+      </if>
+      <if test="groupName != null">
+        group_name,
+      </if>
+      <if test="topicId != null">
+        topic_id,
+      </if>
+      <if test="topicName != null">
+        topic_name,
+      </if>
+      <if test="clusterId != null">
+        cluster_id,
+      </if>
+      <if test="clusterName != null">
+        cluster_name,
+      </if>
+      <if test="pressureTraffic != null">
+        pressure_traffic,
+      </if>
+      <if test="maxTps != null">
+        max_tps,
+      </if>
+      <if test="alarmType != null">
+        alarm_type,
+      </if>
+      <if test="alarmIsEnable != null">
+        alarm_is_enable,
+      </if>
+      <if test="alarmLevel != null">
+        alarm_level,
+      </if>
+      <if test="alarmMsgLag != null">
+        alarm_msg_lag,
+      </if>
+      <if test="alarmDelayTime != null">
+        alarm_delay_time,
+      </if>
+      <if test="apiType != null">
+        api_type,
+      </if>
+      <if test="consumeTimeout != null">
+        consume_timeout,
+      </if>
+      <if test="errorRetryTimes != null">
+        error_retry_times,
+      </if>
+      <if test="retryIntervals != null">
+        retry_intervals,
+      </if>
+      <if test="msgType != null">
+        msg_type,
+      </if>
+      <if test="enableGroovy != null">
+        enable_groovy,
+      </if>
+      <if test="enableTransit != null">
+        enable_transit,
+      </if>
+      <if test="enableOrder != null">
+        enable_order,
+      </if>
+      <if test="orderKey != null">
+        order_key,
+      </if>
+      <if test="consumeType != null">
+        consume_type,
+      </if>
+      <if test="bigDataType != null">
+        big_data_type,
+      </if>
+      <if test="bigDataConfig != null">
+        big_data_config,
+      </if>
+      <if test="urls != null">
+        urls,
+      </if>
+      <if test="httpMethod != null">
+        http_method,
+      </if>
+      <if test="httpHeaders != null">
+        http_headers,
+      </if>
+      <if test="httpQueryParams != null">
+        http_query_params,
+      </if>
+      <if test="msgPushType != null">
+        msg_push_type,
+      </if>
+      <if test="httpToken != null">
+        http_token,
+      </if>
+      <if test="pushMaxConcurrency != null">
+        push_max_concurrency,
+      </if>
+      <if test="actions != null">
+        actions,
+      </if>
+      <if test="config != null">
+        config,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="extraParams != null">
+        extra_params,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="groovy != null">
+        groovy,
+      </if>
+      <if test="transit != null">
+        transit,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="groupId != null">
+        #{groupId,jdbcType=BIGINT},
+      </if>
+      <if test="groupName != null">
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="topicId != null">
+        #{topicId,jdbcType=BIGINT},
+      </if>
+      <if test="topicName != null">
+        #{topicName,jdbcType=VARCHAR},
+      </if>
+      <if test="clusterId != null">
+        #{clusterId,jdbcType=BIGINT},
+      </if>
+      <if test="clusterName != null">
+        #{clusterName,jdbcType=VARCHAR},
+      </if>
+      <if test="pressureTraffic != null">
+        #{pressureTraffic,jdbcType=TINYINT},
+      </if>
+      <if test="maxTps != null">
+        #{maxTps,jdbcType=DOUBLE},
+      </if>
+      <if test="alarmType != null">
+        #{alarmType,jdbcType=TINYINT},
+      </if>
+      <if test="alarmIsEnable != null">
+        #{alarmIsEnable,jdbcType=TINYINT},
+      </if>
+      <if test="alarmLevel != null">
+        #{alarmLevel,jdbcType=TINYINT},
+      </if>
+      <if test="alarmMsgLag != null">
+        #{alarmMsgLag,jdbcType=INTEGER},
+      </if>
+      <if test="alarmDelayTime != null">
+        #{alarmDelayTime,jdbcType=INTEGER},
+      </if>
+      <if test="apiType != null">
+        #{apiType,jdbcType=TINYINT},
+      </if>
+      <if test="consumeTimeout != null">
+        #{consumeTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="errorRetryTimes != null">
+        #{errorRetryTimes,jdbcType=INTEGER},
+      </if>
+      <if test="retryIntervals != null">
+        #{retryIntervals,jdbcType=VARCHAR},
+      </if>
+      <if test="msgType != null">
+        #{msgType,jdbcType=TINYINT},
+      </if>
+      <if test="enableGroovy != null">
+        #{enableGroovy,jdbcType=TINYINT},
+      </if>
+      <if test="enableTransit != null">
+        #{enableTransit,jdbcType=TINYINT},
+      </if>
+      <if test="enableOrder != null">
+        #{enableOrder,jdbcType=TINYINT},
+      </if>
+      <if test="orderKey != null">
+        #{orderKey,jdbcType=VARCHAR},
+      </if>
+      <if test="consumeType != null">
+        #{consumeType,jdbcType=TINYINT},
+      </if>
+      <if test="bigDataType != null">
+        #{bigDataType,jdbcType=TINYINT},
+      </if>
+      <if test="bigDataConfig != null">
+        #{bigDataConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="urls != null">
+        #{urls,jdbcType=VARCHAR},
+      </if>
+      <if test="httpMethod != null">
+        #{httpMethod,jdbcType=TINYINT},
+      </if>
+      <if test="httpHeaders != null">
+        #{httpHeaders,jdbcType=VARCHAR},
+      </if>
+      <if test="httpQueryParams != null">
+        #{httpQueryParams,jdbcType=VARCHAR},
+      </if>
+      <if test="msgPushType != null">
+        #{msgPushType,jdbcType=TINYINT},
+      </if>
+      <if test="httpToken != null">
+        #{httpToken,jdbcType=VARCHAR},
+      </if>
+      <if test="pushMaxConcurrency != null">
+        #{pushMaxConcurrency,jdbcType=INTEGER},
+      </if>
+      <if test="actions != null">
+        #{actions,jdbcType=VARCHAR},
+      </if>
+      <if test="config != null">
+        #{config,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=TINYINT},
+      </if>
+      <if test="extraParams != null">
+        #{extraParams,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="groovy != null">
+        #{groovy,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="transit != null">
+        #{transit,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscriptionCriteria" resultType="java.lang.Long">
+    select count(*) from consume_subscription
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update consume_subscription
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.groupId != null">
+        group_id = #{record.groupId,jdbcType=BIGINT},
+      </if>
+      <if test="record.groupName != null">
+        group_name = #{record.groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.topicId != null">
+        topic_id = #{record.topicId,jdbcType=BIGINT},
+      </if>
+      <if test="record.topicName != null">
+        topic_name = #{record.topicName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.clusterId != null">
+        cluster_id = #{record.clusterId,jdbcType=BIGINT},
+      </if>
+      <if test="record.clusterName != null">
+        cluster_name = #{record.clusterName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pressureTraffic != null">
+        pressure_traffic = #{record.pressureTraffic,jdbcType=TINYINT},
+      </if>
+      <if test="record.maxTps != null">
+        max_tps = #{record.maxTps,jdbcType=DOUBLE},
+      </if>
+      <if test="record.alarmType != null">
+        alarm_type = #{record.alarmType,jdbcType=TINYINT},
+      </if>
+      <if test="record.alarmIsEnable != null">
+        alarm_is_enable = #{record.alarmIsEnable,jdbcType=TINYINT},
+      </if>
+      <if test="record.alarmLevel != null">
+        alarm_level = #{record.alarmLevel,jdbcType=TINYINT},
+      </if>
+      <if test="record.alarmMsgLag != null">
+        alarm_msg_lag = #{record.alarmMsgLag,jdbcType=INTEGER},
+      </if>
+      <if test="record.alarmDelayTime != null">
+        alarm_delay_time = #{record.alarmDelayTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.apiType != null">
+        api_type = #{record.apiType,jdbcType=TINYINT},
+      </if>
+      <if test="record.consumeTimeout != null">
+        consume_timeout = #{record.consumeTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="record.errorRetryTimes != null">
+        error_retry_times = #{record.errorRetryTimes,jdbcType=INTEGER},
+      </if>
+      <if test="record.retryIntervals != null">
+        retry_intervals = #{record.retryIntervals,jdbcType=VARCHAR},
+      </if>
+      <if test="record.msgType != null">
+        msg_type = #{record.msgType,jdbcType=TINYINT},
+      </if>
+      <if test="record.enableGroovy != null">
+        enable_groovy = #{record.enableGroovy,jdbcType=TINYINT},
+      </if>
+      <if test="record.enableTransit != null">
+        enable_transit = #{record.enableTransit,jdbcType=TINYINT},
+      </if>
+      <if test="record.enableOrder != null">
+        enable_order = #{record.enableOrder,jdbcType=TINYINT},
+      </if>
+      <if test="record.orderKey != null">
+        order_key = #{record.orderKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.consumeType != null">
+        consume_type = #{record.consumeType,jdbcType=TINYINT},
+      </if>
+      <if test="record.bigDataType != null">
+        big_data_type = #{record.bigDataType,jdbcType=TINYINT},
+      </if>
+      <if test="record.bigDataConfig != null">
+        big_data_config = #{record.bigDataConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="record.urls != null">
+        urls = #{record.urls,jdbcType=VARCHAR},
+      </if>
+      <if test="record.httpMethod != null">
+        http_method = #{record.httpMethod,jdbcType=TINYINT},
+      </if>
+      <if test="record.httpHeaders != null">
+        http_headers = #{record.httpHeaders,jdbcType=VARCHAR},
+      </if>
+      <if test="record.httpQueryParams != null">
+        http_query_params = #{record.httpQueryParams,jdbcType=VARCHAR},
+      </if>
+      <if test="record.msgPushType != null">
+        msg_push_type = #{record.msgPushType,jdbcType=TINYINT},
+      </if>
+      <if test="record.httpToken != null">
+        http_token = #{record.httpToken,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pushMaxConcurrency != null">
+        push_max_concurrency = #{record.pushMaxConcurrency,jdbcType=INTEGER},
+      </if>
+      <if test="record.actions != null">
+        actions = #{record.actions,jdbcType=VARCHAR},
+      </if>
+      <if test="record.config != null">
+        config = #{record.config,jdbcType=VARCHAR},
+      </if>
+      <if test="record.state != null">
+        state = #{record.state,jdbcType=TINYINT},
+      </if>
+      <if test="record.extraParams != null">
+        extra_params = #{record.extraParams,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.modifyTime != null">
+        modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.groovy != null">
+        groovy = #{record.groovy,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.transit != null">
+        transit = #{record.transit,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update consume_subscription
+    set id = #{record.id,jdbcType=BIGINT},
+      group_id = #{record.groupId,jdbcType=BIGINT},
+      group_name = #{record.groupName,jdbcType=VARCHAR},
+      topic_id = #{record.topicId,jdbcType=BIGINT},
+      topic_name = #{record.topicName,jdbcType=VARCHAR},
+      cluster_id = #{record.clusterId,jdbcType=BIGINT},
+      cluster_name = #{record.clusterName,jdbcType=VARCHAR},
+      pressure_traffic = #{record.pressureTraffic,jdbcType=TINYINT},
+      max_tps = #{record.maxTps,jdbcType=DOUBLE},
+      alarm_type = #{record.alarmType,jdbcType=TINYINT},
+      alarm_is_enable = #{record.alarmIsEnable,jdbcType=TINYINT},
+      alarm_level = #{record.alarmLevel,jdbcType=TINYINT},
+      alarm_msg_lag = #{record.alarmMsgLag,jdbcType=INTEGER},
+      alarm_delay_time = #{record.alarmDelayTime,jdbcType=INTEGER},
+      api_type = #{record.apiType,jdbcType=TINYINT},
+      consume_timeout = #{record.consumeTimeout,jdbcType=INTEGER},
+      error_retry_times = #{record.errorRetryTimes,jdbcType=INTEGER},
+      retry_intervals = #{record.retryIntervals,jdbcType=VARCHAR},
+      msg_type = #{record.msgType,jdbcType=TINYINT},
+      enable_groovy = #{record.enableGroovy,jdbcType=TINYINT},
+      enable_transit = #{record.enableTransit,jdbcType=TINYINT},
+      enable_order = #{record.enableOrder,jdbcType=TINYINT},
+      order_key = #{record.orderKey,jdbcType=VARCHAR},
+      consume_type = #{record.consumeType,jdbcType=TINYINT},
+      big_data_type = #{record.bigDataType,jdbcType=TINYINT},
+      big_data_config = #{record.bigDataConfig,jdbcType=VARCHAR},
+      urls = #{record.urls,jdbcType=VARCHAR},
+      http_method = #{record.httpMethod,jdbcType=TINYINT},
+      http_headers = #{record.httpHeaders,jdbcType=VARCHAR},
+      http_query_params = #{record.httpQueryParams,jdbcType=VARCHAR},
+      msg_push_type = #{record.msgPushType,jdbcType=TINYINT},
+      http_token = #{record.httpToken,jdbcType=VARCHAR},
+      push_max_concurrency = #{record.pushMaxConcurrency,jdbcType=INTEGER},
+      actions = #{record.actions,jdbcType=VARCHAR},
+      config = #{record.config,jdbcType=VARCHAR},
+      state = #{record.state,jdbcType=TINYINT},
+      extra_params = #{record.extraParams,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      groovy = #{record.groovy,jdbcType=LONGVARCHAR},
+      transit = #{record.transit,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update consume_subscription
+    set id = #{record.id,jdbcType=BIGINT},
+      group_id = #{record.groupId,jdbcType=BIGINT},
+      group_name = #{record.groupName,jdbcType=VARCHAR},
+      topic_id = #{record.topicId,jdbcType=BIGINT},
+      topic_name = #{record.topicName,jdbcType=VARCHAR},
+      cluster_id = #{record.clusterId,jdbcType=BIGINT},
+      cluster_name = #{record.clusterName,jdbcType=VARCHAR},
+      pressure_traffic = #{record.pressureTraffic,jdbcType=TINYINT},
+      max_tps = #{record.maxTps,jdbcType=DOUBLE},
+      alarm_type = #{record.alarmType,jdbcType=TINYINT},
+      alarm_is_enable = #{record.alarmIsEnable,jdbcType=TINYINT},
+      alarm_level = #{record.alarmLevel,jdbcType=TINYINT},
+      alarm_msg_lag = #{record.alarmMsgLag,jdbcType=INTEGER},
+      alarm_delay_time = #{record.alarmDelayTime,jdbcType=INTEGER},
+      api_type = #{record.apiType,jdbcType=TINYINT},
+      consume_timeout = #{record.consumeTimeout,jdbcType=INTEGER},
+      error_retry_times = #{record.errorRetryTimes,jdbcType=INTEGER},
+      retry_intervals = #{record.retryIntervals,jdbcType=VARCHAR},
+      msg_type = #{record.msgType,jdbcType=TINYINT},
+      enable_groovy = #{record.enableGroovy,jdbcType=TINYINT},
+      enable_transit = #{record.enableTransit,jdbcType=TINYINT},
+      enable_order = #{record.enableOrder,jdbcType=TINYINT},
+      order_key = #{record.orderKey,jdbcType=VARCHAR},
+      consume_type = #{record.consumeType,jdbcType=TINYINT},
+      big_data_type = #{record.bigDataType,jdbcType=TINYINT},
+      big_data_config = #{record.bigDataConfig,jdbcType=VARCHAR},
+      urls = #{record.urls,jdbcType=VARCHAR},
+      http_method = #{record.httpMethod,jdbcType=TINYINT},
+      http_headers = #{record.httpHeaders,jdbcType=VARCHAR},
+      http_query_params = #{record.httpQueryParams,jdbcType=VARCHAR},
+      msg_push_type = #{record.msgPushType,jdbcType=TINYINT},
+      http_token = #{record.httpToken,jdbcType=VARCHAR},
+      push_max_concurrency = #{record.pushMaxConcurrency,jdbcType=INTEGER},
+      actions = #{record.actions,jdbcType=VARCHAR},
+      config = #{record.config,jdbcType=VARCHAR},
+      state = #{record.state,jdbcType=TINYINT},
+      extra_params = #{record.extraParams,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscription">
+    update consume_subscription
+    <set>
+      <if test="groupId != null">
+        group_id = #{groupId,jdbcType=BIGINT},
+      </if>
+      <if test="groupName != null">
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="topicId != null">
+        topic_id = #{topicId,jdbcType=BIGINT},
+      </if>
+      <if test="topicName != null">
+        topic_name = #{topicName,jdbcType=VARCHAR},
+      </if>
+      <if test="clusterId != null">
+        cluster_id = #{clusterId,jdbcType=BIGINT},
+      </if>
+      <if test="clusterName != null">
+        cluster_name = #{clusterName,jdbcType=VARCHAR},
+      </if>
+      <if test="pressureTraffic != null">
+        pressure_traffic = #{pressureTraffic,jdbcType=TINYINT},
+      </if>
+      <if test="maxTps != null">
+        max_tps = #{maxTps,jdbcType=DOUBLE},
+      </if>
+      <if test="alarmType != null">
+        alarm_type = #{alarmType,jdbcType=TINYINT},
+      </if>
+      <if test="alarmIsEnable != null">
+        alarm_is_enable = #{alarmIsEnable,jdbcType=TINYINT},
+      </if>
+      <if test="alarmLevel != null">
+        alarm_level = #{alarmLevel,jdbcType=TINYINT},
+      </if>
+      <if test="alarmMsgLag != null">
+        alarm_msg_lag = #{alarmMsgLag,jdbcType=INTEGER},
+      </if>
+      <if test="alarmDelayTime != null">
+        alarm_delay_time = #{alarmDelayTime,jdbcType=INTEGER},
+      </if>
+      <if test="apiType != null">
+        api_type = #{apiType,jdbcType=TINYINT},
+      </if>
+      <if test="consumeTimeout != null">
+        consume_timeout = #{consumeTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="errorRetryTimes != null">
+        error_retry_times = #{errorRetryTimes,jdbcType=INTEGER},
+      </if>
+      <if test="retryIntervals != null">
+        retry_intervals = #{retryIntervals,jdbcType=VARCHAR},
+      </if>
+      <if test="msgType != null">
+        msg_type = #{msgType,jdbcType=TINYINT},
+      </if>
+      <if test="enableGroovy != null">
+        enable_groovy = #{enableGroovy,jdbcType=TINYINT},
+      </if>
+      <if test="enableTransit != null">
+        enable_transit = #{enableTransit,jdbcType=TINYINT},
+      </if>
+      <if test="enableOrder != null">
+        enable_order = #{enableOrder,jdbcType=TINYINT},
+      </if>
+      <if test="orderKey != null">
+        order_key = #{orderKey,jdbcType=VARCHAR},
+      </if>
+      <if test="consumeType != null">
+        consume_type = #{consumeType,jdbcType=TINYINT},
+      </if>
+      <if test="bigDataType != null">
+        big_data_type = #{bigDataType,jdbcType=TINYINT},
+      </if>
+      <if test="bigDataConfig != null">
+        big_data_config = #{bigDataConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="urls != null">
+        urls = #{urls,jdbcType=VARCHAR},
+      </if>
+      <if test="httpMethod != null">
+        http_method = #{httpMethod,jdbcType=TINYINT},
+      </if>
+      <if test="httpHeaders != null">
+        http_headers = #{httpHeaders,jdbcType=VARCHAR},
+      </if>
+      <if test="httpQueryParams != null">
+        http_query_params = #{httpQueryParams,jdbcType=VARCHAR},
+      </if>
+      <if test="msgPushType != null">
+        msg_push_type = #{msgPushType,jdbcType=TINYINT},
+      </if>
+      <if test="httpToken != null">
+        http_token = #{httpToken,jdbcType=VARCHAR},
+      </if>
+      <if test="pushMaxConcurrency != null">
+        push_max_concurrency = #{pushMaxConcurrency,jdbcType=INTEGER},
+      </if>
+      <if test="actions != null">
+        actions = #{actions,jdbcType=VARCHAR},
+      </if>
+      <if test="config != null">
+        config = #{config,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=TINYINT},
+      </if>
+      <if test="extraParams != null">
+        extra_params = #{extraParams,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="groovy != null">
+        groovy = #{groovy,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="transit != null">
+        transit = #{transit,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscription">
+    update consume_subscription
+    set group_id = #{groupId,jdbcType=BIGINT},
+      group_name = #{groupName,jdbcType=VARCHAR},
+      topic_id = #{topicId,jdbcType=BIGINT},
+      topic_name = #{topicName,jdbcType=VARCHAR},
+      cluster_id = #{clusterId,jdbcType=BIGINT},
+      cluster_name = #{clusterName,jdbcType=VARCHAR},
+      pressure_traffic = #{pressureTraffic,jdbcType=TINYINT},
+      max_tps = #{maxTps,jdbcType=DOUBLE},
+      alarm_type = #{alarmType,jdbcType=TINYINT},
+      alarm_is_enable = #{alarmIsEnable,jdbcType=TINYINT},
+      alarm_level = #{alarmLevel,jdbcType=TINYINT},
+      alarm_msg_lag = #{alarmMsgLag,jdbcType=INTEGER},
+      alarm_delay_time = #{alarmDelayTime,jdbcType=INTEGER},
+      api_type = #{apiType,jdbcType=TINYINT},
+      consume_timeout = #{consumeTimeout,jdbcType=INTEGER},
+      error_retry_times = #{errorRetryTimes,jdbcType=INTEGER},
+      retry_intervals = #{retryIntervals,jdbcType=VARCHAR},
+      msg_type = #{msgType,jdbcType=TINYINT},
+      enable_groovy = #{enableGroovy,jdbcType=TINYINT},
+      enable_transit = #{enableTransit,jdbcType=TINYINT},
+      enable_order = #{enableOrder,jdbcType=TINYINT},
+      order_key = #{orderKey,jdbcType=VARCHAR},
+      consume_type = #{consumeType,jdbcType=TINYINT},
+      big_data_type = #{bigDataType,jdbcType=TINYINT},
+      big_data_config = #{bigDataConfig,jdbcType=VARCHAR},
+      urls = #{urls,jdbcType=VARCHAR},
+      http_method = #{httpMethod,jdbcType=TINYINT},
+      http_headers = #{httpHeaders,jdbcType=VARCHAR},
+      http_query_params = #{httpQueryParams,jdbcType=VARCHAR},
+      msg_push_type = #{msgPushType,jdbcType=TINYINT},
+      http_token = #{httpToken,jdbcType=VARCHAR},
+      push_max_concurrency = #{pushMaxConcurrency,jdbcType=INTEGER},
+      actions = #{actions,jdbcType=VARCHAR},
+      config = #{config,jdbcType=VARCHAR},
+      state = #{state,jdbcType=TINYINT},
+      extra_params = #{extraParams,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      groovy = #{groovy,jdbcType=LONGVARCHAR},
+      transit = #{transit,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.didi.carrera.console.dao.model.ConsumeSubscription">
+    update consume_subscription
+    set group_id = #{groupId,jdbcType=BIGINT},
+      group_name = #{groupName,jdbcType=VARCHAR},
+      topic_id = #{topicId,jdbcType=BIGINT},
+      topic_name = #{topicName,jdbcType=VARCHAR},
+      cluster_id = #{clusterId,jdbcType=BIGINT},
+      cluster_name = #{clusterName,jdbcType=VARCHAR},
+      pressure_traffic = #{pressureTraffic,jdbcType=TINYINT},
+      max_tps = #{maxTps,jdbcType=DOUBLE},
+      alarm_type = #{alarmType,jdbcType=TINYINT},
+      alarm_is_enable = #{alarmIsEnable,jdbcType=TINYINT},
+      alarm_level = #{alarmLevel,jdbcType=TINYINT},
+      alarm_msg_lag = #{alarmMsgLag,jdbcType=INTEGER},
+      alarm_delay_time = #{alarmDelayTime,jdbcType=INTEGER},
+      api_type = #{apiType,jdbcType=TINYINT},
+      consume_timeout = #{consumeTimeout,jdbcType=INTEGER},
+      error_retry_times = #{errorRetryTimes,jdbcType=INTEGER},
+      retry_intervals = #{retryIntervals,jdbcType=VARCHAR},
+      msg_type = #{msgType,jdbcType=TINYINT},
+      enable_groovy = #{enableGroovy,jdbcType=TINYINT},
+      enable_transit = #{enableTransit,jdbcType=TINYINT},
+      enable_order = #{enableOrder,jdbcType=TINYINT},
+      order_key = #{orderKey,jdbcType=VARCHAR},
+      consume_type = #{consumeType,jdbcType=TINYINT},
+      big_data_type = #{bigDataType,jdbcType=TINYINT},
+      big_data_config = #{bigDataConfig,jdbcType=VARCHAR},
+      urls = #{urls,jdbcType=VARCHAR},
+      http_method = #{httpMethod,jdbcType=TINYINT},
+      http_headers = #{httpHeaders,jdbcType=VARCHAR},
+      http_query_params = #{httpQueryParams,jdbcType=VARCHAR},
+      msg_push_type = #{msgPushType,jdbcType=TINYINT},
+      http_token = #{httpToken,jdbcType=VARCHAR},
+      push_max_concurrency = #{pushMaxConcurrency,jdbcType=INTEGER},
+      actions = #{actions,jdbcType=VARCHAR},
+      config = #{config,jdbcType=VARCHAR},
+      state = #{state,jdbcType=TINYINT},
+      extra_params = #{extraParams,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

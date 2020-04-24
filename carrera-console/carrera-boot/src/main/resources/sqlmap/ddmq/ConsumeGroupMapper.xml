@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.didi.carrera.console.dao.mapper.ConsumeGroupMapper">
+  <resultMap id="BaseResultMap" type="com.didi.carrera.console.dao.model.ConsumeGroup">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="group_name" jdbcType="VARCHAR" property="groupName" />
+    <result column="service" jdbcType="VARCHAR" property="service" />
+    <result column="department" jdbcType="VARCHAR" property="department" />
+    <result column="contacters" jdbcType="VARCHAR" property="contacters" />
+    <result column="alarm_is_enable" jdbcType="TINYINT" property="alarmIsEnable" />
+    <result column="alarm_group" jdbcType="VARCHAR" property="alarmGroup" />
+    <result column="alarm_level" jdbcType="TINYINT" property="alarmLevel" />
+    <result column="alarm_msg_lag" jdbcType="INTEGER" property="alarmMsgLag" />
+    <result column="alarm_delay_time" jdbcType="INTEGER" property="alarmDelayTime" />
+    <result column="broadcast_consume" jdbcType="TINYINT" property="broadcastConsume" />
+    <result column="consume_mode" jdbcType="TINYINT" property="consumeMode" />
+    <result column="consume_mode_mapper" jdbcType="VARCHAR" property="consumeModeMapper" />
+    <result column="extra_params" jdbcType="VARCHAR" property="extraParams" />
+    <result column="config" jdbcType="VARCHAR" property="config" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, group_name, service, department, contacters, alarm_is_enable, alarm_group, alarm_level, 
+    alarm_msg_lag, alarm_delay_time, broadcast_consume, consume_mode, consume_mode_mapper, 
+    extra_params, config, remark, is_delete, create_time, modify_time
+  </sql>
+  <select id="selectByExample" parameterType="com.didi.carrera.console.dao.model.ConsumeGroupCriteria" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from consume_group
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <if test="start != null and start >= 0 ">
+      limit #{start}
+    </if>
+    <if test="start != null and start >= 0 and end != null and end >= 0">
+      , #{end}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from consume_group
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from consume_group
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.didi.carrera.console.dao.model.ConsumeGroupCriteria">
+    delete from consume_group
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.didi.carrera.console.dao.model.ConsumeGroup" useGeneratedKeys="true">
+    insert into consume_group (group_name, service, department, 
+      contacters, alarm_is_enable, alarm_group, 
+      alarm_level, alarm_msg_lag, alarm_delay_time, 
+      broadcast_consume, consume_mode, consume_mode_mapper, 
+      extra_params, config, remark, 
+      is_delete, create_time, modify_time
+      )
+    values (#{groupName,jdbcType=VARCHAR}, #{service,jdbcType=VARCHAR}, #{department,jdbcType=VARCHAR}, 
+      #{contacters,jdbcType=VARCHAR}, #{alarmIsEnable,jdbcType=TINYINT}, #{alarmGroup,jdbcType=VARCHAR}, 
+      #{alarmLevel,jdbcType=TINYINT}, #{alarmMsgLag,jdbcType=INTEGER}, #{alarmDelayTime,jdbcType=INTEGER}, 
+      #{broadcastConsume,jdbcType=TINYINT}, #{consumeMode,jdbcType=TINYINT}, #{consumeModeMapper,jdbcType=VARCHAR}, 
+      #{extraParams,jdbcType=VARCHAR}, #{config,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{isDelete,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.didi.carrera.console.dao.model.ConsumeGroup" useGeneratedKeys="true">
+    insert into consume_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="groupName != null">
+        group_name,
+      </if>
+      <if test="service != null">
+        service,
+      </if>
+      <if test="department != null">
+        department,
+      </if>
+      <if test="contacters != null">
+        contacters,
+      </if>
+      <if test="alarmIsEnable != null">
+        alarm_is_enable,
+      </if>
+      <if test="alarmGroup != null">
+        alarm_group,
+      </if>
+      <if test="alarmLevel != null">
+        alarm_level,
+      </if>
+      <if test="alarmMsgLag != null">
+        alarm_msg_lag,
+      </if>
+      <if test="alarmDelayTime != null">
+        alarm_delay_time,
+      </if>
+      <if test="broadcastConsume != null">
+        broadcast_consume,
+      </if>
+      <if test="consumeMode != null">
+        consume_mode,
+      </if>
+      <if test="consumeModeMapper != null">
+        consume_mode_mapper,
+      </if>
+      <if test="extraParams != null">
+        extra_params,
+      </if>
+      <if test="config != null">
+        config,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="groupName != null">
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="service != null">
+        #{service,jdbcType=VARCHAR},
+      </if>
+      <if test="department != null">
+        #{department,jdbcType=VARCHAR},
+      </if>
+      <if test="contacters != null">
+        #{contacters,jdbcType=VARCHAR},
+      </if>
+      <if test="alarmIsEnable != null">
+        #{alarmIsEnable,jdbcType=TINYINT},
+      </if>
+      <if test="alarmGroup != null">
+        #{alarmGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="alarmLevel != null">
+        #{alarmLevel,jdbcType=TINYINT},
+      </if>
+      <if test="alarmMsgLag != null">
+        #{alarmMsgLag,jdbcType=INTEGER},
+      </if>
+      <if test="alarmDelayTime != null">
+        #{alarmDelayTime,jdbcType=INTEGER},
+      </if>
+      <if test="broadcastConsume != null">
+        #{broadcastConsume,jdbcType=TINYINT},
+      </if>
+      <if test="consumeMode != null">
+        #{consumeMode,jdbcType=TINYINT},
+      </if>
+      <if test="consumeModeMapper != null">
+        #{consumeModeMapper,jdbcType=VARCHAR},
+      </if>
+      <if test="extraParams != null">
+        #{extraParams,jdbcType=VARCHAR},
+      </if>
+      <if test="config != null">
+        #{config,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.didi.carrera.console.dao.model.ConsumeGroupCriteria" resultType="java.lang.Long">
+    select count(*) from consume_group
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update consume_group
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.groupName != null">
+        group_name = #{record.groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.service != null">
+        service = #{record.service,jdbcType=VARCHAR},
+      </if>
+      <if test="record.department != null">
+        department = #{record.department,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contacters != null">
+        contacters = #{record.contacters,jdbcType=VARCHAR},
+      </if>
+      <if test="record.alarmIsEnable != null">
+        alarm_is_enable = #{record.alarmIsEnable,jdbcType=TINYINT},
+      </if>
+      <if test="record.alarmGroup != null">
+        alarm_group = #{record.alarmGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="record.alarmLevel != null">
+        alarm_level = #{record.alarmLevel,jdbcType=TINYINT},
+      </if>
+      <if test="record.alarmMsgLag != null">
+        alarm_msg_lag = #{record.alarmMsgLag,jdbcType=INTEGER},
+      </if>
+      <if test="record.alarmDelayTime != null">
+        alarm_delay_time = #{record.alarmDelayTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.broadcastConsume != null">
+        broadcast_consume = #{record.broadcastConsume,jdbcType=TINYINT},
+      </if>
+      <if test="record.consumeMode != null">
+        consume_mode = #{record.consumeMode,jdbcType=TINYINT},
+      </if>
+      <if test="record.consumeModeMapper != null">
+        consume_mode_mapper = #{record.consumeModeMapper,jdbcType=VARCHAR},
+      </if>
+      <if test="record.extraParams != null">
+        extra_params = #{record.extraParams,jdbcType=VARCHAR},
+      </if>
+      <if test="record.config != null">
+        config = #{record.config,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.modifyTime != null">
+        modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update consume_group
+    set id = #{record.id,jdbcType=BIGINT},
+      group_name = #{record.groupName,jdbcType=VARCHAR},
+      service = #{record.service,jdbcType=VARCHAR},
+      department = #{record.department,jdbcType=VARCHAR},
+      contacters = #{record.contacters,jdbcType=VARCHAR},
+      alarm_is_enable = #{record.alarmIsEnable,jdbcType=TINYINT},
+      alarm_group = #{record.alarmGroup,jdbcType=VARCHAR},
+      alarm_level = #{record.alarmLevel,jdbcType=TINYINT},
+      alarm_msg_lag = #{record.alarmMsgLag,jdbcType=INTEGER},
+      alarm_delay_time = #{record.alarmDelayTime,jdbcType=INTEGER},
+      broadcast_consume = #{record.broadcastConsume,jdbcType=TINYINT},
+      consume_mode = #{record.consumeMode,jdbcType=TINYINT},
+      consume_mode_mapper = #{record.consumeModeMapper,jdbcType=VARCHAR},
+      extra_params = #{record.extraParams,jdbcType=VARCHAR},
+      config = #{record.config,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.didi.carrera.console.dao.model.ConsumeGroup">
+    update consume_group
+    <set>
+      <if test="groupName != null">
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="service != null">
+        service = #{service,jdbcType=VARCHAR},
+      </if>
+      <if test="department != null">
+        department = #{department,jdbcType=VARCHAR},
+      </if>
+      <if test="contacters != null">
+        contacters = #{contacters,jdbcType=VARCHAR},
+      </if>
+      <if test="alarmIsEnable != null">
+        alarm_is_enable = #{alarmIsEnable,jdbcType=TINYINT},
+      </if>
+      <if test="alarmGroup != null">
+        alarm_group = #{alarmGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="alarmLevel != null">
+        alarm_level = #{alarmLevel,jdbcType=TINYINT},
+      </if>
+      <if test="alarmMsgLag != null">
+        alarm_msg_lag = #{alarmMsgLag,jdbcType=INTEGER},
+      </if>
+      <if test="alarmDelayTime != null">
+        alarm_delay_time = #{alarmDelayTime,jdbcType=INTEGER},
+      </if>
+      <if test="broadcastConsume != null">
+        broadcast_consume = #{broadcastConsume,jdbcType=TINYINT},
+      </if>
+      <if test="consumeMode != null">
+        consume_mode = #{consumeMode,jdbcType=TINYINT},
+      </if>
+      <if test="consumeModeMapper != null">
+        consume_mode_mapper = #{consumeModeMapper,jdbcType=VARCHAR},
+      </if>
+      <if test="extraParams != null">
+        extra_params = #{extraParams,jdbcType=VARCHAR},
+      </if>
+      <if test="config != null">
+        config = #{config,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.didi.carrera.console.dao.model.ConsumeGroup">
+    update consume_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      service = #{service,jdbcType=VARCHAR},
+      department = #{department,jdbcType=VARCHAR},
+      contacters = #{contacters,jdbcType=VARCHAR},
+      alarm_is_enable = #{alarmIsEnable,jdbcType=TINYINT},
+      alarm_group = #{alarmGroup,jdbcType=VARCHAR},
+      alarm_level = #{alarmLevel,jdbcType=TINYINT},
+      alarm_msg_lag = #{alarmMsgLag,jdbcType=INTEGER},
+      alarm_delay_time = #{alarmDelayTime,jdbcType=INTEGER},
+      broadcast_consume = #{broadcastConsume,jdbcType=TINYINT},
+      consume_mode = #{consumeMode,jdbcType=TINYINT},
+      consume_mode_mapper = #{consumeModeMapper,jdbcType=VARCHAR},
+      extra_params = #{extraParams,jdbcType=VARCHAR},
+      config = #{config,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

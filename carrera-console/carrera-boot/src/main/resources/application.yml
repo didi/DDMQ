@@ -1,0 +1,33 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/carrera_open_source?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false
+    username: root
+    password: 123456
+mybatis:
+  mapperLocations: classpath:sqlmap/ddmq/*.xml
+  config-location: classpath:mybatis-config.xml
+  typeAliasesPackage: com.didi.carrera.console.dao.model
+
+server:
+  port: 8281
+  servlet:
+    context-path: /carrera
+
+
+#logs
+logs:
+  level: INFO
+  file:
+    path: ./logs
+
+
+console:
+  env: test
+  carrera:
+    zookeeper: localhost:9181
+  admin:
+    user: admin,felix
+    password: admin

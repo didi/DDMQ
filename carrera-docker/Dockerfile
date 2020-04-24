@@ -5,6 +5,7 @@ EXPOSE 9613
 EXPOSE 9713
 EXPOSE 8080
 EXPOSE 2181
+EXPOSE 9876
 
 # Env
 ENV HOME_DIR /root
@@ -15,16 +16,16 @@ WORKDIR ${HOME_DIR}
 RUN yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel unzip gettext nmap-ncat openssl wget telnet\
   && yum clean all -y
 
-RUN curl http://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.14/bin/apache-tomcat-9.0.14.zip -o tomcat.zip \
+RUN curl http://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.34/bin/apache-tomcat-9.0.34.zip -o tomcat.zip \
   && unzip tomcat.zip \ 
-  && mv apache-tomcat-9.0.14 tomcat \
+  && mv apache-tomcat-9.0.34 tomcat \
   && rm tomcat.zip \ 
   && chmod +x tomcat/bin/*.sh
 
-RUN curl http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz -o zookeeper-3.4.10.tar.gz \
-  && tar xzvf zookeeper-3.4.10.tar.gz \
-  && rm zookeeper-3.4.10.tar.gz \ 
-  && cp zookeeper-3.4.10/conf/zoo_sample.cfg zookeeper-3.4.10/conf/zoo.cfg 
+RUN curl http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz -o zookeeper-3.4.14.tar.gz \
+  && tar xzvf zookeeper-3.4.14.tar.gz \
+  && rm zookeeper-3.4.14.tar.gz \ 
+  && cp zookeeper-3.4.14/conf/zoo_sample.cfg zookeeper-3.4.14/conf/zoo.cfg 
 
 RUN mkdir -p \
  /root/logs/rocketmqlogs \

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.didi.carrera.console.dao.mapper.custom.TopicCustomMapper">
+
+    <select id="selectByCondition" resultMap="com.didi.carrera.console.dao.mapper.TopicMapper.ResultMapWithBLOBs">
+        select
+        a.id, a.topic_name, a.topic_schema, a.service, a.department, a.contacters, a.alarm_group, a.alarm_is_enable,
+        a.delay_topic, a.need_audit_subinfo, a.enable_schema_verify, a.produce_mode, a.produce_mode_mapper, a.state, a.config, a.description, a.extra_params,
+        a.is_delete, a.create_time, a.modify_time
+        from topic a ,
+        (select distinct topic_id from topic_conf where is_delete=0
+        <if test="clusterId != null and clusterId > 0">
+            AND cluster_id=#{clusterId}
+        </if>
+        ) b
+        where
+        a.id = b.topic_id
+        AND a.is_delete = 0
+        <if test="contacters != null and contacters != ''">
+            AND a.contacters LIKE concat('%',#{contacters},'%')
+        </if>
+        <if test="text != null and text != ''">
+            AND (
+            a.topic_name LIKE concat('%',#{text},'%')
+            OR a.contacters LIKE concat('%',#{text},'%')
+            )
+        </if>
+
+        ORDER BY a.create_time DESC
+        <if test="limit != null and limit >= 0 ">
+            limit #{limit}
+        </if>
+        <if test="limit != null and limit >= 0 and size != null and size >= 0">
+            , #{size}
+        </if>
+    </select>
+
+    <select id="selectCountByCondition" resultType="java.lang.Integer">
+        select
+        count(*)
+        from topic a ,
+        (select distinct topic_id from topic_conf where is_delete=0
+        <if test="clusterId != null and clusterId > 0">
+            AND cluster_id=#{clusterId}
+        </if>
+        ) b
+        where
+        a.id = b.topic_id
+        AND a.is_delete = 0
+
+        <if test="contacters != null and contacters != ''">
+            AND a.contacters LIKE concat('%',#{contacters},'%')
+        </if>
+        <if test="text != null and text != ''">
+            AND (
+            a.topic_name LIKE concat('%',#{text},'%')
+            OR a.contacters LIKE concat('%',#{text},'%')
+            )
+        </if>
+    </select>
+
+</mapper>
