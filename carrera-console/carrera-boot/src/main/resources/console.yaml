@@ -1,4 +1,0 @@
-zookeeper: localhost:9181
-env: test
-carreraAdminUser: [admin]
-carreraAdminPassword: [admin]

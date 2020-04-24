@@ -1,17 +1,19 @@
 package com.didi.carrera.console.config;
 
-import org.yaml.snakeyaml.Yaml;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
 import java.util.List;
 
+@Component
 public class ConsoleConfig {
+    @Value("${console.carrera.zookeeper}")
     private String zookeeper;
-    private static ConsoleConfig consoleConfig;
+    @Value("${console.env}")
     private String env;
-
+    @Value("#{'${console.admin.user}'.split(',')}")
     private List<String> carreraAdminUser;
-
+    @Value("#{'${console.admin.password}'.split(',')}")
     private List<String> carreraAdminPassword;
 
     public String getZookeeper() {
@@ -30,10 +32,6 @@ public class ConsoleConfig {
         this.env = env;
     }
 
-    public static ConsoleConfig instance() {
-        return consoleConfig;
-    }
-
     public List<String> getCarreraAdminUser() {
         return carreraAdminUser;
     }
@@ -48,15 +46,6 @@ public class ConsoleConfig {
 
     public void setCarreraAdminPassword(List<String> carreraAdminPassword) {
         this.carreraAdminPassword = carreraAdminPassword;
-    }
-
-    static {
-        Yaml yaml = new Yaml();
-        try (InputStream inputStream = ConsoleConfig.class.getResourceAsStream("/console.yaml")) {
-            consoleConfig = yaml.loadAs(inputStream, ConsoleConfig.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

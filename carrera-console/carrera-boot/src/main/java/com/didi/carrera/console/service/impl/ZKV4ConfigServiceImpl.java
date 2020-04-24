@@ -83,6 +83,9 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
     @Autowired
     private ZkService zkService;
 
+    @Autowired
+    private ConsoleConfig consoleConfig;
+
     private Map<Long, MqServer> getMqServerMap() {
         Map<Long, MqServer> mqServerMap = Maps.newHashMap();
         mqServerService.findAll().forEach(mqServer -> mqServerMap.put(mqServer.getId(), mqServer));
@@ -123,7 +126,7 @@ public class ZKV4ConfigServiceImpl implements ZKV4ConfigService {
     public void initZkPath() throws Exception {
         ParameterDynamicZookeeper parameterDynamic = null;
         try {
-            ParameterDynamicConfig config = new ParameterDynamicConfig(ConsoleConfig.instance().getZookeeper());
+            ParameterDynamicConfig config = new ParameterDynamicConfig(consoleConfig.getZookeeper());
             config.setConfigCentre(true);
             parameterDynamic = new ParameterDynamicZookeeper(config);
             parameterDynamic.setData("/carrera/v4/config/topic", "default");

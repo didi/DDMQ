@@ -46,6 +46,9 @@ public class InternalController extends AbstractBaseController {
     @Autowired
     private ZKV4ConfigService zkv4ConfigService;
 
+    @Autowired
+    private ConsoleConfig consoleConfig;
+
     public static boolean validate(final String ip) {
         String PATTERN = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
         return ip.matches(PATTERN);
@@ -55,8 +58,8 @@ public class InternalController extends AbstractBaseController {
     @RequestMapping(value = {"/login"}, method = {RequestMethod.GET})
     public ConsoleBaseResponse<?> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) {
         try {
-            if (ConsoleConfig.instance().getCarreraAdminUser().contains(username)
-                    && ConsoleConfig.instance().getCarreraAdminPassword().contains(password)) {
+            if (consoleConfig.getCarreraAdminUser().contains(username)
+                    && consoleConfig.getCarreraAdminPassword().contains(password)) {
 
                 response.addCookie(CookieUtil.newCookie());
                 return ConsoleBaseResponse.success("success");

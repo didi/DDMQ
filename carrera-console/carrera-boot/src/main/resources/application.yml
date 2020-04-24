@@ -25,5 +25,9 @@ logs:
 
 
 console:
+  env: test
   carrera:
     zookeeper: localhost:9181
+  admin:
+    user: admin,felix
+    password: admin
