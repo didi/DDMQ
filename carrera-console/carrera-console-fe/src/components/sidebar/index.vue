@@ -3,7 +3,7 @@
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  width: 197px;
+  width: 200px;
   background: #1b2d4b;
   font-size: 1.4rem;
   color: #dbdee3;

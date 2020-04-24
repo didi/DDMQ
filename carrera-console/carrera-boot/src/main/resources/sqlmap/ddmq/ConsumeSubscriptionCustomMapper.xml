@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.didi.carrera.console.dao.mapper.custom.ConsumeSubscriptionCustomMapper">
+
+    <resultMap id="BaseResultMap" type="com.didi.carrera.console.dao.model.custom.CustomConsumeSubscription">
+        <result column="group_id" jdbcType="BIGINT" property="groupId"/>
+        <result column="group_name" jdbcType="VARCHAR" property="groupName"/>
+        <result column="contacters" jdbcType="VARCHAR" property="contacters"/>
+        <result column="topic_id" jdbcType="BIGINT" property="topicId"/>
+        <result column="cluster_id" jdbcType="BIGINT" property="clusterId"/>
+        <result column="state" jdbcType="TINYINT" property="state"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <select id="selectByTopicIdClusterId" resultMap="BaseResultMap">
+        select
+        a.group_id, b.group_name, b.contacters, a.topic_id, a.cluster_id, a.state, b.create_time
+        from consume_subscription a
+        JOIN consume_group b ON (a.group_id=b.id)
+        where
+        a.is_delete = 0
+        AND b.is_delete = 0
+        AND a.topic_id=#{topicId}
+        AND a.cluster_id=#{clusterId}
+    </select>
+
+
+    <select id="selectStateCountByGroupId" resultType="com.didi.carrera.console.dao.model.custom.CustomSubscriptionStateCount">
+        select
+        group_id as groupId, state, count(id) as count
+        from consume_subscription
+        where
+        is_delete = 0
+        AND group_id in
+        <foreach item="item" collection="list" index="index" open="(" separator="," close=")">#{item}</foreach>
+        group by group_id,state
+    </select>
+
+    <select id="selectByCondition" resultMap="com.didi.carrera.console.dao.mapper.ConsumeSubscriptionMapper.ResultMapWithBLOBs">
+        select
+        b.id, b.group_id, b.group_name, b.topic_id, b.topic_name, b.cluster_id, b.cluster_name, b.pressure_traffic, b.max_tps, b.alarm_type, b.alarm_is_enable, b.alarm_level, b.alarm_msg_lag, b.alarm_delay_time, b.api_type, b.consume_timeout, b.error_retry_times, b.retry_intervals, b.msg_type, b.enable_groovy, b.enable_transit,transit, b.enable_order, b.order_key, b.consume_type, b.urls, b.http_method, b.http_headers, b.http_query_params, b.msg_push_type, b.http_token, b.push_max_concurrency, b.actions, b.big_data_type, b.big_data_config, b.config, b.state, b.extra_params, b.remark, b.is_delete, b.create_time, b.modify_time, b.groovy
+        from consume_group a left join consume_subscription b on a.id=b.group_id
+        where
+        a.is_delete = 0
+        and b.is_delete = 0
+        <if test="contacters != null and contacters != ''">
+            AND a.contacters LIKE #{contacters}
+        </if>
+        <if test="groupId != null and groupId > 0">
+            AND b.group_id = #{groupId}
+        </if>
+        <if test="clusterId != null and clusterId > 0">
+            AND b.cluster_id = #{clusterId}
+        </if>
+        <if test="consumeType != null">
+            AND b.consume_type = #{consumeType}
+        </if>
+        <if test="state != null">
+            AND b.state = #{state}
+        </if>
+        <if test="text != null and text != ''">
+            AND (
+            b.group_name LIKE #{text}
+            OR b.cluster_name LIKE #{text}
+            OR b.topic_name LIKE #{text}
+            )
+        </if>
+        ORDER BY b.create_time DESC
+        <if test="limit != null and limit >= 0 ">
+            limit #{limit}
+        </if>
+        <if test="limit != null and limit >= 0 and size != null and size >= 0">
+            , #{size}
+        </if>
+    </select>
+
+    <select id="selectCountByCondition" resultType="java.lang.Integer">
+        select
+        count(*)
+        from consume_group a left join consume_subscription b on a.id=b.group_id
+        where
+        a.is_delete = 0
+        and b.is_delete = 0
+
+        <if test="contacters != null and contacters != ''">
+            AND a.contacters LIKE #{contacters}
+        </if>
+
+        <if test="groupId != null and groupId > 0">
+            AND b.group_id = #{groupId}
+        </if>
+        <if test="clusterId != null and clusterId > 0">
+            AND b.cluster_id = #{clusterId}
+        </if>
+        <if test="consumeType != null">
+            AND b.consume_type = #{consumeType}
+        </if>
+        <if test="state != null">
+            AND b.state = #{state}
+        </if>
+        <if test="text != null and text != ''">
+            AND (
+            b.group_name LIKE #{text}
+            OR b.cluster_name LIKE #{text}
+            OR b.topic_name LIKE #{text}
+            )
+        </if>
+    </select>
+
+</mapper>

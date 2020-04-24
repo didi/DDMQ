@@ -10,8 +10,8 @@ fi
 
 # run mysql container
 echo 'start mysql container...'
-docker run -d --rm --name mysql -p 127.0.0.1:3306:3306 -t mysql:1.0
+docker run -d --rm --name mysql -p 3306:3306 -t mysql:1.0
 
 # run ddmq container
 echo 'start ddmq container.'
-docker run -i --rm -t -p 127.0.0.1:8080:8080 -p 127.0.0.1:9613:9613 -p 127.0.0.1:9713:9713 --name ddmq --link mysql ddmq:1.0
+docker run -d --rm -t -p 8080:8080 -p 9613:9613 -p 9713:9713 -p 9181:2181 -p 9876:9876 --name ddmq --link mysql ddmq:1.0
