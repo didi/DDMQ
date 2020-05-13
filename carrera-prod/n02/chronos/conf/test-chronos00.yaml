@@ -1,0 +1,118 @@
+#所属集群, 用于选举master
+clusterName : test
+#所属集群中的组, 用于选举master
+groupName : group_0
+pullOn : true
+pushOn : true
+deleteOn : true
+standAlone : false
+fakeSend : false
+
+dbConfig:
+  dbPath : "/home/xiaoju/chronos-storage/rocksdb"
+  seekTimestampPath : "/home/xiaoju/chronos-storage/seektimestamp"
+
+  # path Where to keep the backup files. Has to be different than dbname
+  dbPathBackup : "/home/xiaoju/chronos-storage/rocksdb_backup"
+  dbPathRestore : "/home/xiaoju/chronos-storage/rocksdb_restore"
+
+  # https://github.com/facebook/rocksdb/wiki/RocksDB-Tuning-Guide#compaction-stats
+  # Parallelism options
+  # In LSM architecture, there are two background processes: flush and compaction.
+  # Both can execute concurrently via threads to take advantage of storage technology
+  # concurrency. Flush threads are in the HIGH priority pool, while compaction threads
+  # are in the LOW priority pool. To benefit from more threads you might need to set
+  # these options to change the max number of concurrent compactions and flushes:
+  # max_background_flushes is the maximum number of concurrent flush operations.
+  # It is usually good enough to set this to 1.
+  maxBackgroundFlushes : 10
+
+  # max_background_compactions is the maximum number of concurrent background compactions.
+  # The default is 1, but to fully utilize your CPU and storage you might want to
+  # increase this to approximately number of cores in the system.
+  maxBackgroundCompactions : 35
+  baseBackgroundCompactions : 5
+
+  # RocksDB memtable 的大小, 单位 MB
+  writeBufferSize : 128
+
+  # 最多允许几个 memtable 存在。写入到 RocksDB 的数据首先会记录到 WAL 日志里面，然后会插入到
+  # memtable 里面，当 memtable 的大小到达了 write-buffer-size 限定的大小的时候，当前的
+  # memtable 会变成只读的，然后生成一个新的 memtable 接收新的写入。只读的 memtable 会被
+  # RocksDB 的 flush 线程（max-background-flushes 参数能够控制 flush 线程的最大个数）
+  # flush 到磁盘，成为 level0 的一个 sst 文件。当 flush 线程忙不过来，导致等待 flush 到磁盘的
+  # memtable 的数量到达 max-write-buffer-number 限定的个数的时候，RocksDB 会将新的写入
+  # stall 住，stall 是 RocksDB 的一种流控机制。在导数据的时候可以将 max-write-buffer-number
+  # 的值设置的更大一点，例如 10。
+  maxWriteBufferNumber : 10
+
+  maxSubcompactions : 10
+
+  # 当 level0 的 sst 文件个数到达 level0-slowdown-writes-trigger 指定的限度的时候，
+  # RocksDB 会尝试减慢写入的速度。因为 level0 的 sst 太多会导致 RocksDB 的读放大上升。
+  # level0-slowdown-writes-trigger 和 level0-stop-writes-trigger 是 RocksDB 进行流控的
+  # 另一个表现。当 level0 的 sst 的文件个数到达 4（默认值），level0 的 sst 文件会和 level1 中
+  # 有 overlap 的 sst 文件进行 compaction，缓解读放大的问题。
+  level0SlowdownWritesTrigger : 30
+
+  # 当 level0 的 sst 文件个数到达 level0-stop-writes-trigger 指定的限度的时候，RocksDB 会
+  # stall 住新的写入。
+  level0StopWritesTrigger : 50
+
+  # 当 level1 的数据量大小达到 max-bytes-for-level-base 限定的值的时候，会触发 level1 的
+  # sst 和 level2 种有 overlap 的 sst 进行 compaction。
+  # 黄金定律：max-bytes-for-level-base 的设置的第一参考原则就是保证和 level0 的数据量大致相
+  # 等，这样能够减少不必要的 compaction。例如压缩方式为"no:no:lz4:lz4:lz4:lz4:lz4"，那么
+  # max-bytes-for-level-base 的值应该是 write-buffer-size 的大小乘以 4，因为 level0 和
+  # level1 都没有压缩，而且 level0 触发 compaction 的条件是 sst 的个数到达 4（默认值）。在
+  # level0 和 level1 都采取了压缩的情况下，就需要分析下 RocksDB 的日志，看一个 memtable 的压
+  # 缩成一个 sst 文件的大小大概是多少，例如 32MB，那么 max-bytes-for-level-base 的建议值就应
+  # 该是 32MB * 4 = 128MB。
+  maxBytesForLevelBase : 512
+
+
+  # sst 文件的大小。level0 的 sst 文件的大小受 write-buffer-size 和 level0 采用的压缩算法的
+  # 影响，target-file-size-base 参数用于控制 level1-level6 单个 sst 文件的大小。
+  targetFileSizeBase : 128
+
+  delayedWriteRate : 64
+
+pullConfig:
+  innerGroup : cg_R_test_chronos_inner_0_0
+  innerTopic : R_test_chronos_inner_0
+  cproxyAddrs : 127.0.0.1:9713 #分号分割
+  retryIntervalMs : 500
+  maxBatchSize : 200
+  timeoutMs : 3000
+  pullBatchItemNum : 10000
+  threadNum : 10
+  msgByteBaseLen : 1000
+
+pushConfig:
+  pproxyAddrs :
+    - 127.0.0.1:9613
+  proxyTimeoutMs : 200
+  clientRetry : 2
+  clientTimeoutMs : 300
+  poolSize : 100
+  pushIntervalMs : 300
+  batchSendThreadNum : 50
+
+deleteConfig:
+  deleteWhen : 04
+  saveHours : 6
+
+zkConfig:
+  zkAddrs : "127.0.0.1:2181"
+  zkSessionTimeoutMs : 30000
+  masterPathPrefix : "/chronos/master"
+  metaPathPrefix : "/chronos/meta"
+  offsetsProp : "offsets"
+  seekTimestampProp : "seektimestamp"
+  baseSleepTimeMs : 10   #baseSleepTimeMs initial amount of time to wait between retries
+  maxSleepMs : 1000      #maxSleepMs max time in ms to sleep on each retry
+  maxRetries : 5         #maxRetries max number of times to retry
+
+
+
+

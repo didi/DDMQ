@@ -1,0 +1,3 @@
+zookeeperAddr: 172.18.0.4:2181/carrera/v4/config # config zk cluster address here.
+host: 172.18.0.4 # local ip
+port: 9713 # thrift server port.
