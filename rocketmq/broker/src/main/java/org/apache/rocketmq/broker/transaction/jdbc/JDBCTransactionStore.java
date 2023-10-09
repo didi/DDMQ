@@ -119,12 +119,12 @@ public class JDBCTransactionStore implements TransactionStore {
     }
 
     private boolean createDB() {
-        Statement statement = null;
+        PreparedStatement statement = null;
         try {
-            statement = this.connection.createStatement();
-
             String sql = this.createTableSql();
             log.info("createDB SQL:\n {}", sql);
+
+            statement = this.connection.prepareStatement(sql);
             statement.execute(sql);
             this.connection.commit();
             return true;
